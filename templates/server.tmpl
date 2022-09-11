@@ -1,6 +1,8 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -8,6 +10,6 @@ import (
 
 {{ template "unimplemented_server.tmpl" .}}
 
-{{ template "request_models.tmpl" .}}
+{{ template "models.tmpl" .}}
 
 {{ template "register_server.tmpl" .}}
