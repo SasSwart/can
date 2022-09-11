@@ -1,0 +1,13 @@
+package api
+
+import (
+	"github.com/gin-gonic/gin"
+)
+
+{{ template "server_interface.tmpl" . }}
+
+{{ template "unimplemented_server.tmpl" .}}
+
+{{ template "request_models.tmpl" .}}
+
+{{ template "register_server.tmpl" .}}

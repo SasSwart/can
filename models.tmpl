@@ -1,0 +1,8 @@
+{{- range $pathName, $pathItem := .Paths -}}
+{{- $funcName := pathNameToFuncName $pathName -}}
+{{- if $pathItem.Get -}}{{- $method := "Get" -}}{{- end -}}
+
+{{ template "request_model.tmpl"}}
+{{ template "response_model.tmpl"}}
+
+{{- end -}}

@@ -1,0 +1,7 @@
+func RegisterServer(e *gin.Engine, srv Server) {
+	{{- range . }}
+	e.{{ .Method | ToUpper }}("{{ .Path }}", func(c *gin.Context) {
+		srv.{{ .Name }}{{ .Method }}(c, &{{ .Name }}{{ .Method }}Request{})
+	})
+	{{- end }}
+}

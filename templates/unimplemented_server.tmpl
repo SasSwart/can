@@ -1,0 +1,4 @@
+type UnimplementedServer struct{}
+{{ range . }}
+func (UnimplementedServer) {{ .Name }}{{ .Method }}(*gin.Context, *{{ .Name }}{{ .Method }}Request) {}
+{{- end -}}
