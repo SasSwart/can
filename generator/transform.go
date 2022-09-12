@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"fmt"
 	"strings"
 
 	"github.gom/sasswart/gin-in-a-can/openapi"
@@ -32,6 +33,16 @@ type Route struct {
 func NewRoute(pathName, method string) Route {
 	caser := cases.Title(language.English)
 
+	return Route{
+		Method: caser.String(method),
+		Name:   funcName(pathName, method),
+		Path:   ginPathName(pathName),
+	}
+}
+
+func funcName(pathName, method string) string {
+	caser := cases.Title(language.English)
+
 	pathSegments := strings.Split(pathName, "/")
 	nameSegments := make([]string, len(pathSegments))
 	for _, segment := range pathSegments {
@@ -45,9 +56,18 @@ func NewRoute(pathName, method string) Route {
 		nameSegments = append(nameSegments, caser.String(segment))
 	}
 
-	return Route{
-		Method: caser.String(method),
-		Name:   strings.Join(nameSegments, ""),
-		Path:   pathNameToGinPathName(pathName),
+	return strings.Join(nameSegments, "")
+}
+
+func ginPathName(pathName string) string {
+	pathSegments := strings.Split(pathName, "/")
+	for i, segment := range pathSegments {
+		if len(segment) == 0 {
+			continue
+		}
+		if segment[0] == '{' {
+			pathSegments[i] = fmt.Sprintf(":%s", segment[1:len(segment)-1])
+		}
 	}
+	return strings.Join(pathSegments, "/")
 }

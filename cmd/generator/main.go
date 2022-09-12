@@ -15,8 +15,5 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Lex
 	generator.Generate(apiSpec)
-	// Parse
-	// Generate
 }
