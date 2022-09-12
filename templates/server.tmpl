@@ -1,3 +1,5 @@
+// GENERATED CODE. DO NOT EDIT
+
 package api
 
 import (
