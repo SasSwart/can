@@ -15,5 +15,5 @@ func main() {
 		os.Exit(1)
 	}
 
-	generator.Generate(apiSpec)
+	fmt.Println(string(generator.Generate(apiSpec)))
 }
