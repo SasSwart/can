@@ -1,7 +1,21 @@
 func RegisterServer(e *gin.Engine, srv Server) {
 	{{- range . }}
 	e.{{ .Method | ToUpper }}("{{ .Path }}", func(c *gin.Context) {
-		response := srv.{{ .Name }}{{ .Method }}(c, &{{ .Name }}{{ .Method }}Request{})
+		request := &{{ .Name }}{{ .Method }}Request{
+		{{- range .Parameters }}
+			{{ .Name }}: c.Param("{{ .Name }}"),
+		{{- end }}
+		}
+		if err := request.valid(); err != nil {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
+
+		response, err := srv.{{ .Name }}{{ .Method }}(c, request)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err)
+			return
+		}
 		c.JSON(http.StatusOK, response)
 	})
 	{{- end }}

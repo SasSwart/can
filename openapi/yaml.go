@@ -54,6 +54,7 @@ type Parameter struct {
 	Description     string
 	Required        bool
 	AllowEmptyValue bool
+	Schema          Schema
 }
 
 type RequestBody struct{}
@@ -68,6 +69,7 @@ type MediaType struct {
 }
 
 type Schema struct {
+	Type string
 }
 
 type ExternalDocs struct {

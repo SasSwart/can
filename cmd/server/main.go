@@ -10,6 +10,10 @@ type server struct {
 	api.UnimplementedServer
 }
 
+func (s server) UserGet(*gin.Context, *api.UserGetRequest) (*api.UserGetResponse, error) {
+	return &api.UserGetResponse{}, nil
+}
+
 // Compile time assertion that server must implement the api.Server interface
 var _ api.Server = server{}
 

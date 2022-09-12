@@ -1,4 +1,13 @@
 {{- range . }}
-type {{ .Name }}{{ .Method }}Request struct {}
+type {{ .Name }}{{ .Method }}Request struct {
+{{- range .Parameters }}
+	{{ .Name }} {{ .Schema.Type }}
+{{- end }}
+}
+
+func (req {{ .Name }}{{ .Method }}Request)valid() error {
+	return nil
+}
+
 type {{ .Name }}{{ .Method }}Response struct {}
 {{- end }}

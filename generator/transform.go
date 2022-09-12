@@ -12,10 +12,12 @@ import (
 func NewServerInterface(apiSpec *openapi.OpenAPI) ServerInterface {
 	serverInterface := ServerInterface{}
 	for pathName, pathItem := range apiSpec.Paths {
-		for method := range pathItem.Operations() {
+		for method, operation := range pathItem.Operations() {
 			serverInterface = append(serverInterface, NewRoute(
 				pathName,
 				method,
+				pathItem.Parameters,
+				operation.Responses,
 			))
 		}
 	}
@@ -25,18 +27,22 @@ func NewServerInterface(apiSpec *openapi.OpenAPI) ServerInterface {
 type ServerInterface []Route
 
 type Route struct {
-	Name   string
-	Path   string
-	Method string
+	Name       string
+	Path       string
+	Method     string
+	Parameters []openapi.Parameter
+	Responses  map[string]openapi.Response
 }
 
-func NewRoute(pathName, method string) Route {
+func NewRoute(pathName, method string, parameters []openapi.Parameter, responses map[string]openapi.Response) Route {
 	caser := cases.Title(language.English)
 
 	return Route{
-		Method: caser.String(method),
-		Name:   funcName(pathName, method),
-		Path:   ginPathName(pathName),
+		Method:     caser.String(method),
+		Name:       funcName(pathName, method),
+		Path:       ginPathName(pathName),
+		Parameters: parameters,
+		Responses:  responses,
 	}
 }
 
