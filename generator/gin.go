@@ -1,21 +1,16 @@
 package generator
 
 import (
-	"os"
+	"bytes"
 	"strings"
 	"text/template"
 
 	"github.gom/sasswart/gin-in-a-can/openapi"
 )
 
-func Generate(apiSpec *openapi.OpenAPI) map[string][]byte {
-	buffers := make(map[string][]byte)
-	buffers["server.go"] = server(apiSpec)
+func Generate(apiSpec *openapi.OpenAPI) []byte {
+	buff := bytes.NewBuffer([]byte{})
 
-	return buffers
-}
-
-func server(apiSpec *openapi.OpenAPI) []byte {
 	templater := template.New("server.tmpl")
 
 	templater.Funcs(template.FuncMap{
@@ -27,10 +22,10 @@ func server(apiSpec *openapi.OpenAPI) []byte {
 		panic(err)
 	}
 
-	err = parsedTemplate.Execute(os.Stdout, NewServerInterface(apiSpec))
+	err = parsedTemplate.Execute(buff, NewServerInterface(apiSpec))
 	if err != nil {
 		panic(err)
 	}
 
-	return []byte{}
+	return buff.Bytes()
 }
