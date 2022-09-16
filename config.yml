@@ -1,0 +1,5 @@
+openAPIFile: ./docs/openapi.yml
+moduleName: github.gom/sasswart/gin-in-a-can
+outputPath: .
+basePackageName: api
+InvalidRequestStatus: 400

@@ -1,12 +1,24 @@
 func RegisterServer(e *gin.Engine, srv Server) {
 	{{- range . }}
 	e.{{ .Method | ToUpper }}("{{ .Path }}", func(c *gin.Context) {
+		{{- if eq .RequestBody.Type "struct" }}
+		// Load and validate request Body
+		var body models.{{ .Name }}{{ .Method }}Body
+		err := c.ShouldBindJSON(&body)
+		if err != nil {
+				c.JSON(http.StatusBadRequest, err)
+				return
+		}
+		{{ end }}
 		request := &models.{{ .Name }}{{ .Method }}Request{
 		{{- range .Parameters }}
 			{{ .Name | ToTitle }}:
 			{{- if eq .In "path" }} c.Param("{{ .Name }}"), {{- end -}}
 			{{- if eq .In "query" }} c.Query("{{ .Name }}"), {{- end -}}
 		{{- end }}
+			{{- if eq .RequestBody.Type "struct" }}
+			{{ .Name }}{{ .Method }}Body: body,
+			{{ end }}
 		}
 		if err := request.Valid(); err != nil {
 			c.JSON(http.StatusBadRequest, err)
