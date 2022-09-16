@@ -32,7 +32,7 @@ type Route struct {
 	Path        string
 	Method      string
 	Parameters  []openapi.Parameter
-	Responses   map[string]openapi.Response
+	Responses   map[string]Schema
 	RequestBody Schema
 }
 
@@ -78,12 +78,16 @@ func NewSchema(schema openapi.Schema) Schema {
 
 func NewRoute(pathName, method string, parameters []openapi.Parameter, requestBody openapi.RequestBody, responses map[string]openapi.Response) Route {
 	caser := cases.Title(language.English)
+	transformedResponses := make(map[string]Schema)
+	for r, response := range responses {
+		transformedResponses[r] = NewSchema(response.Content["application/json"].Schema)
+	}
 	return Route{
 		Method:      caser.String(method),
 		Name:        funcName(pathName),
 		Path:        ginPathName(pathName),
 		Parameters:  parameters,
-		Responses:   responses,
+		Responses:   transformedResponses,
 		RequestBody: NewRequestBody(requestBody),
 	}
 }

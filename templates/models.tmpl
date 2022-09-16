@@ -31,7 +31,11 @@ type {{ $name }}{{ $method }}Response interface {
     mustImplement{{ $name }}{{ $method }}Response()
 }
 {{ range $code, $response := .Responses -}}
-type {{ $name }}{{ $method }}{{ $code }}Response struct {}
+type {{ $name }}{{ $method }}{{ $code }}Response struct {
+    {{- range $name, $schema := $response.Properties }}
+    	{{ $name | ToTitle }} {{ $schema.Type }}
+    {{- end }}
+}
 func ({{ $name }}{{ $method }}{{ $code }}Response)mustImplement{{ $name }}{{ $method }}Response() {}
 
 {{ end }}
