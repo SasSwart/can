@@ -2,99 +2,6 @@
 
 package models
 
-type UserPostRequest struct {
-	Name string
-    UserPostBody UserPostBody
-}
-
-
-type UserPostBody struct {
-	Enabled bool
-	Name string
-	Options []string
-	Password string
-}
-
-
-func (req UserPostRequest)Valid() error {
-	return nil
-}
-
-
-
-type UserPostResponse interface {
-    mustImplementUserPostResponse()
-}
-type UserPost204Response struct {
-}
-func (UserPost204Response)mustImplementUserPostResponse() {}
-
-type UserPost400Response struct {
-}
-func (UserPost400Response)mustImplementUserPostResponse() {}
-
-type UserPost500Response struct {
-}
-func (UserPost500Response)mustImplementUserPostResponse() {}
-
-type UserDeleteRequest struct {
-	Name string
-}
-
-
-
-func (req UserDeleteRequest)Valid() error {
-	return nil
-}
-
-
-
-type UserDeleteResponse interface {
-    mustImplementUserDeleteResponse()
-}
-type UserDelete204Response struct {
-}
-func (UserDelete204Response)mustImplementUserDeleteResponse() {}
-
-type UserDelete400Response struct {
-}
-func (UserDelete400Response)mustImplementUserDeleteResponse() {}
-
-type UserDelete500Response struct {
-}
-func (UserDelete500Response)mustImplementUserDeleteResponse() {}
-
-type UserGetRequest struct {
-	Name string
-}
-
-
-
-func (req UserGetRequest)Valid() error {
-	return nil
-}
-
-
-
-type UserGetResponse interface {
-    mustImplementUserGetResponse()
-}
-type UserGet200Response struct {
-    	Enabled bool
-    	Name string
-    	Options []string
-    	Password string
-}
-func (UserGet200Response)mustImplementUserGetResponse() {}
-
-type UserGet400Response struct {
-}
-func (UserGet400Response)mustImplementUserGetResponse() {}
-
-type UserGet500Response struct {
-}
-func (UserGet500Response)mustImplementUserGetResponse() {}
-
 type UserPatchRequest struct {
 	Name string
     UserPatchBody UserPatchBody
@@ -123,12 +30,121 @@ type UserPatch201Response struct {
 func (UserPatch201Response)mustImplementUserPatchResponse() {}
 
 type UserPatch400Response struct {
+    	Code string
+    	Error string
 }
 func (UserPatch400Response)mustImplementUserPatchResponse() {}
 
 type UserPatch500Response struct {
+    	Code string
+    	Error string
 }
 func (UserPatch500Response)mustImplementUserPatchResponse() {}
+
+type UserPostRequest struct {
+	Name string
+    UserPostBody UserPostBody
+}
+
+
+type UserPostBody struct {
+	Enabled bool
+	Name string
+	Options []string
+	Password string
+}
+
+
+func (req UserPostRequest)Valid() error {
+	return nil
+}
+
+
+
+type UserPostResponse interface {
+    mustImplementUserPostResponse()
+}
+type UserPost204Response struct {
+}
+func (UserPost204Response)mustImplementUserPostResponse() {}
+
+type UserPost400Response struct {
+    	Code string
+    	Error string
+}
+func (UserPost400Response)mustImplementUserPostResponse() {}
+
+type UserPost500Response struct {
+    	Code string
+    	Error string
+}
+func (UserPost500Response)mustImplementUserPostResponse() {}
+
+type UserDeleteRequest struct {
+	Name string
+}
+
+
+
+func (req UserDeleteRequest)Valid() error {
+	return nil
+}
+
+
+
+type UserDeleteResponse interface {
+    mustImplementUserDeleteResponse()
+}
+type UserDelete204Response struct {
+}
+func (UserDelete204Response)mustImplementUserDeleteResponse() {}
+
+type UserDelete400Response struct {
+    	Code string
+    	Error string
+}
+func (UserDelete400Response)mustImplementUserDeleteResponse() {}
+
+type UserDelete500Response struct {
+    	Code string
+    	Error string
+}
+func (UserDelete500Response)mustImplementUserDeleteResponse() {}
+
+type UserGetRequest struct {
+	Name string
+}
+
+
+
+func (req UserGetRequest)Valid() error {
+	return nil
+}
+
+
+
+type UserGetResponse interface {
+    mustImplementUserGetResponse()
+}
+type UserGet200Response struct {
+    	Enabled bool
+    	Name string
+    	Options []string
+    	Password string
+}
+func (UserGet200Response)mustImplementUserGetResponse() {}
+
+type UserGet400Response struct {
+    	Code string
+    	Error string
+}
+func (UserGet400Response)mustImplementUserGetResponse() {}
+
+type UserGet500Response struct {
+    	Code string
+    	Error string
+}
+func (UserGet500Response)mustImplementUserGetResponse() {}
 
 type ProjectDeleteRequest struct {
 	Id string
@@ -150,10 +166,14 @@ type ProjectDelete200Response struct {
 func (ProjectDelete200Response)mustImplementProjectDeleteResponse() {}
 
 type ProjectDelete400Response struct {
+    	Code string
+    	Error string
 }
 func (ProjectDelete400Response)mustImplementProjectDeleteResponse() {}
 
 type ProjectDelete500Response struct {
+    	Code string
+    	Error string
 }
 func (ProjectDelete500Response)mustImplementProjectDeleteResponse() {}
 
@@ -177,10 +197,14 @@ type ProjectGet200Response struct {
 func (ProjectGet200Response)mustImplementProjectGetResponse() {}
 
 type ProjectGet400Response struct {
+    	Code string
+    	Error string
 }
 func (ProjectGet400Response)mustImplementProjectGetResponse() {}
 
 type ProjectGet500Response struct {
+    	Code string
+    	Error string
 }
 func (ProjectGet500Response)mustImplementProjectGetResponse() {}
 
@@ -204,10 +228,14 @@ type ProjectPatch200Response struct {
 func (ProjectPatch200Response)mustImplementProjectPatchResponse() {}
 
 type ProjectPatch400Response struct {
+    	Code string
+    	Error string
 }
 func (ProjectPatch400Response)mustImplementProjectPatchResponse() {}
 
 type ProjectPatch500Response struct {
+    	Code string
+    	Error string
 }
 func (ProjectPatch500Response)mustImplementProjectPatchResponse() {}
 
@@ -231,10 +259,14 @@ type ProjectPost200Response struct {
 func (ProjectPost200Response)mustImplementProjectPostResponse() {}
 
 type ProjectPost400Response struct {
+    	Code string
+    	Error string
 }
 func (ProjectPost400Response)mustImplementProjectPostResponse() {}
 
 type ProjectPost500Response struct {
+    	Code string
+    	Error string
 }
 func (ProjectPost500Response)mustImplementProjectPostResponse() {}
 

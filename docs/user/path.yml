@@ -4,8 +4,12 @@
   content:
     application/json:
       schema:
-        type: string
-        summary: "Manage users"
+        type: object
+        properties:
+          error:
+            type: string
+          code:
+            type: string
 # Path
 description: |
   Users for a sample API

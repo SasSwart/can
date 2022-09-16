@@ -9,6 +9,9 @@ import (
 type UnimplementedServer struct{}
 
 
+func (UnimplementedServer) UserPatch(requestModel *models.UserPatchRequest) (models.UserPatchResponse, error) {
+  return models.UserPatch400Response{}, nil
+}
 func (UnimplementedServer) UserPost(requestModel *models.UserPostRequest) (models.UserPostResponse, error) {
   return models.UserPost400Response{}, nil
 }
@@ -17,9 +20,6 @@ func (UnimplementedServer) UserDelete(requestModel *models.UserDeleteRequest) (m
 }
 func (UnimplementedServer) UserGet(requestModel *models.UserGetRequest) (models.UserGetResponse, error) {
   return models.UserGet400Response{}, nil
-}
-func (UnimplementedServer) UserPatch(requestModel *models.UserPatchRequest) (models.UserPatchResponse, error) {
-  return models.UserPatch400Response{}, nil
 }
 func (UnimplementedServer) ProjectDelete(requestModel *models.ProjectDeleteRequest) (models.ProjectDeleteResponse, error) {
   return models.ProjectDelete400Response{}, nil

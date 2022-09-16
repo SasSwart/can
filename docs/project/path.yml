@@ -4,9 +4,13 @@
   content:
     application/json:
       schema:
-        type: string
-        summary: "Manage users"
-  # Path
+        type: object
+        properties:
+          error:
+            type: string
+          code:
+            type: string
+# Path
 get:
   description: "Send a greeting using the name parameter"
   responses:
