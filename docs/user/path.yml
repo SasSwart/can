@@ -1,0 +1,64 @@
+# Anchors
+.error: &error
+  description: "An error has occurred"
+  content:
+    application/json:
+      schema:
+        type: string
+        summary: "Manage users"
+# Path
+description: |
+  Users for a sample API
+get:
+  description: "Show user details"
+  responses:
+    200:
+      description: "A successful greeting has been sent"
+      content:
+        application/json:
+          schema:
+            type: string
+    400: &400
+      <<: *error
+      description: "An invalid request has been sent"
+    500: &500
+      <<: *error
+post:
+  description: "Create a user"
+  responses:
+    204:
+      description: "A successful greeting has been sent"
+      content:
+        application/json:
+          schema:
+            type: string
+    400: *400
+    500: *500
+patch:
+  description: "Change user details"
+  responses:
+    204:
+      description: "A successful greeting has been sent"
+      content:
+        application/json:
+          schema:
+            type: string
+    400: *400
+    500: *500
+delete:
+  description: "Delete a user"
+  responses:
+    204:
+      description: "A successful greeting has been sent"
+      content:
+        application/json:
+          schema:
+            type: string
+    400: *400
+    500: *500
+parameters:
+  - name: name
+    in: path
+    required: true
+    schema:
+      type: string

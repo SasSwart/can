@@ -9,7 +9,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-func NewServerInterface(apiSpec *openapi.OpenAPI) ServerInterface {
+func NewServerInterface(apiSpec openapi.OpenAPI) ServerInterface {
 	serverInterface := ServerInterface{}
 	for pathName, pathItem := range apiSpec.Paths {
 		for method, operation := range pathItem.Operations() {
@@ -36,22 +36,36 @@ type Route struct {
 
 func NewRoute(pathName, method string, parameters []openapi.Parameter, responses map[string]openapi.Response) Route {
 	caser := cases.Title(language.English)
-
 	return Route{
 		Method:     caser.String(method),
-		Name:       funcName(pathName, method),
+		Name:       funcName(pathName),
 		Path:       ginPathName(pathName),
 		Parameters: parameters,
 		Responses:  responses,
 	}
 }
 
-func funcName(pathName, method string) string {
+type Response struct{}
+
+func NewResponseSlice(map[string]openapi.Response) {
+
+}
+
+func funcName(pathName string) string {
 	caser := cases.Title(language.English)
 
-	pathSegments := strings.Split(pathName, "/")
+	// Replace - with _ (- is not allowed in go func names)
+	pathSegments := strings.Split(pathName, "-")
 	nameSegments := make([]string, len(pathSegments))
-	for _, segment := range pathSegments {
+	for i, segment := range pathSegments {
+		nameSegments[i] = caser.String(segment)
+	}
+	pathName = strings.Join(nameSegments, "_")
+
+	// Convert from '/' delimited path to Camelcase func names
+	pathSegments = strings.Split(pathName, "/")
+	nameSegments = make([]string, len(pathSegments))
+	for i, segment := range pathSegments {
 		if len(segment) == 0 {
 			continue
 		}
@@ -59,7 +73,7 @@ func funcName(pathName, method string) string {
 			continue
 		}
 
-		nameSegments = append(nameSegments, caser.String(segment))
+		nameSegments[i] = caser.String(segment)
 	}
 
 	return strings.Join(nameSegments, "")

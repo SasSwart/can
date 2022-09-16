@@ -1,0 +1,9 @@
+openapi: 3.0.0
+info:
+  title: Sample
+  version: 0.0.1
+paths:
+  /user/{name}:
+    $ref: ./user/path.yml
+  /project/{name}:
+    $ref: ./project/path.yml

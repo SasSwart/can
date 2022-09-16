@@ -1,13 +1,28 @@
-{{- range . }}
+// GENERATED CODE. DO NOT EDIT
+
+package models
+
+{{ range .Spec -}}
 type {{ .Name }}{{ .Method }}Request struct {
 {{- range .Parameters }}
-	{{ .Name }} {{ .Schema.Type }}
+	{{ .Name | ToTitle }} {{ .Schema.Type }}
 {{- end }}
 }
 
-func (req {{ .Name }}{{ .Method }}Request)valid() error {
+func (req {{ .Name }}{{ .Method }}Request)Valid() error {
 	return nil
 }
 
-type {{ .Name }}{{ .Method }}Response struct {}
+{{ $name := .Name }}
+{{ $method := .Method }}
+type {{ $name }}{{ $method }}Response interface {
+    mustImplement{{ $name }}{{ $method }}Response()
+}
+{{ range $code, $response := .Responses -}}
+type {{ $name }}{{ $method }}{{ $code }}Response struct {}
+func ({{ $name }}{{ $method }}{{ $code }}Response)mustImplement{{ $name }}{{ $method }}Response() {}
+
+{{ end }}
 {{- end }}
+
+

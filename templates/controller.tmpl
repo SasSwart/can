@@ -1,0 +1,15 @@
+// GENERATED CODE. DO NOT EDIT
+
+package controller
+
+import (
+    "{{ .ModuleName }}/{{ .BasePackageName }}/models"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+{{ template "server_interface.tmpl" .Spec }}
+
+{{ template "register_server.tmpl" .Spec }}
+

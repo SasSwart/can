@@ -7,8 +7,11 @@ The features I need are:
 * To be able to register an existing gin Engine with predefined middleware.
 * To be able to use the generated code without modifying it.
 
-See openapi.yaml for a sample API.
-Also see api/server.go for an example of generated code based on the sample API.
+The entrypoint to this application is [cmd/generator/main.go](cmd/generator/main.go)
+
+
+See [docs/openapi.yml](docs/openapi.yml) for a sample API.
+Also see [cmd/server/main.go](cmd/server/main.go) for an example of how to use generated code.
 
 ## TODO
 * Add request and response schema attributes to their respective structs

@@ -1,5 +1,5 @@
 type Server interface {
   {{- range . }}
-  {{ .Name }}{{ .Method }}(*gin.Context, *{{ .Name }}{{ .Method }}Request) (*{{ .Name }}{{ .Method }}Response, error)
+  {{ .Name }}{{ .Method }}(*models.{{ .Name }}{{ .Method }}Request) (models.{{ .Name }}{{ .Method }}Response, error)
   {{- end }}
 }

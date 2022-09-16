@@ -4,28 +4,69 @@ import (
 	"bytes"
 	"strings"
 	"text/template"
-
-	"github.gom/sasswart/gin-in-a-can/openapi"
 )
 
-func Generate(apiSpec *openapi.OpenAPI) []byte {
+func GenerateController(config TemplateConfig) []byte {
 	buff := bytes.NewBuffer([]byte{})
 
-	templater := template.New("server.tmpl")
+	templater := template.New("controller.tmpl")
 
-	templater.Funcs(template.FuncMap{
-		"ToUpper": strings.ToUpper,
-	})
+	templater.Funcs(templateFuncMap)
 
 	parsedTemplate, err := templater.ParseGlob("templates/*.tmpl")
 	if err != nil {
 		panic(err)
 	}
 
-	err = parsedTemplate.Execute(buff, NewServerInterface(apiSpec))
+	err = parsedTemplate.Execute(buff, config)
 	if err != nil {
 		panic(err)
 	}
 
 	return buff.Bytes()
+}
+
+func GenerateModels(config TemplateConfig) []byte {
+	buff := bytes.NewBuffer([]byte{})
+
+	templater := template.New("models.tmpl")
+
+	templater.Funcs(templateFuncMap)
+
+	parsedTemplate, err := templater.ParseGlob("templates/*.tmpl")
+	if err != nil {
+		panic(err)
+	}
+
+	err = parsedTemplate.Execute(buff, config)
+	if err != nil {
+		panic(err)
+	}
+
+	return buff.Bytes()
+}
+
+func GenerateUnimplementedServer(config TemplateConfig) []byte {
+	buff := bytes.NewBuffer([]byte{})
+
+	templater := template.New("unimplemented_server.tmpl")
+
+	templater.Funcs(templateFuncMap)
+
+	parsedTemplate, err := templater.ParseGlob("templates/*.tmpl")
+	if err != nil {
+		panic(err)
+	}
+
+	err = parsedTemplate.Execute(buff, config)
+	if err != nil {
+		panic(err)
+	}
+
+	return buff.Bytes()
+}
+
+var templateFuncMap = template.FuncMap{
+	"ToUpper": strings.ToUpper,
+	"ToTitle": strings.ToTitle,
 }

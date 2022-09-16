@@ -1,6 +1,15 @@
+// GENERATED CODE. DO NOT EDIT
+
+package controller
+
+import (
+    "{{ .ModuleName }}/{{ .BasePackageName }}/models"
+)
+
 type UnimplementedServer struct{}
-{{ range . }}
-func (UnimplementedServer) {{ .Name }}{{ .Method }}(*gin.Context, *{{ .Name }}{{ .Method }}Request) (*{{ .Name }}{{ .Method }}Response, error) {
-  return &{{ .Name }}{{ .Method }}Response{}, nil
+{{ $InvalidRequestStatus := .InvalidRequestStatus }}
+{{ range .Spec }}
+func (UnimplementedServer) {{ .Name }}{{ .Method }}(requestModel *models.{{ .Name }}{{ .Method }}Request) (models.{{ .Name }}{{ .Method }}Response, error) {
+  return models.{{ .Name }}{{ .Method }}{{ $InvalidRequestStatus }}Response{}, nil
 }
 {{- end -}}

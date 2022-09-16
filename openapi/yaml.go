@@ -2,15 +2,31 @@ package openapi
 
 import (
 	"fmt"
-	"os"
-
 	"gopkg.in/yaml.v3"
+	"os"
+	"path"
 )
 
 type OpenAPI struct {
 	OpenAPI string
 	Info    Info
 	Paths   Paths
+}
+
+func (o *OpenAPI) ResolveRefs(basePath string) error {
+	for key, pathItem := range o.Paths {
+		if pathItem.Ref == "" {
+			continue
+		}
+		content, err := os.ReadFile(path.Join(basePath, pathItem.Ref))
+		if err != nil {
+			return fmt.Errorf("unable to resolve PathItem Reference: %w", err)
+		}
+		var newPathItem PathItem
+		yaml.Unmarshal(content, &newPathItem)
+		o.Paths[key] = newPathItem
+	}
+	return nil
 }
 
 type Info struct {
@@ -28,6 +44,7 @@ type PathItem struct {
 	Patch       Operation
 	Delete      Operation
 	Parameters  []Parameter
+	Ref         string `yaml:"$ref""`
 }
 
 func (p PathItem) Operations() map[string]Operation {

@@ -1,0 +1,62 @@
+# Anchors
+.error: &error
+  description: "An error has occurred"
+  content:
+    application/json:
+      schema:
+        type: string
+        summary: "Manage users"
+  # Path
+get:
+  description: "Send a greeting using the name parameter"
+  responses:
+    200:
+      description: "A successful greeting has been sent"
+      content:
+        application/json:
+          schema:
+            type: string
+    400: &400
+      <<: *error
+      description: "An invalid request has been sent"
+    500: &500
+      <<: *error
+post:
+  description: "Send a greeting using the name parameter"
+  responses:
+    200:
+      description: "A successful greeting has been sent"
+      content:
+        application/json:
+          schema:
+            type: string
+    400: *400
+    500: *500
+patch:
+  description: "Send a greeting using the name parameter"
+  responses:
+    200:
+      description: "A successful greeting has been sent"
+      content:
+        application/json:
+          schema:
+            type: string
+    400: *400
+    500: *500
+delete:
+  description: "Send a greeting using the name parameter"
+  responses:
+    200:
+      description: "A successful greeting has been sent"
+      content:
+        application/json:
+          schema:
+            type: string
+    400: *400
+    500: *500
+parameters:
+  - name: name
+    in: path
+    required: true
+    schema:
+      type: string
