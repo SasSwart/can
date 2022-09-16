@@ -2,71 +2,38 @@ package generator
 
 import (
 	"bytes"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"strings"
 	"text/template"
 )
 
-func GenerateController(config TemplateConfig) []byte {
+func Generate(config TemplateConfig, templateFile string) ([]byte, error) {
 	buff := bytes.NewBuffer([]byte{})
 
-	templater := template.New("controller.tmpl")
+	templater := template.New(templateFile)
 
 	templater.Funcs(templateFuncMap)
 
 	parsedTemplate, err := templater.ParseGlob("templates/*.tmpl")
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	err = parsedTemplate.Execute(buff, config)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return buff.Bytes()
-}
-
-func GenerateModels(config TemplateConfig) []byte {
-	buff := bytes.NewBuffer([]byte{})
-
-	templater := template.New("models.tmpl")
-
-	templater.Funcs(templateFuncMap)
-
-	parsedTemplate, err := templater.ParseGlob("templates/*.tmpl")
-	if err != nil {
-		panic(err)
-	}
-
-	err = parsedTemplate.Execute(buff, config)
-	if err != nil {
-		panic(err)
-	}
-
-	return buff.Bytes()
-}
-
-func GenerateUnimplementedServer(config TemplateConfig) []byte {
-	buff := bytes.NewBuffer([]byte{})
-
-	templater := template.New("unimplemented_server.tmpl")
-
-	templater.Funcs(templateFuncMap)
-
-	parsedTemplate, err := templater.ParseGlob("templates/*.tmpl")
-	if err != nil {
-		panic(err)
-	}
-
-	err = parsedTemplate.Execute(buff, config)
-	if err != nil {
-		panic(err)
-	}
-
-	return buff.Bytes()
+	return buff.Bytes(), nil
 }
 
 var templateFuncMap = template.FuncMap{
 	"ToUpper": strings.ToUpper,
-	"ToTitle": strings.ToTitle,
+	"ToTitle": toTitle,
+}
+
+func toTitle(s string) string {
+	caser := cases.Title(language.English)
+	return caser.String(s)
 }

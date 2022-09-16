@@ -38,21 +38,26 @@ func main() {
 		os.Exit(1)
 	}
 
-	controllerFile := generator.GenerateController(config.WithSpec(*apiSpec))
-	err = os.WriteFile("./api/controller/controller.go", controllerFile, 0777)
-	if err != nil {
-		fmt.Println(err)
-	}
+	outputPath := viper.GetString("outputPath")
+	basePackageName := viper.GetString("basePackageName")
+	configWithSpec := config.WithSpec(*apiSpec)
+	for _, target := range []struct {
+		pkg      string
+		file     string
+		template string
+	}{
+		{"controller", "controller.go", "controller.tmpl"},
+		{"controller", "unimplemented.go", "unimplemented.tmpl"},
+		{"models", "models.go", "models.tmpl"},
+	} {
+		file, err := generator.Generate(configWithSpec, target.template)
+		if err != nil {
+			fmt.Println(err)
+		}
 
-	modelsFile := generator.GenerateModels(config.WithSpec(*apiSpec))
-	err = os.WriteFile("./api/models/models.go", modelsFile, 0777)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	unimplementedServerFile := generator.GenerateUnimplementedServer(config.WithSpec(*apiSpec))
-	err = os.WriteFile("./api/controller/unimplemented.go", unimplementedServerFile, 0777)
-	if err != nil {
-		fmt.Println(err)
+		err = os.WriteFile(path.Join(outputPath, basePackageName, target.pkg, target.file), file, 0777)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 }

@@ -55,7 +55,7 @@ delete:
     400: *400
     500: *500
 parameters:
-  - name: name
+  - name: id
     in: path
     required: true
     schema:

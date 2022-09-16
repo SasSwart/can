@@ -3,7 +3,9 @@ func RegisterServer(e *gin.Engine, srv Server) {
 	e.{{ .Method | ToUpper }}("{{ .Path }}", func(c *gin.Context) {
 		request := &models.{{ .Name }}{{ .Method }}Request{
 		{{- range .Parameters }}
-			{{ .Name | ToTitle }}: c.Param("{{ .Name }}"),
+			{{ .Name | ToTitle }}:
+			{{- if eq .In "path" }} c.Param("{{ .Name }}"), {{- end -}}
+			{{- if eq .In "query" }} c.Query("{{ .Name }}"), {{- end -}}
 		{{- end }}
 		}
 		if err := request.Valid(); err != nil {

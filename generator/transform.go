@@ -16,7 +16,8 @@ func NewServerInterface(apiSpec openapi.OpenAPI) ServerInterface {
 			serverInterface = append(serverInterface, NewRoute(
 				pathName,
 				method,
-				pathItem.Parameters,
+				append(pathItem.Parameters, operation.Parameters...),
+				operation.RequestBody,
 				operation.Responses,
 			))
 		}
@@ -27,28 +28,64 @@ func NewServerInterface(apiSpec openapi.OpenAPI) ServerInterface {
 type ServerInterface []Route
 
 type Route struct {
-	Name       string
-	Path       string
-	Method     string
-	Parameters []openapi.Parameter
-	Responses  map[string]openapi.Response
+	Name        string
+	Path        string
+	Method      string
+	Parameters  []openapi.Parameter
+	Responses   map[string]openapi.Response
+	RequestBody Schema
 }
 
-func NewRoute(pathName, method string, parameters []openapi.Parameter, responses map[string]openapi.Response) Route {
-	caser := cases.Title(language.English)
-	return Route{
-		Method:     caser.String(method),
-		Name:       funcName(pathName),
-		Path:       ginPathName(pathName),
-		Parameters: parameters,
-		Responses:  responses,
+type Schema struct {
+	Properties map[string]Schema
+	Type       string
+}
+
+func NewRequestBody(body openapi.RequestBody) Schema {
+	return NewSchema(body.Content["application/json"].Schema)
+}
+
+func NewSchema(schema openapi.Schema) Schema {
+	var schemaType string
+	switch true {
+	case schema.Type == "object":
+		schemaType = "struct"
+
+		schemas := make(map[string]Schema)
+		for s, schema := range schema.Properties {
+			schemas[s] = NewSchema(schema)
+		}
+		return Schema{
+			Properties: schemas,
+			Type:       schemaType,
+		}
+		break
+	case schema.Type == "array":
+		itemSchema := NewSchema(*schema.Items)
+		return Schema{
+			Type: "[]" + itemSchema.Type,
+		}
+		break
+	case schema.Type == "boolean":
+		return Schema{
+			Type: "bool",
+		}
+	}
+	return Schema{
+		Type: schema.Type,
 	}
 }
 
-type Response struct{}
-
-func NewResponseSlice(map[string]openapi.Response) {
-
+func NewRoute(pathName, method string, parameters []openapi.Parameter, requestBody openapi.RequestBody, responses map[string]openapi.Response) Route {
+	caser := cases.Title(language.English)
+	return Route{
+		Method:      caser.String(method),
+		Name:        funcName(pathName),
+		Path:        ginPathName(pathName),
+		Parameters:  parameters,
+		Responses:   responses,
+		RequestBody: NewRequestBody(requestBody),
+	}
 }
 
 func funcName(pathName string) string {

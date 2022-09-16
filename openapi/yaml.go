@@ -25,6 +25,12 @@ func (o *OpenAPI) ResolveRefs(basePath string) error {
 		var newPathItem PathItem
 		yaml.Unmarshal(content, &newPathItem)
 		o.Paths[key] = newPathItem
+
+		refBasePath := path.Dir(pathItem.Ref)
+		err = newPathItem.ResolveRefs(path.Join(basePath, refBasePath))
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -47,6 +53,10 @@ type PathItem struct {
 	Ref         string `yaml:"$ref""`
 }
 
+func (p *PathItem) ResolveRefs(basePath string) error {
+	return nil
+}
+
 func (p PathItem) Operations() map[string]Operation {
 	return map[string]Operation{
 		"delete": p.Delete,
@@ -60,7 +70,7 @@ type Operation struct {
 	Tags         []string
 	Description  string
 	Parameters   []Parameter
-	RequestBody  RequestBody
+	RequestBody  RequestBody `yaml:"requestBody"`
 	Responses    map[string]Response
 	ExternalDocs ExternalDocs
 }
@@ -74,7 +84,11 @@ type Parameter struct {
 	Schema          Schema
 }
 
-type RequestBody struct{}
+type RequestBody struct {
+	Description string
+	Content     map[string]MediaType
+	Required    bool
+}
 
 type Response struct {
 	Description string
@@ -86,7 +100,12 @@ type MediaType struct {
 }
 
 type Schema struct {
-	Type string
+	Description          string
+	Type                 string
+	Properties           map[string]Schema
+	Items                *Schema
+	Ref                  string
+	AdditionalProperties bool
 }
 
 type ExternalDocs struct {

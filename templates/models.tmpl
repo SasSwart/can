@@ -4,10 +4,22 @@ package models
 
 {{ range .Spec -}}
 type {{ .Name }}{{ .Method }}Request struct {
-{{- range .Parameters }}
+    {{- range .Parameters }}
 	{{ .Name | ToTitle }} {{ .Schema.Type }}
+    {{- end }}
+
+    {{- if eq .RequestBody.Type "struct" }}
+    {{ .Name | ToTitle }}{{ .Method }}Body {{ .Name | ToTitle }}{{ .Method }}Body
+    {{- end }}
+}
+
+{{ if eq .RequestBody.Type "struct" }}
+type {{ .Name | ToTitle }}{{ .Method }}Body {{ .RequestBody.Type }} {
+{{- range $name, $schema := .RequestBody.Properties }}
+	{{ $name | ToTitle }} {{ $schema.Type }}
 {{- end }}
 }
+{{ end }}
 
 func (req {{ .Name }}{{ .Method }}Request)Valid() error {
 	return nil
