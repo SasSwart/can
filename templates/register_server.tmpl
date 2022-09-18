@@ -20,7 +20,7 @@ func RegisterServer(e *gin.Engine, srv Server) {
 			{{ .Name }}{{ .Method }}Body: body,
 			{{ end }}
 		}
-		if err := request.Valid(); err != nil {
+		if err := request.IsValid(); err != nil {
 			c.JSON(http.StatusBadRequest, err)
 			return
 		}

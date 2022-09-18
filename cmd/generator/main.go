@@ -40,7 +40,7 @@ func main() {
 
 	outputPath := viper.GetString("outputPath")
 	basePackageName := viper.GetString("basePackageName")
-	configWithSpec := config.WithSpec(*apiSpec)
+	configWithSpec := config.WithServer(*apiSpec)
 	for _, target := range []struct {
 		pkg      string
 		file     string

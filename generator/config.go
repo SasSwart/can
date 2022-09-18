@@ -6,10 +6,10 @@ type TemplateConfig struct {
 	ModuleName           string
 	BasePackageName      string
 	InvalidRequestStatus string
-	Spec                 ServerInterface
+	ServerInterface      ServerInterface
 }
 
-func (tc *TemplateConfig) WithSpec(api openapi.OpenAPI) TemplateConfig {
-	tc.Spec = NewServerInterface(api)
+func (tc *TemplateConfig) WithServer(api openapi.OpenAPI) TemplateConfig {
+	tc.ServerInterface = NewServerInterface(api)
 	return *tc
 }

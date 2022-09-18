@@ -29,8 +29,10 @@ func Generate(config TemplateConfig, templateFile string) ([]byte, error) {
 }
 
 var templateFuncMap = template.FuncMap{
-	"ToUpper": strings.ToUpper,
-	"ToTitle": toTitle,
+	"ToUpper":  strings.ToUpper,
+	"ToTitle":  toTitle,
+	"Type":     Type,
+	"Sanitize": Sanitize,
 }
 
 func toTitle(s string) string {

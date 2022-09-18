@@ -1,0 +1,12 @@
+type {{ .Name }}{{ .Method }}Request struct {
+{{- range .Parameters }}
+	{{ .Name | ToTitle }} {{ .Schema.Type }}
+{{- end }}
+	Body {{ .RequestBody.Name }}
+}
+
+func (r {{ .Name }}{{ .Method }}Request)IsValid() error {
+	return nil
+}
+
+{{ template "request_body.tmpl" .RequestBody }}

@@ -1,0 +1,13 @@
+{{ $interface := .Responses.Interface }}
+type {{ $interface }} interface {
+	mustImplement{{ .Responses.Interface }}()
+}
+
+{{ range .Responses.Responses }}
+type {{ .Name }} struct {
+	{{- range $name, $schema := .Schema.Properties }}
+	{{ $name | Sanitize| ToTitle }} {{ Type $schema }} `json:"{{ $name }}"`
+	{{- end }}
+}
+func ({{ .Name}}) mustImplement{{ $interface }}(){}
+{{ end }}
