@@ -3,7 +3,7 @@
 package models
 
 type UserDeleteRequest struct {
-	Id string
+	Name string
 	Body UserDeleteRequestBody
 }
 
@@ -25,24 +25,18 @@ func (UserDelete204Response) mustImplementUserDeleteResponse(){}
 
 type UserDelete400Response struct {
 	Code string `json:"code"`
-	Message string `json:"message"`
+	Error string `json:"error"`
 }
 func (UserDelete400Response) mustImplementUserDeleteResponse(){}
 
-type UserDelete404Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (UserDelete404Response) mustImplementUserDeleteResponse(){}
-
 type UserDelete500Response struct {
 	Code string `json:"code"`
-	Message string `json:"message"`
+	Error string `json:"error"`
 }
 func (UserDelete500Response) mustImplementUserDeleteResponse(){}
 
 type UserGetRequest struct {
-	Id string
+	Name string
 	Body UserGetRequestBody
 }
 
@@ -68,24 +62,18 @@ func (UserGet200Response) mustImplementUserGetResponse(){}
 
 type UserGet400Response struct {
 	Code string `json:"code"`
-	Message string `json:"message"`
+	Error string `json:"error"`
 }
 func (UserGet400Response) mustImplementUserGetResponse(){}
 
-type UserGet404Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (UserGet404Response) mustImplementUserGetResponse(){}
-
 type UserGet500Response struct {
 	Code string `json:"code"`
-	Message string `json:"message"`
+	Error string `json:"error"`
 }
 func (UserGet500Response) mustImplementUserGetResponse(){}
 
 type UserPatchRequest struct {
-	Id string
+	Name string
 	Body UserPatchRequestBody
 }
 
@@ -105,29 +93,24 @@ type UserPatchResponse interface {
 }
 
 
-type UserPatch204Response struct {
+type UserPatch201Response struct {
 }
-func (UserPatch204Response) mustImplementUserPatchResponse(){}
+func (UserPatch201Response) mustImplementUserPatchResponse(){}
 
 type UserPatch400Response struct {
 	Code string `json:"code"`
-	Message string `json:"message"`
+	Error string `json:"error"`
 }
 func (UserPatch400Response) mustImplementUserPatchResponse(){}
 
-type UserPatch404Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (UserPatch404Response) mustImplementUserPatchResponse(){}
-
 type UserPatch500Response struct {
 	Code string `json:"code"`
-	Message string `json:"message"`
+	Error string `json:"error"`
 }
 func (UserPatch500Response) mustImplementUserPatchResponse(){}
 
 type UserPostRequest struct {
+	Name string
 	Body UserPostRequestBody
 }
 
@@ -147,98 +130,21 @@ type UserPostResponse interface {
 }
 
 
-type UserPost201Response struct {
+type UserPost204Response struct {
 }
-func (UserPost201Response) mustImplementUserPostResponse(){}
+func (UserPost204Response) mustImplementUserPostResponse(){}
 
 type UserPost400Response struct {
 	Code string `json:"code"`
-	Message string `json:"message"`
+	Error string `json:"error"`
 }
 func (UserPost400Response) mustImplementUserPostResponse(){}
 
 type UserPost500Response struct {
 	Code string `json:"code"`
-	Message string `json:"message"`
+	Error string `json:"error"`
 }
 func (UserPost500Response) mustImplementUserPostResponse(){}
-
-type ProjectPatchRequest struct {
-	Id string
-	Body ProjectPatchRequestBody
-}
-
-func (r ProjectPatchRequest)IsValid() error {
-	return nil
-}
-
-type ProjectPatchRequestBody struct {
-	Description string `json:"description"`
-	Enabled bool `json:"enabled"`
-	Name string `json:"name"`
-}
-
-type ProjectPatchResponse interface {
-	mustImplementProjectPatchResponse()
-}
-
-
-type ProjectPatch204Response struct {
-}
-func (ProjectPatch204Response) mustImplementProjectPatchResponse(){}
-
-type ProjectPatch400Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (ProjectPatch400Response) mustImplementProjectPatchResponse(){}
-
-type ProjectPatch404Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (ProjectPatch404Response) mustImplementProjectPatchResponse(){}
-
-type ProjectPatch500Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (ProjectPatch500Response) mustImplementProjectPatchResponse(){}
-
-type ProjectPostRequest struct {
-	Body ProjectPostRequestBody
-}
-
-func (r ProjectPostRequest)IsValid() error {
-	return nil
-}
-
-type ProjectPostRequestBody struct {
-	Description string `json:"description"`
-	Enabled bool `json:"enabled"`
-	Name string `json:"name"`
-}
-
-type ProjectPostResponse interface {
-	mustImplementProjectPostResponse()
-}
-
-
-type ProjectPost201Response struct {
-}
-func (ProjectPost201Response) mustImplementProjectPostResponse(){}
-
-type ProjectPost400Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (ProjectPost400Response) mustImplementProjectPostResponse(){}
-
-type ProjectPost500Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (ProjectPost500Response) mustImplementProjectPostResponse(){}
 
 type ProjectDeleteRequest struct {
 	Id string
@@ -257,25 +163,19 @@ type ProjectDeleteResponse interface {
 }
 
 
-type ProjectDelete204Response struct {
+type ProjectDelete200Response struct {
 }
-func (ProjectDelete204Response) mustImplementProjectDeleteResponse(){}
+func (ProjectDelete200Response) mustImplementProjectDeleteResponse(){}
 
 type ProjectDelete400Response struct {
 	Code string `json:"code"`
-	Message string `json:"message"`
+	Error string `json:"error"`
 }
 func (ProjectDelete400Response) mustImplementProjectDeleteResponse(){}
 
-type ProjectDelete404Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (ProjectDelete404Response) mustImplementProjectDeleteResponse(){}
-
 type ProjectDelete500Response struct {
 	Code string `json:"code"`
-	Message string `json:"message"`
+	Error string `json:"error"`
 }
 func (ProjectDelete500Response) mustImplementProjectDeleteResponse(){}
 
@@ -297,260 +197,84 @@ type ProjectGetResponse interface {
 
 
 type ProjectGet200Response struct {
-	Description string `json:"description"`
-	Enabled bool `json:"enabled"`
-	Name string `json:"name"`
 }
 func (ProjectGet200Response) mustImplementProjectGetResponse(){}
 
 type ProjectGet400Response struct {
 	Code string `json:"code"`
-	Message string `json:"message"`
+	Error string `json:"error"`
 }
 func (ProjectGet400Response) mustImplementProjectGetResponse(){}
 
-type ProjectGet404Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (ProjectGet404Response) mustImplementProjectGetResponse(){}
-
 type ProjectGet500Response struct {
 	Code string `json:"code"`
-	Message string `json:"message"`
+	Error string `json:"error"`
 }
 func (ProjectGet500Response) mustImplementProjectGetResponse(){}
 
-type NetworkDeleteRequest struct {
+type ProjectPatchRequest struct {
 	Id string
-	Body NetworkDeleteRequestBody
+	Body ProjectPatchRequestBody
 }
 
-func (r NetworkDeleteRequest)IsValid() error {
+func (r ProjectPatchRequest)IsValid() error {
 	return nil
 }
 
-type NetworkDeleteRequestBody struct {
+type ProjectPatchRequestBody struct {
 }
 
-type NetworkDeleteResponse interface {
-	mustImplementNetworkDeleteResponse()
+type ProjectPatchResponse interface {
+	mustImplementProjectPatchResponse()
 }
 
 
-type NetworkDelete204Response struct {
+type ProjectPatch200Response struct {
 }
-func (NetworkDelete204Response) mustImplementNetworkDeleteResponse(){}
+func (ProjectPatch200Response) mustImplementProjectPatchResponse(){}
 
-type NetworkDelete400Response struct {
+type ProjectPatch400Response struct {
 	Code string `json:"code"`
-	Message string `json:"message"`
+	Error string `json:"error"`
 }
-func (NetworkDelete400Response) mustImplementNetworkDeleteResponse(){}
+func (ProjectPatch400Response) mustImplementProjectPatchResponse(){}
 
-type NetworkDelete404Response struct {
+type ProjectPatch500Response struct {
 	Code string `json:"code"`
-	Message string `json:"message"`
+	Error string `json:"error"`
 }
-func (NetworkDelete404Response) mustImplementNetworkDeleteResponse(){}
+func (ProjectPatch500Response) mustImplementProjectPatchResponse(){}
 
-type NetworkDelete500Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (NetworkDelete500Response) mustImplementNetworkDeleteResponse(){}
-
-type NetworkGetRequest struct {
+type ProjectPostRequest struct {
 	Id string
-	Body NetworkGetRequestBody
+	Body ProjectPostRequestBody
 }
 
-func (r NetworkGetRequest)IsValid() error {
+func (r ProjectPostRequest)IsValid() error {
 	return nil
 }
 
-type NetworkGetRequestBody struct {
+type ProjectPostRequestBody struct {
 }
 
-type NetworkGetResponse interface {
-	mustImplementNetworkGetResponse()
+type ProjectPostResponse interface {
+	mustImplementProjectPostResponse()
 }
 
 
-type NetworkGet200Response struct {
-	Admin_state_up bool `json:"admin_state_up"`
-	Created_at string `json:"created_at"`
-	Description string `json:"description"`
-	Dns_domain string `json:"dns_domain"`
-	Ipv4_address_scope string `json:"ipv4_address_scope"`
-	Ipv6_address_scope string `json:"ipv6_address_scope"`
-	Is_default bool `json:"is_default"`
-	L2_adjacency bool `json:"l2_adjacency"`
-	Mtu int `json:"mtu"`
-	Name string `json:"name"`
-	Port_security_enabled bool `json:"port_security_enabled"`
-	Project_id string `json:"project_id"`
-	Provider_network_type string `json:"provider:network_type"`
-	Provider_physical_network string `json:"provider:physical_network"`
-	Provider_segmentation_id string `json:"provider:segmentation_id"`
-	Qos_policy_id string `json:"qos_policy_id"`
-	Revision_number int `json:"revision_number"`
-	Router_external bool `json:"router:external"`
-	Segments []struct{} `json:"segments"`
-	Shared bool `json:"shared"`
-	Status string `json:"status"`
-	Subnets []string `json:"subnets"`
-	Tags []string `json:"tags"`
-	Tenant_id string `json:"tenant_id"`
-	Updated_at string `json:"updated_at"`
-	Vlan_transparent bool `json:"vlan_transparent"`
+type ProjectPost200Response struct {
 }
-func (NetworkGet200Response) mustImplementNetworkGetResponse(){}
+func (ProjectPost200Response) mustImplementProjectPostResponse(){}
 
-type NetworkGet400Response struct {
+type ProjectPost400Response struct {
 	Code string `json:"code"`
-	Message string `json:"message"`
+	Error string `json:"error"`
 }
-func (NetworkGet400Response) mustImplementNetworkGetResponse(){}
+func (ProjectPost400Response) mustImplementProjectPostResponse(){}
 
-type NetworkGet404Response struct {
+type ProjectPost500Response struct {
 	Code string `json:"code"`
-	Message string `json:"message"`
+	Error string `json:"error"`
 }
-func (NetworkGet404Response) mustImplementNetworkGetResponse(){}
-
-type NetworkGet500Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (NetworkGet500Response) mustImplementNetworkGetResponse(){}
-
-type NetworkPatchRequest struct {
-	Id string
-	Body NetworkPatchRequestBody
-}
-
-func (r NetworkPatchRequest)IsValid() error {
-	return nil
-}
-
-type NetworkPatchRequestBody struct {
-	Admin_state_up bool `json:"admin_state_up"`
-	Created_at string `json:"created_at"`
-	Description string `json:"description"`
-	Dns_domain string `json:"dns_domain"`
-	Ipv4_address_scope string `json:"ipv4_address_scope"`
-	Ipv6_address_scope string `json:"ipv6_address_scope"`
-	Is_default bool `json:"is_default"`
-	L2_adjacency bool `json:"l2_adjacency"`
-	Mtu int `json:"mtu"`
-	Name string `json:"name"`
-	Port_security_enabled bool `json:"port_security_enabled"`
-	Project_id string `json:"project_id"`
-	Provider_network_type string `json:"provider:network_type"`
-	Provider_physical_network string `json:"provider:physical_network"`
-	Provider_segmentation_id string `json:"provider:segmentation_id"`
-	Qos_policy_id string `json:"qos_policy_id"`
-	Revision_number int `json:"revision_number"`
-	Router_external bool `json:"router:external"`
-	Segments []struct{} `json:"segments"`
-	Shared bool `json:"shared"`
-	Status string `json:"status"`
-	Subnets []string `json:"subnets"`
-	Tags []string `json:"tags"`
-	Tenant_id string `json:"tenant_id"`
-	Updated_at string `json:"updated_at"`
-	Vlan_transparent bool `json:"vlan_transparent"`
-}
-
-type NetworkPatchResponse interface {
-	mustImplementNetworkPatchResponse()
-}
-
-
-type NetworkPatch204Response struct {
-}
-func (NetworkPatch204Response) mustImplementNetworkPatchResponse(){}
-
-type NetworkPatch400Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (NetworkPatch400Response) mustImplementNetworkPatchResponse(){}
-
-type NetworkPatch404Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (NetworkPatch404Response) mustImplementNetworkPatchResponse(){}
-
-type NetworkPatch500Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (NetworkPatch500Response) mustImplementNetworkPatchResponse(){}
-
-type NetworkPostRequest struct {
-	Body NetworkPostRequestBody
-}
-
-func (r NetworkPostRequest)IsValid() error {
-	return nil
-}
-
-type NetworkPostRequestBody struct {
-	Admin_state_up bool `json:"admin_state_up"`
-	Created_at string `json:"created_at"`
-	Description string `json:"description"`
-	Dns_domain string `json:"dns_domain"`
-	Ipv4_address_scope string `json:"ipv4_address_scope"`
-	Ipv6_address_scope string `json:"ipv6_address_scope"`
-	Is_default bool `json:"is_default"`
-	L2_adjacency bool `json:"l2_adjacency"`
-	Mtu int `json:"mtu"`
-	Name string `json:"name"`
-	Port_security_enabled bool `json:"port_security_enabled"`
-	Project_id string `json:"project_id"`
-	Provider_network_type string `json:"provider:network_type"`
-	Provider_physical_network string `json:"provider:physical_network"`
-	Provider_segmentation_id string `json:"provider:segmentation_id"`
-	Qos_policy_id string `json:"qos_policy_id"`
-	Revision_number int `json:"revision_number"`
-	Router_external bool `json:"router:external"`
-	Segments []struct{} `json:"segments"`
-	Shared bool `json:"shared"`
-	Status string `json:"status"`
-	Subnets []string `json:"subnets"`
-	Tags []string `json:"tags"`
-	Tenant_id string `json:"tenant_id"`
-	Updated_at string `json:"updated_at"`
-	Vlan_transparent bool `json:"vlan_transparent"`
-}
-
-type NetworkPostResponse interface {
-	mustImplementNetworkPostResponse()
-}
-
-
-type NetworkPost204Response struct {
-}
-func (NetworkPost204Response) mustImplementNetworkPostResponse(){}
-
-type NetworkPost400Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (NetworkPost400Response) mustImplementNetworkPostResponse(){}
-
-type NetworkPost404Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (NetworkPost404Response) mustImplementNetworkPostResponse(){}
-
-type NetworkPost500Response struct {
-	Code string `json:"code"`
-	Message string `json:"message"`
-}
-func (NetworkPost500Response) mustImplementNetworkPostResponse(){}
+func (ProjectPost500Response) mustImplementProjectPostResponse(){}
 

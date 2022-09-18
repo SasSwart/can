@@ -6,13 +6,19 @@ import (
 	"golang.org/x/text/language"
 )
 
-type ServerInterface []Route
+type ServerInterface struct {
+	Routes []Route
+	openapi.OpenAPI
+}
 
 func NewServerInterface(apiSpec openapi.OpenAPI) ServerInterface {
-	serverInterface := ServerInterface{}
+	serverInterface := ServerInterface{
+		Routes:  []Route{},
+		OpenAPI: apiSpec,
+	}
 	for pathName, pathItem := range apiSpec.Paths {
 		for method, operation := range pathItem.Operations() {
-			serverInterface = append(serverInterface, NewRoute(
+			serverInterface.Routes = append(serverInterface.Routes, NewRoute(
 				pathName,
 				method,
 				append(pathItem.Parameters, operation.Parameters...),

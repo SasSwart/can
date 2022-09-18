@@ -1,0 +1,10 @@
+    summary: {{ .Summary }}
+    description: "{{ .Description }}"
+    get:
+{{ template "operation.tmpl" .Get }}
+    post:
+{{ template "operation.tmpl" .Post }}
+    patch:
+{{ template "operation.tmpl" .Patch }}
+    delete:
+{{ template "operation.tmpl" .Delete }}

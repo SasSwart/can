@@ -1,0 +1,7 @@
+      summary: "{{ .Summary }}"
+      description: "{{ .Description }}"
+      tags:
+      {{ range .Tags }}- {{ . }}{{ end }}
+      operationId: {{ .OperationId }}
+      parameters: []
+      responses: {}

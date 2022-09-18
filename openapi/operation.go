@@ -2,10 +2,12 @@ package openapi
 
 type Operation struct {
 	Tags         []string
+	Summary      string
 	Description  string
 	Parameters   []Parameter
 	RequestBody  RequestBody `yaml:"requestBody"`
 	Responses    map[string]Response
+	OperationId  string `yaml:"operationId"`
 	ExternalDocs ExternalDocs
 }
 

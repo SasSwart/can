@@ -2,7 +2,7 @@
 
 package models
 
-{{ range .ServerInterface -}}
+{{ range .ServerInterface.Routes -}}
 {{ template "request.tmpl" .}}
 {{ template "responses.tmpl" .}}
 {{ end }}

@@ -1,0 +1,82 @@
+openapi: "3.0.0"
+info:
+  license:
+    name: 
+    url: 
+  description: 
+  title: Sample
+  version: 0.0.1
+servers:
+
+paths:
+  /project/{id}:
+    summary: 
+    description: ""
+    get:
+      summary: ""
+      description: "Send a greeting using the name parameter"
+      tags:
+      
+      operationId: 
+      parameters: []
+      responses: {}
+    post:
+      summary: ""
+      description: "Send a greeting using the name parameter"
+      tags:
+      
+      operationId: 
+      parameters: []
+      responses: {}
+    patch:
+      summary: ""
+      description: "Send a greeting using the name parameter"
+      tags:
+      
+      operationId: 
+      parameters: []
+      responses: {}
+    delete:
+      summary: ""
+      description: "Send a greeting using the name parameter"
+      tags:
+      
+      operationId: 
+      parameters: []
+      responses: {}
+  /user:
+    summary: 
+    description: "Users for a sample API
+"
+    get:
+      summary: ""
+      description: "Show user details"
+      tags:
+      
+      operationId: 
+      parameters: []
+      responses: {}
+    post:
+      summary: ""
+      description: "Create a user"
+      tags:
+      
+      operationId: 
+      parameters: []
+      responses: {}
+    patch:
+      summary: ""
+      description: "Change user details"
+      tags:
+      
+      operationId: 
+      parameters: []
+      responses: {}
+    delete:
+      summary: ""
+      description: "Delete a user"
+      tags:
+      
+      operationId: 
+      parameters: []
+      responses: {}

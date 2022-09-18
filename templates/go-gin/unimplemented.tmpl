@@ -8,7 +8,7 @@ import (
 
 type UnimplementedServer struct{}
 {{ $InvalidRequestStatus := .InvalidRequestStatus }}
-{{ range .ServerInterface }}
+{{ range .ServerInterface.Routes }}
 func (UnimplementedServer) {{ .Name }}{{ .Method }}(requestModel *models.{{ .Name }}{{ .Method }}Request) (models.{{ .Name }}{{ .Method }}Response, error) {
   return models.{{ .Name }}{{ .Method }}{{ $InvalidRequestStatus }}Response{}, nil
 }

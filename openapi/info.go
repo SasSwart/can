@@ -1,6 +1,11 @@
 package openapi
 
 type Info struct {
-	Title   string
-	Version string
+	Title       string
+	Description string
+	Version     string
+	License     struct {
+		Name string
+		Url  string
+	}
 }
