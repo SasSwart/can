@@ -26,5 +26,7 @@ func Type(schema openapi.Schema) string {
 }
 
 func Sanitize(s string) string {
-	return strings.ReplaceAll(s, ":", "_")
+	noColons := strings.ReplaceAll(s, ":", "_")
+	noDashes := strings.ReplaceAll(noColons, "-", "_")
+	return noDashes
 }

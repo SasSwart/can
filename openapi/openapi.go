@@ -24,6 +24,7 @@ func LoadOpenAPI(path string) (*OpenAPI, error) {
 type OpenAPI struct {
 	OpenAPI string
 	Info    Info
+	Servers Servers
 	Paths   Paths
 }
 

@@ -3,45 +3,33 @@
 package controller
 
 import (
-    "github.gom/sasswart/gin-in-a-can/api/models"
+    "github.com/sasswart/gin-in-a-can//api/models"
 )
 
 type UnimplementedServer struct{}
 
 
-func (UnimplementedServer) UserDelete(requestModel *models.UserDeleteRequest) (models.UserDeleteResponse, error) {
-  return models.UserDelete400Response{}, nil
+func (UnimplementedServer) UserDelete(c *gin.Context, requestModel *models.UserDeleteRequest) models.UserDeleteResponse {
+  return models.UserDelete400Response{}
 }
-func (UnimplementedServer) UserGet(requestModel *models.UserGetRequest) (models.UserGetResponse, error) {
-  return models.UserGet400Response{}, nil
+func (UnimplementedServer) UserGet(c *gin.Context, requestModel *models.UserGetRequest) models.UserGetResponse {
+  return models.UserGet400Response{}
 }
-func (UnimplementedServer) UserPatch(requestModel *models.UserPatchRequest) (models.UserPatchResponse, error) {
-  return models.UserPatch400Response{}, nil
+func (UnimplementedServer) UserPatch(c *gin.Context, requestModel *models.UserPatchRequest) models.UserPatchResponse {
+  return models.UserPatch400Response{}
 }
-func (UnimplementedServer) UserPost(requestModel *models.UserPostRequest) (models.UserPostResponse, error) {
-  return models.UserPost400Response{}, nil
+func (UnimplementedServer) UserPost(c *gin.Context, requestModel *models.UserPostRequest) models.UserPostResponse {
+  return models.UserPost400Response{}
 }
-func (UnimplementedServer) ProjectPatch(requestModel *models.ProjectPatchRequest) (models.ProjectPatchResponse, error) {
-  return models.ProjectPatch400Response{}, nil
+func (UnimplementedServer) ProjectDelete(c *gin.Context, requestModel *models.ProjectDeleteRequest) models.ProjectDeleteResponse {
+  return models.ProjectDelete400Response{}
 }
-func (UnimplementedServer) ProjectPost(requestModel *models.ProjectPostRequest) (models.ProjectPostResponse, error) {
-  return models.ProjectPost400Response{}, nil
+func (UnimplementedServer) ProjectGet(c *gin.Context, requestModel *models.ProjectGetRequest) models.ProjectGetResponse {
+  return models.ProjectGet400Response{}
 }
-func (UnimplementedServer) ProjectDelete(requestModel *models.ProjectDeleteRequest) (models.ProjectDeleteResponse, error) {
-  return models.ProjectDelete400Response{}, nil
+func (UnimplementedServer) ProjectPatch(c *gin.Context, requestModel *models.ProjectPatchRequest) models.ProjectPatchResponse {
+  return models.ProjectPatch400Response{}
 }
-func (UnimplementedServer) ProjectGet(requestModel *models.ProjectGetRequest) (models.ProjectGetResponse, error) {
-  return models.ProjectGet400Response{}, nil
-}
-func (UnimplementedServer) NetworkDelete(requestModel *models.NetworkDeleteRequest) (models.NetworkDeleteResponse, error) {
-  return models.NetworkDelete400Response{}, nil
-}
-func (UnimplementedServer) NetworkGet(requestModel *models.NetworkGetRequest) (models.NetworkGetResponse, error) {
-  return models.NetworkGet400Response{}, nil
-}
-func (UnimplementedServer) NetworkPatch(requestModel *models.NetworkPatchRequest) (models.NetworkPatchResponse, error) {
-  return models.NetworkPatch400Response{}, nil
-}
-func (UnimplementedServer) NetworkPost(requestModel *models.NetworkPostRequest) (models.NetworkPostResponse, error) {
-  return models.NetworkPost400Response{}, nil
+func (UnimplementedServer) ProjectPost(c *gin.Context, requestModel *models.ProjectPostRequest) models.ProjectPostResponse {
+  return models.ProjectPost400Response{}
 }

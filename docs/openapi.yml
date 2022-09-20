@@ -3,7 +3,7 @@ info:
   title: Sample
   version: 0.0.1
 paths:
-  /user/:
+  /user:
     $ref: ./user/path.yml
   /project/{id}:
     $ref: ./project/path.yml

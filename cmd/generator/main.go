@@ -42,15 +42,17 @@ func main() {
 	basePackageName := viper.GetString("basePackageName")
 	configWithSpec := config.WithServer(*apiSpec)
 	for _, target := range []struct {
-		pkg      string
-		file     string
-		template string
+		templateDir string
+		pkg         string
+		file        string
+		template    string
 	}{
-		{"controller", "controller.go", "controller.tmpl"},
-		{"controller", "unimplemented.go", "unimplemented.tmpl"},
-		{"models", "models.go", "models.tmpl"},
+		{"go-gin", "controller", "controller.go", "controller.tmpl"},
+		{"go-gin", "controller", "unimplemented.go", "unimplemented.tmpl"},
+		{"go-gin", "models", "models.go", "models.tmpl"},
+		{"oas-3-0-0", "api", "openapi.yaml", "openapi.tmpl"},
 	} {
-		file, err := generator.Generate(configWithSpec, target.template)
+		file, err := generator.Generate(configWithSpec, target.templateDir, target.template)
 		if err != nil {
 			fmt.Println(err)
 		}

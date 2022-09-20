@@ -1,0 +1,16 @@
+openapi: "3.0.0"
+info:
+  license:
+    name: {{ .ServerInterface.Info.License.Name }}
+    url: {{ .ServerInterface.Info.License.Url }}
+  description: {{ .ServerInterface.Info.Description }}
+  title: {{ .ServerInterface.Info.Title }}
+  version: {{ .ServerInterface.Info.Version }}
+servers:
+{{ range .ServerInterface.Servers }}  - url: {{ .Url }}
+{{ end }}
+paths:
+{{- range $name, $pathItem := .ServerInterface.Paths }}
+  {{ $name }}:
+{{ template "path.tmpl" $pathItem }}
+{{- end }}

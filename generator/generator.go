@@ -2,20 +2,21 @@ package generator
 
 import (
 	"bytes"
+	"fmt"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"strings"
 	"text/template"
 )
 
-func Generate(config TemplateConfig, templateFile string) ([]byte, error) {
+func Generate(config TemplateConfig, templateDir, templateFile string) ([]byte, error) {
 	buff := bytes.NewBuffer([]byte{})
 
 	templater := template.New(templateFile)
 
 	templater.Funcs(templateFuncMap)
 
-	parsedTemplate, err := templater.ParseGlob("templates/*.tmpl")
+	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("templates/%s/*.tmpl", templateDir))
 	if err != nil {
 		return nil, err
 	}

@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-{{ template "server_interface.tmpl" .ServerInterface }}
+{{ template "server_interface.tmpl" .ServerInterface.Routes }}
 
-{{ template "register_server.tmpl" .ServerInterface }}
+{{ template "register_server.tmpl" .ServerInterface.Routes }}
 
