@@ -8,6 +8,7 @@ type Responses struct {
 }
 
 type Response struct {
-	Name   string
-	Schema openapi.Schema
+	Name       string
+	Schema     openapi.Schema
+	StatusCode string
 }

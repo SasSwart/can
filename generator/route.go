@@ -46,8 +46,9 @@ func NewRoute(pathName, method string, parameters []openapi.Parameter, operation
 	}
 	for r, response := range operation.Responses {
 		transformedResponses.Responses[r] = Response{
-			Name:   funcName(pathName) + caser.String(method) + r + "Response",
-			Schema: response.Content["application/json"].Schema,
+			Name:       funcName(pathName) + caser.String(method) + r + "Response",
+			Schema:     response.Content["application/json"].Schema,
+			StatusCode: r,
 		}
 	}
 	return Route{

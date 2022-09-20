@@ -3,21 +3,21 @@
 package controller
 
 import (
-    "github.gom/sasswart/gin-in-a-can/api/models"
+    "github.com/sasswart/gin-in-a-can//api/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Server interface {
-  UserDelete(*models.UserDeleteRequest) (models.UserDeleteResponse, error)
-  UserGet(*models.UserGetRequest) (models.UserGetResponse, error)
-  UserPatch(*models.UserPatchRequest) (models.UserPatchResponse, error)
-  UserPost(*models.UserPostRequest) (models.UserPostResponse, error)
-  ProjectDelete(*models.ProjectDeleteRequest) (models.ProjectDeleteResponse, error)
-  ProjectGet(*models.ProjectGetRequest) (models.ProjectGetResponse, error)
-  ProjectPatch(*models.ProjectPatchRequest) (models.ProjectPatchResponse, error)
-  ProjectPost(*models.ProjectPostRequest) (models.ProjectPostResponse, error)
+  UserDelete(*gin.Context, *models.UserDeleteRequest) models.UserDeleteResponse
+  UserGet(*gin.Context, *models.UserGetRequest) models.UserGetResponse
+  UserPatch(*gin.Context, *models.UserPatchRequest) models.UserPatchResponse
+  UserPost(*gin.Context, *models.UserPostRequest) models.UserPostResponse
+  ProjectDelete(*gin.Context, *models.ProjectDeleteRequest) models.ProjectDeleteResponse
+  ProjectGet(*gin.Context, *models.ProjectGetRequest) models.ProjectGetResponse
+  ProjectPatch(*gin.Context, *models.ProjectPatchRequest) models.ProjectPatchResponse
+  ProjectPost(*gin.Context, *models.ProjectPostRequest) models.ProjectPostResponse
 }
 
 func RegisterServer(e *gin.Engine, srv Server) {
@@ -25,129 +25,145 @@ func RegisterServer(e *gin.Engine, srv Server) {
 		request := &models.UserDeleteRequest{
 			Name: c.Query("name"),
 		}
+
+		if err := c.ShouldBindJSON(&request.Body); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+			return
+		}
+
 		if err := request.IsValid(); err != nil {
 			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
-		response, err := srv.UserDelete(request)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
-			return
-		}
-		c.JSON(http.StatusOK, response)
+		response := srv.UserDelete(c, request)
+		c.JSON(response.GetStatus(), response)
 	})
 	e.GET("/user", func(c *gin.Context) {
 		request := &models.UserGetRequest{
 			Name: c.Query("name"),
 		}
+
+		if err := c.ShouldBindJSON(&request.Body); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+			return
+		}
+
 		if err := request.IsValid(); err != nil {
 			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
-		response, err := srv.UserGet(request)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
-			return
-		}
-		c.JSON(http.StatusOK, response)
+		response := srv.UserGet(c, request)
+		c.JSON(response.GetStatus(), response)
 	})
 	e.PATCH("/user", func(c *gin.Context) {
 		request := &models.UserPatchRequest{
 			Name: c.Query("name"),
 		}
+
+		if err := c.ShouldBindJSON(&request.Body); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+			return
+		}
+
 		if err := request.IsValid(); err != nil {
 			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
-		response, err := srv.UserPatch(request)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
-			return
-		}
-		c.JSON(http.StatusOK, response)
+		response := srv.UserPatch(c, request)
+		c.JSON(response.GetStatus(), response)
 	})
 	e.POST("/user", func(c *gin.Context) {
 		request := &models.UserPostRequest{
 			Name: c.Query("name"),
 		}
+
+		if err := c.ShouldBindJSON(&request.Body); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+			return
+		}
+
 		if err := request.IsValid(); err != nil {
 			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
-		response, err := srv.UserPost(request)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
-			return
-		}
-		c.JSON(http.StatusOK, response)
+		response := srv.UserPost(c, request)
+		c.JSON(response.GetStatus(), response)
 	})
 	e.DELETE("/project/:id", func(c *gin.Context) {
 		request := &models.ProjectDeleteRequest{
 			Id: c.Param("id"),
 		}
+
+		if err := c.ShouldBindJSON(&request.Body); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+			return
+		}
+
 		if err := request.IsValid(); err != nil {
 			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
-		response, err := srv.ProjectDelete(request)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
-			return
-		}
-		c.JSON(http.StatusOK, response)
+		response := srv.ProjectDelete(c, request)
+		c.JSON(response.GetStatus(), response)
 	})
 	e.GET("/project/:id", func(c *gin.Context) {
 		request := &models.ProjectGetRequest{
 			Id: c.Param("id"),
 		}
+
+		if err := c.ShouldBindJSON(&request.Body); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+			return
+		}
+
 		if err := request.IsValid(); err != nil {
 			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
-		response, err := srv.ProjectGet(request)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
-			return
-		}
-		c.JSON(http.StatusOK, response)
+		response := srv.ProjectGet(c, request)
+		c.JSON(response.GetStatus(), response)
 	})
 	e.PATCH("/project/:id", func(c *gin.Context) {
 		request := &models.ProjectPatchRequest{
 			Id: c.Param("id"),
 		}
+
+		if err := c.ShouldBindJSON(&request.Body); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+			return
+		}
+
 		if err := request.IsValid(); err != nil {
 			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
-		response, err := srv.ProjectPatch(request)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
-			return
-		}
-		c.JSON(http.StatusOK, response)
+		response := srv.ProjectPatch(c, request)
+		c.JSON(response.GetStatus(), response)
 	})
 	e.POST("/project/:id", func(c *gin.Context) {
 		request := &models.ProjectPostRequest{
 			Id: c.Param("id"),
 		}
+
+		if err := c.ShouldBindJSON(&request.Body); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+			return
+		}
+
 		if err := request.IsValid(); err != nil {
 			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
-		response, err := srv.ProjectPost(request)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
-			return
-		}
-		c.JSON(http.StatusOK, response)
+		response := srv.ProjectPost(c, request)
+		c.JSON(response.GetStatus(), response)
 	})
 }
 

@@ -1,6 +1,7 @@
 {{ $interface := .Responses.Interface }}
 type {{ $interface }} interface {
 	mustImplement{{ .Responses.Interface }}()
+	GetStatus() int
 }
 
 {{ range .Responses.Responses }}
@@ -10,4 +11,8 @@ type {{ .Name }} struct {
 	{{- end }}
 }
 func ({{ .Name}}) mustImplement{{ $interface }}(){}
+
+func ({{ .Name }}) GetStatus() int {
+	return {{ .StatusCode }}
+}
 {{ end }}
