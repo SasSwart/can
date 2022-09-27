@@ -14,6 +14,7 @@ See [docs/openapi.yml](docs/openapi.yml) for a sample API.
 Also see [cmd/server/main.go](cmd/server/main.go) for an example of how to use generated code.
 
 ## TODO
-* Add request and response schema attributes to their respective structs
+* use components to avoid duplicate ref structs
+* use nullable types in parameters and request bodies
 * Add parameter validation based on the `required` flag, regex patterns and other OpenAPI format specifications
 * Add API Fuzz testing

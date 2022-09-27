@@ -1,4 +1,4 @@
-module github.gom/sasswart/gin-in-a-can
+module github.com/sasswart/gin-in-a-can
 
 go 1.18
 
