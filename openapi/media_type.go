@@ -9,24 +9,27 @@ type MediaType struct {
 	Schema Schema
 }
 
-var _ node = &MediaType{}
-
-func (m *MediaType) ResolveRefs(basePath string) error {
+func (m *MediaType) ResolveRefs(basePath string, components *Components) error {
 	if m.Schema.Ref == "" {
 		return nil
 	}
 
 	ref := m.Schema.Ref
 
+	fullRefPath := path.Join(basePath, m.Schema.Ref)
 	var newSchema Schema
-	err := readRef(path.Join(basePath, m.Schema.Ref), &newSchema)
+	err := readRef(fullRefPath, &newSchema)
 	if err != nil {
 		return fmt.Errorf("Unable to read schema reference:\n%w", err)
 	}
-	m.Schema = newSchema
+	components.Schemas[fullRefPath] = newSchema
+
+	m.Schema = Schema{
+		Ref: fullRefPath,
+	}
 
 	refBasePath := path.Dir(ref)
-	err = newSchema.ResolveRefs(path.Join(basePath, refBasePath))
+	err = newSchema.ResolveRefs(path.Join(basePath, refBasePath), components)
 	if err != nil {
 		return err
 	}

@@ -5,9 +5,9 @@ type Response struct {
 	Content     map[string]MediaType
 }
 
-func (r *Response) ResolveRefs(basePath string) error {
+func (r *Response) ResolveRefs(basePath string, components *Components) error {
 	for key, mediaType := range r.Content {
-		err := mediaType.ResolveRefs(basePath)
+		err := mediaType.ResolveRefs(basePath, components)
 		if err != nil {
 			return err
 		}

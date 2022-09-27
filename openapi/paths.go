@@ -7,7 +7,7 @@ import (
 
 type Paths map[string]PathItem
 
-func (p *Paths) ResolveRefs(basePath string) error {
+func (p *Paths) ResolveRefs(basePath string, components *Components) error {
 	for key, pathItem := range *p {
 		if pathItem.Ref == "" {
 			continue
@@ -21,7 +21,7 @@ func (p *Paths) ResolveRefs(basePath string) error {
 		(*p)[key] = newPathItem
 
 		refBasePath := path.Dir(pathItem.Ref)
-		err = newPathItem.ResolveRefs(path.Join(basePath, refBasePath))
+		err = newPathItem.ResolveRefs(path.Join(basePath, refBasePath), components)
 		if err != nil {
 			return err
 		}
@@ -37,12 +37,15 @@ type PathItem struct {
 	Patch       *Operation
 	Delete      *Operation
 	Parameters  []Parameter
-	Ref         string `yaml:"$ref""`
+	Ref         string `yaml:"$ref"`
 }
 
-func (p *PathItem) ResolveRefs(basePath string) error {
+func (p *PathItem) ResolveRefs(basePath string, components *Components) error {
 	for _, operation := range p.Operations() {
-		err := operation.ResolveRefs(basePath)
+		if operation == nil {
+			continue
+		}
+		err := operation.ResolveRefs(basePath, components)
 		if err != nil {
 			return err
 		}
