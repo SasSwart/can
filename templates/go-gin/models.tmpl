@@ -2,13 +2,15 @@
 
 package models
 
+import "fmt"
+
 {{ range .ServerInterface.Routes -}}
 type {{ .Name }}{{ .Method }}Request struct {
 	{{- range .Parameters }}
 	{{ .Name }} {{ .Type }}
 	{{- end }}
 	{{ if ne .RequestBody.Type "" -}}
-	body {{ .RequestBody.Type }}
+	Body {{ .RequestBody.Type }}
 	{{- end }}
 }
 
@@ -50,8 +52,24 @@ type {{ .Name }} struct {
 }
 
 func (model {{ .Name }})IsValid() error {
-	// Min: {{ .MinLength }}
-	// Max: {{ .MaxLength }}
+	{{- range $name, $schema := .Properties }}
+	{{- if eq $schema.Type "string" }}
+
+	{{- if ne $schema.MinLength 0 }}
+	if len(model.{{ $name | Sanitize | ToTitle }}) < {{ $schema.MinLength }} {
+		return fmt.Errorf("model.{{ $name | Sanitize | ToTitle }} too short")
+	}
+	{{- end }}
+
+	{{- if ne $schema.MaxLength 0 }}
+	if len(model.{{ $name | Sanitize | ToTitle }}) > {{ $schema.MaxLength }} {
+		return fmt.Errorf("model.{{ $name | Sanitize | ToTitle }} too long")
+	}
+	{{- end }}
+
+	{{- end }}
+	{{- end }}
+
 	return nil
 }
 {{ end }}

@@ -16,6 +16,7 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 		Components: Components{
 			Schemas: map[string]Schema{},
 		},
+		Paths: map[string]PathItem{},
 	}
 	content, err := os.ReadFile(openAPIFile)
 	if err != nil {
