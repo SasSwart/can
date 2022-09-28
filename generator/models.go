@@ -49,7 +49,7 @@ func newModel(tc TemplateConfig, schema openapi.Schema) Model {
 
 	switch schema.Type {
 	case "boolean":
-		s.Type = "bool"
+		s.Type = "*bool"
 		break
 	case "array":
 		name := strings.ReplaceAll(schema.Items.Ref, filepath.Dir(tc.OpenAPIFile), "")

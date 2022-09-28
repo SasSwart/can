@@ -7,7 +7,7 @@ import (
 func Type(schema Model) string {
 	switch schema.Type {
 	case "boolean":
-		return "bool"
+		return "*bool"
 	case "array":
 		//if schema.Items == nil {
 		//	return "[]interface{}"
