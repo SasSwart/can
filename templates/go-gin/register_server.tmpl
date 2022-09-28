@@ -21,10 +21,12 @@ func RegisterServer(e *gin.Engine, srv Server) {
 			{{ end }}
 		}
 
+		{{- if ne .RequestBody.Name "" }}
 		if err := c.ShouldBindJSON(&request.Body); err != nil {
 		c.JSON(http.StatusBadRequest, err)
 			return
 		}
+		{{- end }}
 
 		if err := request.IsValid(); err != nil {
 			c.JSON(http.StatusBadRequest, err)
