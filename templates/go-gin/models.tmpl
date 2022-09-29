@@ -2,7 +2,10 @@
 
 package models
 
-import "fmt"
+import (
+	"fmt"
+	"regexp"
+)
 
 {{ range .ServerInterface.Routes -}}
 type {{ .Name }}{{ .Method }}Request struct {
@@ -16,9 +19,19 @@ type {{ .Name }}{{ .Method }}Request struct {
 
 func (model {{ .Name }}{{ .Method }}Request)IsValid() error {
 	{{- range .Parameters }}
-	// {{ .Name }} {{ .Type }}
-	// Min: {{ .MinLength }}
-	// Max: {{ .MaxLength }}
+	{{- if eq .Type "string" }}
+	{{- if ne .MinLength 0 }}
+	if len(model.{{ .Name | Sanitize | ToTitle }}) < {{ .MinLength }} {
+		return fmt.Errorf("model.{{ .Name | Sanitize | ToTitle }} too short")
+	}
+	{{- end }}
+
+	{{- if ne .MaxLength 0 }}
+	if len(model.{{ .Name | Sanitize | ToTitle }}) > {{ .MaxLength }} {
+		return fmt.Errorf("model.{{ .Name | Sanitize | ToTitle }} too long")
+	}
+	{{- end }}
+	{{- end }}
 	{{- end }}
 	{{ if ne .RequestBody.Type "" -}}
 	err := model.Body.IsValid()
@@ -70,6 +83,15 @@ func (model {{ .Name }})IsValid() error {
 	{{- if ne $schema.MaxLength 0 }}
 	if len(model.{{ $name | Sanitize | ToTitle }}) > {{ $schema.MaxLength }} {
 		return fmt.Errorf("model.{{ $name | Sanitize | ToTitle }} too long")
+	}
+	{{- end }}
+
+	{{- if ne $schema.Pattern "" }}
+	// Regular expressions are checked for compilation during code generation
+	// No need to check them here.
+	r{{ $name | Sanitize | ToTitle }}, _ := regexp.Compile("{{ $schema.Pattern }}")
+	if !r{{ $name | Sanitize | ToTitle }}.MatchString(model.{{ $name | Sanitize | ToTitle }}) {
+		return fmt.Errorf("model.{{ $name | Sanitize | ToTitle }} did not pass validation pattern")
 	}
 	{{- end }}
 

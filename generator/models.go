@@ -27,6 +27,7 @@ type Model struct {
 	Items      *Model
 	MinLength  int
 	MaxLength  int
+	Pattern    string
 }
 
 func newModel(tc TemplateConfig, schema openapi.Schema) Model {
@@ -40,6 +41,7 @@ func newModel(tc TemplateConfig, schema openapi.Schema) Model {
 		Properties: properties,
 		MinLength:  schema.MinLength,
 		MaxLength:  schema.MaxLength,
+		Pattern:    schema.Pattern,
 	}
 
 	if schema.Items != nil {
