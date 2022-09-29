@@ -1,0 +1,28 @@
+# workflow name
+name: Generate release-artifacts
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  generate:
+    name: Generate cross-platform builds
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+      - name: Setup Go environment
+        uses: actions/setup-go@v2.2.0
+        with:
+          go-version: '1.18'
+      - name: Show go version
+        run: go version
+      - name: Generate build files
+        run: make all
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            linux.zip

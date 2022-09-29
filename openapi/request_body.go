@@ -6,13 +6,13 @@ type RequestBody struct {
 	Required    bool
 }
 
-func (r *RequestBody) ResolveRefs(basePath string) error {
+func (r *RequestBody) ResolveRefs(basePath string, components *Components) error {
 	if r.Content == nil {
 		return nil
 	}
 
 	for m, mediaType := range r.Content {
-		err := mediaType.ResolveRefs(basePath)
+		err := mediaType.ResolveRefs(basePath, components)
 		if err != nil {
 			return err
 		}

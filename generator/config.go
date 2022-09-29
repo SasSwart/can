@@ -1,8 +1,9 @@
 package generator
 
-import "github.gom/sasswart/gin-in-a-can/openapi"
+import "github.com/sasswart/gin-in-a-can/openapi"
 
 type TemplateConfig struct {
+	OpenAPIFile          string
 	ModuleName           string
 	BasePackageName      string
 	InvalidRequestStatus string
@@ -10,6 +11,6 @@ type TemplateConfig struct {
 }
 
 func (tc *TemplateConfig) WithServer(api openapi.OpenAPI) TemplateConfig {
-	tc.ServerInterface = NewServerInterface(api)
+	tc.ServerInterface = NewServerInterface(*tc, api)
 	return *tc
 }

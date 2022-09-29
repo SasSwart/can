@@ -2,25 +2,21 @@ package generator
 
 import (
 	"strings"
-
-	"github.gom/sasswart/gin-in-a-can/openapi"
 )
 
-type Schema struct {
-	openapi.Schema
-	Name string
-}
-
-func Type(schema openapi.Schema) string {
+func Type(schema Model) string {
 	switch schema.Type {
 	case "boolean":
 		return "bool"
 	case "array":
-		return "[]" + Type(*schema.Items)
+		//if schema.Items == nil {
+		//	return "[]interface{}"
+		//}
+		return "[]" //+ Type(*schema.Items)
 	case "integer":
 		return "int"
 	case "object":
-		return "struct{}" // TODO: Support nested objects
+		return schema.Name
 	}
 	return schema.Type
 }

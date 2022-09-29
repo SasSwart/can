@@ -2,11 +2,8 @@ type {{ .Name }}{{ .Method }}Request struct {
 {{- range .Parameters }}
 	{{ .Name | ToTitle }} {{ .Schema.Type }}
 {{- end }}
-	Body {{ .RequestBody.Name }}
+	{{ if ne .RequestBody.Name ""}}Body {{ .RequestBody.Name }}{{ end }}
 }
 
-func (r {{ .Name }}{{ .Method }}Request)IsValid() error {
-	return nil
-}
 
-{{ template "request_body.tmpl" .RequestBody }}
+{{ if ne .RequestBody.Name ""}}{{ template "request_body.tmpl" .RequestBody }}{{ end }}

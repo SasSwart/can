@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/gin-gonic/gin"
-	"github.gom/sasswart/gin-in-a-can/api/controller"
-	"github.gom/sasswart/gin-in-a-can/api/models"
+	"github.com/sasswart/gin-in-a-can/api/controller"
+	"github.com/sasswart/gin-in-a-can/api/models"
 )
 
 type server struct {

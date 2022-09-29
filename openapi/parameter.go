@@ -9,6 +9,6 @@ type Parameter struct {
 	Schema          Schema
 }
 
-func (p *Parameter) ResolveRefs(basePath string) error {
+func (p *Parameter) ResolveRefs(basePath string, components *Components) error {
 	return nil
 }

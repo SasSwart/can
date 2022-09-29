@@ -3,6 +3,55 @@
 package models
 
 {{ range .ServerInterface.Routes -}}
-{{ template "request.tmpl" .}}
-{{ template "responses.tmpl" .}}
+type {{ .Name }}{{ .Method }}Request struct {
+	{{- range .Parameters }}
+	{{ .Name }} {{ .Type }}
+	{{- end }}
+	{{ if ne .RequestBody.Type "" -}}
+	body {{ .RequestBody.Type }}
+	{{- end }}
+}
+
+func (model {{ .Name }}{{ .Method }}Request)IsValid() error {
+	{{- range .Parameters }}
+	// {{ .Name }} {{ .Type }}
+	// Min: {{ .MinLength }}
+	// Max: {{ .MaxLength }}
+	{{- end }}
+	return nil
+}
+
+{{ $interfaceName := (printf "%s%s%s" .Name .Method "Response") }}
+type {{ $interfaceName }} interface {
+	Implements{{ $interfaceName }}()
+	GetStatus() int
+}
+
+{{ range $code, $response := .Responses }}
+type {{ $response.Name }} struct {
+	{{- range $name, $schema := $response.Properties }}
+	{{ $name | Sanitize | ToTitle }} {{ $schema.Type }} `json:"{{ $name }}"`
+	{{- end }}
+}
+
+func ({{ $response.Name }}) Implements{{ $interfaceName }}(){}
+
+func ({{ $response.Name }}) GetStatus() int {
+	return {{ $code }}
+}
+{{ end }}
+{{ end -}}
+
+{{ range .ServerInterface.Models }}
+type {{ .Name }} struct {
+	{{- range $name, $schema := .Properties }}
+	{{ $name | Sanitize | ToTitle }} {{ $schema.Type }} `json:"{{ $name }}"`
+	{{- end }}
+}
+
+func (model {{ .Name }})IsValid() error {
+	// Min: {{ .MinLength }}
+	// Max: {{ .MaxLength }}
+	return nil
+}
 {{ end }}
