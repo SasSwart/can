@@ -13,12 +13,12 @@ type Parameter struct {
 
 func newParameterModel(tc TemplateConfig, openAPIParameter openapi.Parameter) Parameter {
 	model := Model{
-		Name: funcName(openAPIParameter.Name),
+		Name: openAPIParameter.Name,
 	}
 
 	switch openAPIParameter.Schema.Type {
 	case "boolean":
-		model.Type = "bool"
+		model.Type = "*bool"
 		break
 	case "array":
 		name := strings.ReplaceAll(openAPIParameter.Schema.Items.Ref, filepath.Dir(tc.OpenAPIFile), "")

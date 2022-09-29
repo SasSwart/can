@@ -27,6 +27,7 @@ type Model struct {
 	Items      *Model
 	MinLength  int
 	MaxLength  int
+	Pattern    string
 }
 
 func newModel(tc TemplateConfig, schema openapi.Schema) Model {
@@ -40,6 +41,7 @@ func newModel(tc TemplateConfig, schema openapi.Schema) Model {
 		Properties: properties,
 		MinLength:  schema.MinLength,
 		MaxLength:  schema.MaxLength,
+		Pattern:    schema.Pattern,
 	}
 
 	if schema.Items != nil {
@@ -49,7 +51,7 @@ func newModel(tc TemplateConfig, schema openapi.Schema) Model {
 
 	switch schema.Type {
 	case "boolean":
-		s.Type = "bool"
+		s.Type = "*bool"
 		break
 	case "array":
 		name := strings.ReplaceAll(schema.Items.Ref, filepath.Dir(tc.OpenAPIFile), "")

@@ -17,6 +17,9 @@ type Schema struct {
 	Name                 string
 	MinLength            int `yaml:"minLength"`
 	MaxLength            int `yaml:"maxLength"`
+	Pattern              string
+	Format               string
+	Required             []string
 }
 
 func (s *Schema) ResolveRefs(basePath string, components *Components) error {
