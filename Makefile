@@ -1,9 +1,12 @@
 APP_GO_FILES := $(shell find . -name '*.go')
 
-all: linux.zip
+all: linux_amd64
 
-linux.zip: build/linux_amd64/can LICENSE
-	zip -r linux build/linux_amd64/can LICENSE
+linux_amd64: build/linux_amd64/can LICENSE
+	zip -r linux_amd64 build/linux_amd64/can LICENSE
 
 build/linux_amd64/can: $(APP_GO_FILES)
 	go build -o ./build/linux_amd64/ ./cmd/...
+
+clean:
+	rm -rf build linux_amd64.zip
