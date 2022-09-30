@@ -25,4 +25,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            linux.zip
+            linux_amd64.zip
