@@ -12,8 +12,9 @@ import (
 )
 
 type Config struct {
-	Generator  generator.Config
-	OutputPath string
+	Generator         generator.Config
+	OutputPath        string
+	TemplateDirectory string
 }
 
 func main() {
@@ -32,16 +33,15 @@ func main() {
 	basePackageName := viper.GetString("basePackageName")
 	configWithSpec := config.Generator.WithServer(*apiSpec)
 	for _, target := range []struct {
-		templateDir string
-		pkg         string
-		file        string
-		template    string
+		pkg      string
+		file     string
+		template string
 	}{
-		{"go-gin", "controller", "controller.go", "controller.tmpl"},
-		{"go-gin", "controller", "unimplemented.go", "unimplemented.tmpl"},
-		{"go-gin", "models", "models.go", "models.tmpl"},
+		{"controller", "controller.go", "controller.tmpl"},
+		{"controller", "unimplemented.go", "unimplemented.tmpl"},
+		{"models", "models.go", "models.tmpl"},
 	} {
-		file, err := generator.Generate(configWithSpec, target.templateDir, target.template)
+		file, err := generator.Generate(configWithSpec, config.TemplateDirectory, target.template)
 		if err != nil {
 			fmt.Println(err)
 		}

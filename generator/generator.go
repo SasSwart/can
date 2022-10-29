@@ -16,7 +16,7 @@ func Generate(config Config, templateDir, templateFile string) ([]byte, error) {
 
 	templater.Funcs(templateFuncMap)
 
-	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("templates/%s/*.tmpl", templateDir))
+	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", templateDir))
 	if err != nil {
 		return nil, err
 	}

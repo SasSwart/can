@@ -4,3 +4,4 @@
 #   basePackageName: api
 #   InvalidRequestStatus: 400
 # outputPath: .
+# templateDirectory: ./templates
