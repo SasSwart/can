@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"path"
@@ -10,23 +11,14 @@ import (
 	"github.com/spf13/viper"
 )
 
+type Config struct {
+	generator.Config
+}
+
 func main() {
-	// Load config
-	viper.SetConfigName("config")
-	viper.AddConfigPath(".")
-	err := viper.ReadInConfig()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	config := loadConfig()
 
-	var config generator.TemplateConfig
-
-	viper.Unmarshal(&config)
-
-	openAPIEntryPoint := viper.GetString("openAPIFile")
-
-	apiSpec, err := openapi.LoadOpenAPI(openAPIEntryPoint)
+	apiSpec, err := openapi.LoadOpenAPI(config.OpenAPIFile)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -55,4 +47,27 @@ func main() {
 			fmt.Println(err)
 		}
 	}
+}
+
+func loadConfig() Config {
+	var config Config
+
+	configFilePath := flag.String("configFile", "", "Specify which config file to use")
+	flag.Parse()
+	if *configFilePath == "" {
+		viper.SetConfigName("config")
+		viper.AddConfigPath(".")
+	} else {
+		viper.SetConfigFile(*configFilePath)
+	}
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	viper.Unmarshal(config)
+
+	return config
 }

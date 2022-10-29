@@ -17,7 +17,7 @@ type Route struct {
 	RequestBody Model
 }
 
-func NewRoute(templateConfig TemplateConfig, pathName, method string, parameters []openapi.Parameter, operation openapi.Operation) Route {
+func NewRoute(templateConfig Config, pathName, method string, parameters []openapi.Parameter, operation openapi.Operation) Route {
 	caser := cases.Title(language.English)
 	transformedResponses := make(map[string]Response)
 	for r, response := range operation.Responses {
@@ -56,7 +56,7 @@ func NewRoute(templateConfig TemplateConfig, pathName, method string, parameters
 	return route
 }
 
-func newRoutes(templateConfig TemplateConfig, apiSpec openapi.OpenAPI) (routes []Route) {
+func newRoutes(templateConfig Config, apiSpec openapi.OpenAPI) (routes []Route) {
 	for pathName, pathItem := range apiSpec.Paths {
 		for method, operation := range pathItem.Operations() {
 			if operation == nil {

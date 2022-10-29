@@ -9,7 +9,7 @@ import (
 	"text/template"
 )
 
-func Generate(config TemplateConfig, templateDir, templateFile string) ([]byte, error) {
+func Generate(config Config, templateDir, templateFile string) ([]byte, error) {
 	buff := bytes.NewBuffer([]byte{})
 
 	templater := template.New(templateFile)
