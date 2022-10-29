@@ -12,21 +12,25 @@ import (
 )
 
 type Config struct {
-	generator.Config
+	Generator  generator.Config
+	OutputPath string
 }
 
 func main() {
-	config := loadConfig()
+	config, err := loadConfig()
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
 
-	apiSpec, err := openapi.LoadOpenAPI(config.OpenAPIFile)
+	apiSpec, err := openapi.LoadOpenAPI(config.Generator.OpenAPIFile)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	outputPath := viper.GetString("outputPath")
 	basePackageName := viper.GetString("basePackageName")
-	configWithSpec := config.WithServer(*apiSpec)
+	configWithSpec := config.Generator.WithServer(*apiSpec)
 	for _, target := range []struct {
 		templateDir string
 		pkg         string
@@ -42,18 +46,21 @@ func main() {
 			fmt.Println(err)
 		}
 
-		err = os.WriteFile(path.Join(outputPath, basePackageName, target.pkg, target.file), file, 0777)
+		err = os.WriteFile(path.Join(config.OutputPath, basePackageName, target.pkg, target.file), file, 0777)
 		if err != nil {
 			fmt.Println(err)
 		}
 	}
 }
 
-func loadConfig() Config {
+func loadConfig() (Config, error) {
 	var config Config
 
-	configFilePath := flag.String("configFile", "", "Specify which config file to use")
-	flag.Parse()
+	args := flag.NewFlagSet("can", flag.ExitOnError)
+
+	configFilePath := args.String("configFile", "", "Specify which config file to use")
+	args.Parse(os.Args)
+
 	if *configFilePath == "" {
 		viper.SetConfigName("config")
 		viper.AddConfigPath(".")
@@ -63,11 +70,10 @@ func loadConfig() Config {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return Config{}, fmt.Errorf("could not read config file: %w", err)
 	}
 
-	viper.Unmarshal(config)
+	viper.Unmarshal(&config)
 
-	return config
+	return config, nil
 }
