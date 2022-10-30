@@ -12,7 +12,7 @@ type Config struct {
 }
 
 type node interface {
-	ResolveRefs(basePath string, components *Components) error
+	ResolveRefs(basePath string) error
 }
 
 func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
@@ -28,7 +28,7 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	}
 	yaml.Unmarshal(content, &api)
 
-	err = api.ResolveRefs(path.Dir(openAPIFile), &api.Components)
+	err = api.ResolveRefs(path.Dir(openAPIFile))
 	return &api, err
 }
 
@@ -40,8 +40,8 @@ type OpenAPI struct {
 	Components Components
 }
 
-func (o *OpenAPI) ResolveRefs(basePath string, components *Components) error {
-	return o.Paths.ResolveRefs(basePath, components)
+func (o *OpenAPI) ResolveRefs(basePath string) error {
+	return o.Paths.ResolveRefs(basePath)
 }
 
 type ExternalDocs struct {

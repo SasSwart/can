@@ -11,14 +11,14 @@ type Operation struct {
 	ExternalDocs ExternalDocs
 }
 
-func (o *Operation) ResolveRefs(basePath string, components *Components) error {
-	err := o.RequestBody.ResolveRefs(basePath, components)
+func (o *Operation) ResolveRefs(basePath string) error {
+	err := o.RequestBody.ResolveRefs(basePath)
 	if err != nil {
 		return err
 	}
 
 	for key, response := range o.Responses {
-		err := response.ResolveRefs(basePath, components)
+		err := response.ResolveRefs(basePath)
 		if err != nil {
 			return err
 		}

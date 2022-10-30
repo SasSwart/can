@@ -6,7 +6,7 @@ type RequestBody struct {
 	Required    bool
 }
 
-func (r *RequestBody) ResolveRefs(basePath string, components *Components) error {
+func (r *RequestBody) ResolveRefs(basePath string) error {
 	if r.Content == nil {
 		return nil
 	}
