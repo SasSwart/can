@@ -1,0 +1,3 @@
+description: This is a test schema
+items:
+  $ref: "./sub_schema.yml"

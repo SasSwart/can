@@ -1,10 +1,7 @@
 package openapi
 
 import (
-	"fmt"
-	"github.com/spf13/viper"
 	"path/filepath"
-	"strings"
 )
 
 type Schema struct {
@@ -21,19 +18,22 @@ type Schema struct {
 	Required             []string
 }
 
-func (s *Schema) ResolveRefs(basePath string, components *Components) error {
+func (s *Schema) ResolveRefs(basePath string) error {
+	ref, err := filepath.Abs(filepath.Join(basePath, s.Ref))
+	if err != nil {
+		return err
+	}
+
+	err = readRef(ref, &s)
+	if err != nil {
+		return err
+	}
+	s.Ref = ref
+
+	basePath = filepath.Dir(s.Ref)
+
 	if s.Items != nil && s.Items.Ref != "" {
-		ref := filepath.Join(basePath, s.Items.Ref)
-		var newSchema Schema
-		err := readRef(ref, &newSchema)
-		if err != nil {
-			return fmt.Errorf("Unable to read schema reference:\n%w", err)
-		}
-
-		newSchema.Ref = ref
-		s.Items = &newSchema
-
-		err = s.Items.ResolveRefs(basePath, components)
+		err = s.Items.ResolveRefs(basePath)
 		if err != nil {
 			return err
 		}
@@ -41,7 +41,7 @@ func (s *Schema) ResolveRefs(basePath string, components *Components) error {
 
 	if s.Properties != nil {
 		for key, schema := range s.Properties {
-			err := schema.ResolveRefs(basePath, components)
+			err := schema.ResolveRefs(basePath)
 			if err != nil {
 				return err
 			}
@@ -49,11 +49,4 @@ func (s *Schema) ResolveRefs(basePath string, components *Components) error {
 		}
 	}
 	return nil
-}
-
-func refToName(ref string) string {
-	docsRoot := filepath.Dir(viper.GetString("openAPIFile"))
-	name := strings.ReplaceAll(ref, docsRoot, "")
-	name = strings.ReplaceAll(name, filepath.Ext(name), "")
-	return name
 }

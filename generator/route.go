@@ -24,7 +24,7 @@ func NewRoute(openAPIFile string, pathName, method string, parameters []openapi.
 
 		transformedResponses[r] = Response{
 			Name:       funcName(pathName) + caser.String(method) + r + "Response",
-			Model:      newModel(openAPIFile, response.Content["application/json"].Schema),
+			Model:      newModel(openAPIFile, *response.Content["application/json"].Schema),
 			StatusCode: r,
 		}
 	}
@@ -45,7 +45,7 @@ func NewRoute(openAPIFile string, pathName, method string, parameters []openapi.
 	if operation.RequestBody.Content != nil {
 		route.RequestBody = newModel(
 			openAPIFile,
-			operation.RequestBody.Content["application/json"].Schema,
+			*operation.RequestBody.Content["application/json"].Schema,
 		)
 
 		schema := operation.RequestBody.Content["application/json"].Schema

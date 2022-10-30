@@ -1,32 +1,15 @@
 package openapi
 
-import (
-	"fmt"
-	"path"
-)
-
 type MediaType struct {
-	Schema Schema
+	Schema *Schema
 }
 
-func (m *MediaType) ResolveRefs(basePath string, components *Components) error {
-	if m.Schema.Ref == "" {
+func (m *MediaType) ResolveRefs(basePath string) error {
+	if m.Schema == nil {
 		return nil
 	}
 
-	ref := m.Schema.Ref
-
-	fullRefPath := path.Join(basePath, m.Schema.Ref)
-	var newSchema Schema
-	err := readRef(fullRefPath, &newSchema)
-	if err != nil {
-		return fmt.Errorf("Unable to read schema reference:\n%w", err)
-	}
-	newSchema.Ref = fullRefPath
-	m.Schema = newSchema
-
-	refBasePath := path.Dir(ref)
-	err = newSchema.ResolveRefs(path.Join(basePath, refBasePath), components)
+	err := m.Schema.ResolveRefs(basePath)
 	if err != nil {
 		return err
 	}

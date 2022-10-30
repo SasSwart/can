@@ -12,7 +12,7 @@ func (r *RequestBody) ResolveRefs(basePath string, components *Components) error
 	}
 
 	for m, mediaType := range r.Content {
-		err := mediaType.ResolveRefs(basePath, components)
+		err := mediaType.ResolveRefs(basePath)
 		if err != nil {
 			return err
 		}
