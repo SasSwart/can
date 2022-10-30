@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/sasswart/gin-in-a-can/generator"
+	"github.com/sasswart/gin-in-a-can/openapi"
 	"os"
 	"reflect"
 	"testing"
@@ -19,7 +20,9 @@ func TestLoadConfig(t *testing.T) {
 				ModuleName:           "github.com/sasswart/gin-in-a-can",
 				BasePackageName:      "api",
 				InvalidRequestStatus: "400",
-				OpenAPIFile:          "./docs/openapi.yml",
+			},
+			OpenAPI: openapi.Config{
+				OpenAPIFile: "./docs/openapi.yml",
 			},
 			OutputPath: ".",
 		}},

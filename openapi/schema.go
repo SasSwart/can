@@ -14,7 +14,6 @@ type Schema struct {
 	Items                *Schema
 	Ref                  string `yaml:"$ref"`
 	AdditionalProperties bool
-	Name                 string
 	MinLength            int `yaml:"minLength"`
 	MaxLength            int `yaml:"maxLength"`
 	Pattern              string
@@ -31,10 +30,8 @@ func (s *Schema) ResolveRefs(basePath string, components *Components) error {
 			return fmt.Errorf("Unable to read schema reference:\n%w", err)
 		}
 
-		newSchema.Name = refToName(ref)
+		newSchema.Ref = ref
 		s.Items = &newSchema
-
-		components.Schemas[newSchema.Name] = newSchema
 
 		err = s.Items.ResolveRefs(basePath, components)
 		if err != nil {
@@ -44,12 +41,10 @@ func (s *Schema) ResolveRefs(basePath string, components *Components) error {
 
 	if s.Properties != nil {
 		for key, schema := range s.Properties {
-			ref := schema.Ref
 			err := schema.ResolveRefs(basePath, components)
 			if err != nil {
 				return err
 			}
-			schema.Name = refToName(ref)
 			s.Properties[key] = schema
 		}
 	}

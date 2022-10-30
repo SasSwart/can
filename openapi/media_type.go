@@ -22,9 +22,8 @@ func (m *MediaType) ResolveRefs(basePath string, components *Components) error {
 	if err != nil {
 		return fmt.Errorf("Unable to read schema reference:\n%w", err)
 	}
-	newSchema.Name = refToName(fullRefPath)
+	newSchema.Ref = fullRefPath
 	m.Schema = newSchema
-	components.Schemas[newSchema.Name] = newSchema
 
 	refBasePath := path.Dir(ref)
 	err = newSchema.ResolveRefs(path.Join(basePath, refBasePath), components)

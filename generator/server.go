@@ -7,10 +7,10 @@ type ServerInterface struct {
 	Models []Model
 }
 
-func NewServerInterface(tc Config, apiSpec openapi.OpenAPI) ServerInterface {
+func NewServerInterface(openAPIFile string, apiSpec openapi.OpenAPI) ServerInterface {
 	serverInterface := ServerInterface{
-		Routes: newRoutes(tc, apiSpec),
-		Models: newModels(tc, apiSpec),
+		Routes: newRoutes(openAPIFile, apiSpec),
+		Models: newModels(openAPIFile, apiSpec),
 	}
 
 	return serverInterface

@@ -7,6 +7,10 @@ import (
 	"path"
 )
 
+type Config struct {
+	OpenAPIFile string
+}
+
 type node interface {
 	ResolveRefs(basePath string, components *Components) error
 }

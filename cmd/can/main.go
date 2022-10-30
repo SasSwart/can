@@ -13,6 +13,7 @@ import (
 
 type Config struct {
 	Generator         generator.Config
+	OpenAPI           openapi.Config
 	OutputPath        string
 	TemplateDirectory string
 }
@@ -24,14 +25,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	apiSpec, err := openapi.LoadOpenAPI(config.Generator.OpenAPIFile)
+	apiSpec, err := openapi.LoadOpenAPI(config.OpenAPI.OpenAPIFile)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
 	basePackageName := viper.GetString("basePackageName")
-	configWithSpec := config.Generator.WithServer(*apiSpec)
+	configWithSpec := config.Generator.WithServer(config.OpenAPI.OpenAPIFile, *apiSpec)
 	for _, target := range []struct {
 		pkg      string
 		file     string

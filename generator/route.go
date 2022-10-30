@@ -17,14 +17,14 @@ type Route struct {
 	RequestBody Model
 }
 
-func NewRoute(templateConfig Config, pathName, method string, parameters []openapi.Parameter, operation openapi.Operation) Route {
+func NewRoute(openAPIFile string, pathName, method string, parameters []openapi.Parameter, operation openapi.Operation) Route {
 	caser := cases.Title(language.English)
 	transformedResponses := make(map[string]Response)
 	for r, response := range operation.Responses {
 
 		transformedResponses[r] = Response{
 			Name:       funcName(pathName) + caser.String(method) + r + "Response",
-			Model:      newModel(templateConfig, response.Content["application/json"].Schema),
+			Model:      newModel(openAPIFile, response.Content["application/json"].Schema),
 			StatusCode: r,
 		}
 	}
@@ -38,32 +38,32 @@ func NewRoute(templateConfig Config, pathName, method string, parameters []opena
 
 	wrappedParameters := make([]Parameter, len(parameters))
 	for p, parameter := range parameters {
-		wrappedParameters[p] = newParameterModel(templateConfig, parameter)
+		wrappedParameters[p] = newParameterModel(openAPIFile, parameter)
 	}
 	route.Parameters = wrappedParameters
 
 	if operation.RequestBody.Content != nil {
 		route.RequestBody = newModel(
-			templateConfig,
+			openAPIFile,
 			operation.RequestBody.Content["application/json"].Schema,
 		)
 
 		schema := operation.RequestBody.Content["application/json"].Schema
-		name := strings.ReplaceAll(schema.Ref, filepath.Dir(templateConfig.OpenAPIFile), "")
+		name := strings.ReplaceAll(schema.Ref, filepath.Dir(openAPIFile), "")
 		name = strings.ReplaceAll(name, filepath.Ext(schema.Ref), "")
 		route.RequestBody.Name = funcName(name)
 	}
 	return route
 }
 
-func newRoutes(templateConfig Config, apiSpec openapi.OpenAPI) (routes []Route) {
+func newRoutes(openAPIFile string, apiSpec openapi.OpenAPI) (routes []Route) {
 	for pathName, pathItem := range apiSpec.Paths {
 		for method, operation := range pathItem.Operations() {
 			if operation == nil {
 				continue
 			}
 			routes = append(routes, NewRoute(
-				templateConfig,
+				openAPIFile,
 				pathName,
 				method,
 				append(pathItem.Parameters, operation.Parameters...),

@@ -11,7 +11,7 @@ type Parameter struct {
 	In string
 }
 
-func newParameterModel(tc Config, openAPIParameter openapi.Parameter) Parameter {
+func newParameterModel(openAPIFile string, openAPIParameter openapi.Parameter) Parameter {
 	model := Model{
 		Name: openAPIParameter.Name,
 	}
@@ -21,7 +21,7 @@ func newParameterModel(tc Config, openAPIParameter openapi.Parameter) Parameter 
 		model.Type = "*bool"
 		break
 	case "array":
-		name := strings.ReplaceAll(openAPIParameter.Schema.Items.Ref, filepath.Dir(tc.OpenAPIFile), "")
+		name := strings.ReplaceAll(openAPIParameter.Schema.Items.Ref, filepath.Dir(openAPIFile), "")
 		name = strings.ReplaceAll(name, filepath.Ext(openAPIParameter.Schema.Items.Ref), "")
 
 		model.Type = "[]" + funcName(name)

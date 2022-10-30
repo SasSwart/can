@@ -6,12 +6,12 @@ import (
 	"strings"
 )
 
-func newModels(tc Config, apiSpec openapi.OpenAPI) []Model {
+func newModels(openAPIFile string, apiSpec openapi.OpenAPI) []Model {
 	components := make([]Model, 0)
 	for ref, schema := range apiSpec.Components.Schemas {
-		model := newModel(tc, schema)
+		model := newModel(openAPIFile, schema)
 
-		name := strings.ReplaceAll(ref, filepath.Dir(tc.OpenAPIFile), "")
+		name := strings.ReplaceAll(ref, filepath.Dir(openAPIFile), "")
 		name = strings.ReplaceAll(name, filepath.Ext(ref), "")
 		model.Name = funcName(name)
 
@@ -30,14 +30,14 @@ type Model struct {
 	Pattern    string
 }
 
-func newModel(tc Config, schema openapi.Schema) Model {
+func newModel(name string, schema openapi.Schema) Model {
 	properties := make(map[string]Model)
 	for name, property := range schema.Properties {
-		properties[name] = newModel(tc, property)
+		properties[name] = newModel(name, property)
 	}
 
-	s := Model{
-		Name:       funcName(schema.Name),
+	model := Model{
+		Name:       name,
 		Properties: properties,
 		MinLength:  schema.MinLength,
 		MaxLength:  schema.MaxLength,
@@ -45,29 +45,26 @@ func newModel(tc Config, schema openapi.Schema) Model {
 	}
 
 	if schema.Items != nil {
-		item := newModel(tc, *schema.Items)
-		s.Items = &item
+		item := newModel(name+"Item", *schema.Items)
+		model.Items = &item
 	}
 
 	switch schema.Type {
 	case "boolean":
-		s.Type = "*bool"
+		model.Type = "*bool"
 		break
 	case "array":
-		name := strings.ReplaceAll(schema.Items.Ref, filepath.Dir(tc.OpenAPIFile), "")
-		name = strings.ReplaceAll(name, filepath.Ext(schema.Items.Ref), "")
-
-		s.Type = "[]" + s.Items.Type
+		model.Type = "[]" + model.Items.Type
 		break
 	case "integer":
-		s.Type = "int"
+		model.Type = "int"
 		break
 	case "object":
-		s.Type = s.Name
+		model.Type = model.Name
 		break
 	default:
-		s.Type = schema.Type
+		model.Type = schema.Type
 	}
 
-	return s
+	return model
 }

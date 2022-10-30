@@ -1,7 +1,8 @@
 # generator:
-#   openAPIFile: ./docs/openapi.yml
 #   moduleName: github.com/<account>/<repository>
 #   basePackageName: api
 #   InvalidRequestStatus: 400
+# openapi:
+#   openAPIFile: ./docs/openapi.yml
 # outputPath: .
 # templateDirectory: ./templates
