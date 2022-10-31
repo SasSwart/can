@@ -10,7 +10,7 @@ import (
 {{ range .ServerInterface.Routes -}}
 type {{ .Name }}{{ .Method }}Request struct {
 	{{- range .Parameters }}
-	{{ .Name | ToTitle }} {{ .Type }}
+	{{ .Name | ToTitle }} *{{ .Type }}
 	{{- end }}
 	{{ if ne .RequestBody.Type "" -}}
 	Body {{ .RequestBody.Type }}
@@ -19,15 +19,20 @@ type {{ .Name }}{{ .Method }}Request struct {
 
 func (model {{ .Name }}{{ .Method }}Request)IsValid() error {
 	{{- range .Parameters }}
+	{{- if eq .Required true }}
+	if model.{{ .Name | Sanitize | ToTitle }} == nil {
+			return fmt.Errorf("model.{{ .Name | Sanitize | ToTitle }} is required")
+	}
+	{{- end }}
 	{{- if eq .Type "string" }}
 	{{- if ne .MinLength 0 }}
-	if len(model.{{ .Name | Sanitize | ToTitle }}) < {{ .MinLength }} {
+	if len(*model.{{ .Name | Sanitize | ToTitle }}) < {{ .MinLength }} {
 		return fmt.Errorf("model.{{ .Name | Sanitize | ToTitle }} too short")
 	}
 	{{- end }}
 
 	{{- if ne .MaxLength 0 }}
-	if len(model.{{ .Name | Sanitize | ToTitle }}) > {{ .MaxLength }} {
+	if len(*model.{{ .Name | Sanitize | ToTitle }}) > {{ .MaxLength }} {
 		return fmt.Errorf("model.{{ .Name | Sanitize | ToTitle }} too long")
 	}
 	{{- end }}
@@ -49,9 +54,19 @@ type {{ $interfaceName }} interface {
 }
 
 {{ range $code, $response := .Responses }}
+func New{{ $response.Name }}(
+	{{- range $name, $schema := $response.Properties -}}{{ $name | Sanitize | ToTitle }} {{ $schema.Type }}, {{ end -}}
+) {{ .Name }} {
+	return {{ $response.Name }}{
+		{{- range $name, $schema := $response.Properties }}
+    {{ $name | Sanitize | ToTitle }}: &{{ $name | Sanitize | ToTitle }},
+    {{- end }}
+    }
+}
+
 type {{ $response.Name }} struct {
 	{{- range $name, $schema := $response.Properties }}
-	{{ $name | Sanitize | ToTitle }} {{ $schema.Type }} `json:"{{ $name }}"`
+	{{ $name | Sanitize | ToTitle }} *{{ $schema.Type }} `json:"{{ $name }}"`
 	{{- end }}
 }
 
@@ -64,9 +79,19 @@ func ({{ $response.Name }}) GetStatus() int {
 {{ end -}}
 
 {{ range .ServerInterface.Models }}
+func New{{ .Name }}(
+	{{- range $name, $schema := .Properties -}}{{ $name | Sanitize | ToTitle }} {{ $schema.Type }}, {{ end -}}
+) {{ .Name }} {
+	return {{ .Name }}{
+		{{- range $name, $schema := .Properties }}
+    {{ $name | Sanitize | ToTitle }}: &{{ $name | Sanitize | ToTitle }},
+    {{- end }}
+    }
+}
+
 type {{ .Name }} struct {
 	{{- range $name, $schema := .Properties }}
-	{{ $name | Sanitize | ToTitle }} {{ $schema.Type }} `json:"{{ $name }}"`
+	{{ $name | Sanitize | ToTitle }} *{{ $schema.Type }} `json:"{{ $name }}"`
 	{{- end }}
 }
 
@@ -76,18 +101,18 @@ func (model {{ .Name }})IsValid() error {
 	if model.{{ $name | Sanitize | ToTitle }} == nil {
 	    return fmt.Errorf("model.{{ $name | Sanitize | ToTitle }} is required")
 	}
-    {{- end }}
+	{{- end }}
 
 	{{- if eq $schema.Type "string" }}
 
 	{{- if ne $schema.MinLength 0 }}
-	if len(model.{{ $name | Sanitize | ToTitle }}) < {{ $schema.MinLength }} {
+	if len(*model.{{ $name | Sanitize | ToTitle }}) < {{ $schema.MinLength }} {
 		return fmt.Errorf("model.{{ $name | Sanitize | ToTitle }} too short")
 	}
 	{{- end }}
 
 	{{- if ne $schema.MaxLength 0 }}
-	if len(model.{{ $name | Sanitize | ToTitle }}) > {{ $schema.MaxLength }} {
+	if len(*model.{{ $name | Sanitize | ToTitle }}) > {{ $schema.MaxLength }} {
 		return fmt.Errorf("model.{{ $name | Sanitize | ToTitle }} too long")
 	}
 	{{- end }}
@@ -96,7 +121,7 @@ func (model {{ .Name }})IsValid() error {
 	// Regular expressions are checked for compilation during code generation
 	// No need to check them here.
 	r{{ $name | Sanitize | ToTitle }}, _ := regexp.Compile("{{ $schema.Pattern }}")
-	if !r{{ $name | Sanitize | ToTitle }}.MatchString(model.{{ $name | Sanitize | ToTitle }}) {
+	if !r{{ $name | Sanitize | ToTitle }}.MatchString(*model.{{ $name | Sanitize | ToTitle }}) {
 		return fmt.Errorf("model.{{ $name | Sanitize | ToTitle }} did not pass validation pattern")
 	}
 	{{- end }}
