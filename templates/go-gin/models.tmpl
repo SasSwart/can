@@ -72,6 +72,12 @@ type {{ .Name }} struct {
 
 func (model {{ .Name }})IsValid() error {
 	{{- range $name, $schema := .Properties }}
+	{{- if eq $schema.Required true }}
+	if model.{{ $name | Sanitize | ToTitle }} == nil {
+	    return fmt.Errorf("model.{{ $name | Sanitize | ToTitle }} is required")
+	}
+    {{- end }}
+
 	{{- if eq $schema.Type "string" }}
 
 	{{- if ne $schema.MinLength 0 }}

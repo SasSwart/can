@@ -69,13 +69,13 @@ func newModel(tc TemplateConfig, schema openapi.Schema) Model {
 		s.Type = "[]" + s.Items.Type
 		break
 	case "integer":
-		s.Type = "int"
+		s.Type = "*int"
 		break
 	case "object":
 		s.Type = s.Name
 		break
 	default:
-		s.Type = schema.Type
+		s.Type = "*" + schema.Type
 	}
 
 	return s
