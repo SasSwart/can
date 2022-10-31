@@ -28,12 +28,21 @@ type Model struct {
 	MinLength  int
 	MaxLength  int
 	Pattern    string
+	Required   bool
 }
 
 func newModel(tc TemplateConfig, schema openapi.Schema) Model {
 	properties := make(map[string]Model)
 	for name, property := range schema.Properties {
-		properties[name] = newModel(tc, property)
+		model := newModel(tc, property)
+		for _, p := range schema.Required {
+			if p == name {
+				model.Required = true
+				break
+			}
+		}
+
+		properties[name] = model
 	}
 
 	s := Model{
@@ -51,7 +60,7 @@ func newModel(tc TemplateConfig, schema openapi.Schema) Model {
 
 	switch schema.Type {
 	case "boolean":
-		s.Type = "*bool"
+		s.Type = "bool"
 		break
 	case "array":
 		name := strings.ReplaceAll(schema.Items.Ref, filepath.Dir(tc.OpenAPIFile), "")
