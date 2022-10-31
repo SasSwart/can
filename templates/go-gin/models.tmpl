@@ -97,23 +97,24 @@ type {{ .Name }} struct {
 
 func (model {{ .Name }})IsValid() error {
 	{{- range $name, $schema := .Properties }}
+	{{- $modelName := printf "%s%s" "model." ( $name | Sanitize | ToTitle ) -}}
 	{{- if eq $schema.Required true }}
-	if model.{{ $name | Sanitize | ToTitle }} == nil {
-	    return fmt.Errorf("model.{{ $name | Sanitize | ToTitle }} is required")
+	if {{ $modelName }} == nil {
+	    return fmt.Errorf("{{ $modelName }} is required")
 	}
 	{{- end }}
 
 	{{- if eq $schema.Type "string" }}
 
 	{{- if ne $schema.MinLength 0 }}
-	if len(*model.{{ $name | Sanitize | ToTitle }}) < {{ $schema.MinLength }} {
-		return fmt.Errorf("model.{{ $name | Sanitize | ToTitle }} too short")
+	if {{ $modelName }} != nil && len(*{{ $modelName }}) < {{ $schema.MinLength }} {
+		return fmt.Errorf("{{ $modelName }} too short")
 	}
 	{{- end }}
 
 	{{- if ne $schema.MaxLength 0 }}
-	if len(*model.{{ $name | Sanitize | ToTitle }}) > {{ $schema.MaxLength }} {
-		return fmt.Errorf("model.{{ $name | Sanitize | ToTitle }} too long")
+	if {{ $modelName }} != nil && len(*{{ $modelName }}) > {{ $schema.MaxLength }} {
+		return fmt.Errorf("{{ $modelName }} too long")
 	}
 	{{- end }}
 
@@ -121,7 +122,7 @@ func (model {{ .Name }})IsValid() error {
 	// Regular expressions are checked for compilation during code generation
 	// No need to check them here.
 	r{{ $name | Sanitize | ToTitle }}, _ := regexp.Compile("{{ $schema.Pattern }}")
-	if !r{{ $name | Sanitize | ToTitle }}.MatchString(*model.{{ $name | Sanitize | ToTitle }}) {
+	if {{ $modelName }} != nil && !r{{ $name | Sanitize | ToTitle }}.MatchString(*{{ $modelName }}) {
 		return fmt.Errorf("model.{{ $name | Sanitize | ToTitle }} did not pass validation pattern")
 	}
 	{{- end }}
