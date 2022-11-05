@@ -7,6 +7,7 @@ type Config struct {
 	ModuleName           string
 	BasePackageName      string
 	InvalidRequestStatus string
+	TemplateDirectory    string
 	ServerInterface      ServerInterface
 }
 
