@@ -20,7 +20,7 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	}
 	content, err := os.ReadFile(openAPIFile)
 	if err != nil {
-		return nil, fmt.Errorf("unable to read file: %w", err)
+		return nil, fmt.Errorf("unable to read file \"%s\": %w", openAPIFile, err)
 	}
 	yaml.Unmarshal(content, &api)
 

@@ -11,7 +11,7 @@ type Parameter struct {
 	In string
 }
 
-func newParameterModel(tc TemplateConfig, openAPIParameter openapi.Parameter) Parameter {
+func newParameterModel(tc Config, openAPIParameter openapi.Parameter) Parameter {
 	model := Model{
 		Name: openAPIParameter.Name,
 	}

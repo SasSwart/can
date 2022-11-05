@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func newModels(tc TemplateConfig, apiSpec openapi.OpenAPI) []Model {
+func newModels(tc Config, apiSpec openapi.OpenAPI) []Model {
 	components := make([]Model, 0)
 	for ref, schema := range apiSpec.Components.Schemas {
 		model := newModel(tc, schema)
@@ -31,7 +31,7 @@ type Model struct {
 	Required   bool
 }
 
-func newModel(tc TemplateConfig, schema openapi.Schema) Model {
+func newModel(tc Config, schema openapi.Schema) Model {
 	properties := make(map[string]Model)
 	for name, property := range schema.Properties {
 		model := newModel(tc, property)
