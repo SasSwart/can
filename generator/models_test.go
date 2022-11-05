@@ -6,10 +6,6 @@ import (
 )
 
 func TestNewModel(t *testing.T) {
-	config := TemplateConfig{
-		OpenAPIFile:     "",
-		ServerInterface: ServerInterface{},
-	}
 	schema := openapi.Schema{
 		Description: "",
 		Type:        "",
@@ -20,7 +16,6 @@ func TestNewModel(t *testing.T) {
 		Items:                nil,
 		Ref:                  "",
 		AdditionalProperties: false,
-		Name:                 "",
 		MinLength:            0,
 		MaxLength:            0,
 		Pattern:              "",
@@ -30,7 +25,7 @@ func TestNewModel(t *testing.T) {
 		},
 	}
 
-	model := newModel(config, schema)
+	model := newModel("", schema)
 
 	if !model.Properties["required_field"].Required {
 		t.Log("required_field's Required property is not set to true")

@@ -15,6 +15,10 @@ type HeartbeatGetResponse interface {
 	GetStatus() int
 }
 
+func NewHeartbeatGet200Response() HeartbeatGet200Response {
+	return HeartbeatGet200Response{}
+}
+
 type HeartbeatGet200Response struct {
 }
 
