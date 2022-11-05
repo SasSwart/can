@@ -28,12 +28,21 @@ type Model struct {
 	MinLength  int
 	MaxLength  int
 	Pattern    string
+	Required   bool
 }
 
 func newModel(name string, schema openapi.Schema) Model {
 	properties := make(map[string]Model)
 	for name, property := range schema.Properties {
-		properties[name] = newModel(name, property)
+		model := newModel(name, property)
+		for _, p := range schema.Required {
+			if p == name {
+				model.Required = true
+				break
+			}
+		}
+
+		properties[name] = model
 	}
 
 	model := Model{
@@ -51,7 +60,7 @@ func newModel(name string, schema openapi.Schema) Model {
 
 	switch schema.Type {
 	case "boolean":
-		model.Type = "*bool"
+		model.Type = "bool"
 		break
 	case "array":
 		model.Type = "[]" + model.Items.Type

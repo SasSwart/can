@@ -9,6 +9,7 @@ import (
 )
 
 func TestLoadConfig(t *testing.T) {
+	wd, _ := os.Getwd()
 	tests := []struct {
 		configFile     string
 		expectedConfig Config
@@ -24,11 +25,13 @@ func TestLoadConfig(t *testing.T) {
 			OpenAPI: openapi.Config{
 				OpenAPIFile: "./docs/openapi.yml",
 			},
-			OutputPath: ".",
+			OutputPath:       ".",
+			WorkingDirectory: wd,
+			ConfigFilePath:   "test_fixtures/example.yaml",
 		}},
 	}
 	for i, test := range tests {
-		os.Args = []string{}
+		os.Args = []string{"can"}
 		if test.configFile != "" {
 			os.Args = append(os.Args, "--configFile", test.configFile)
 		}

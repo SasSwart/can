@@ -9,14 +9,14 @@ import (
 	"text/template"
 )
 
-func Generate(config Config, templateDir, templateFile string) ([]byte, error) {
+func Generate(config Config, templateFile string) ([]byte, error) {
 	buff := bytes.NewBuffer([]byte{})
 
 	templater := template.New(templateFile)
 
 	templater.Funcs(templateFuncMap)
 
-	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", templateDir))
+	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", config.TemplateDirectory))
 	if err != nil {
 		return nil, err
 	}
