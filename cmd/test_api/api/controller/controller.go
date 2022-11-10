@@ -10,19 +10,19 @@ import (
 )
 
 type Server interface {
-  HeartbeatGet(*gin.Context, *models.HeartbeatGetRequest) models.HeartbeatGetResponse
+  StudentGet(*gin.Context, *models.StudentGetRequest) models.StudentGetResponse
 }
 
 func RegisterServer(e *gin.Engine, srv Server) {
-	e.GET("/heartbeat", func(c *gin.Context) {
-		request := &models.HeartbeatGetRequest{}
+	e.GET("/student", func(c *gin.Context) {
+		request := &models.StudentGetRequest{}
 
 		if err := request.IsValid(); err != nil {
 			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
-		response := srv.HeartbeatGet(c, request)
+		response := srv.StudentGet(c, request)
 		c.JSON(response.GetStatus(), response)
 	})
 }

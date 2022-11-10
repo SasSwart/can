@@ -2,28 +2,70 @@
 
 package models
 
-type HeartbeatGetRequest struct {
+type StudentGetRequest struct {
 }
 
-func (model HeartbeatGetRequest) IsValid() error {
+func (model StudentGetRequest) IsValid() error {
 
 	return nil
 }
 
-type HeartbeatGetResponse interface {
-	ImplementsHeartbeatGetResponse()
+type StudentGetResponse interface {
+	ImplementsStudentGetResponse()
 	GetStatus() int
 }
 
-func NewHeartbeatGet200Response() HeartbeatGet200Response {
-	return HeartbeatGet200Response{}
+type StudentGet200Response struct {
+	Address    *Address `json:"address"`
+	First_name *string  `json:"first_name"`
 }
 
-type HeartbeatGet200Response struct {
-}
+func (StudentGet200Response) ImplementsStudentGetResponse() {}
 
-func (HeartbeatGet200Response) ImplementsHeartbeatGetResponse() {}
-
-func (HeartbeatGet200Response) GetStatus() int {
+func (StudentGet200Response) GetStatus() int {
 	return 200
+}
+
+type First_name struct {
+}
+
+func (model First_name) IsValid() error {
+
+	return nil
+}
+
+type Address struct {
+	City        *string `json:"city"`
+	Postal_code *string `json:"postal_code"`
+}
+
+func (model Address) IsValid() error {
+
+	return nil
+}
+
+type City struct {
+}
+
+func (model City) IsValid() error {
+
+	return nil
+}
+
+type Postal_code struct {
+}
+
+func (model Postal_code) IsValid() error {
+
+	return nil
+}
+
+type Test_api struct {
+	Address    *Address `json:"address"`
+	First_name *string  `json:"first_name"`
+}
+
+func (model Test_api) IsValid() error {
+
+	return nil
 }

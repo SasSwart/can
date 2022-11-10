@@ -32,6 +32,12 @@ func main() {
 	apiSpec, err := openapi.LoadOpenAPI(
 		absoluteOpenAPIFile(config),
 	)
+	// Get all schemas from paths
+	schemas := apiSpec.GetSchemas("test_api")
+	// Add all schemas to components.schemas
+	for name, schema := range schemas {
+		apiSpec.Components.Schemas[name] = schema
+	}
 	if err != nil {
 		fmt.Println(fmt.Errorf("openapi.LoadOpenAPI error: %w", err))
 		os.Exit(1)
@@ -53,7 +59,7 @@ func main() {
 		}
 
 		outputPath := path.Join(
-			filepath.Dir(absoluteOpenAPIFile(config)),
+			filepath.Dir(config.ConfigFilePath),
 			config.OutputPath,
 			config.Generator.BasePackageName,
 			target.pkg,

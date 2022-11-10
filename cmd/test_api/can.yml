@@ -4,5 +4,5 @@ generator:
   basePackageName: api
   InvalidRequestStatus: 200
 openAPI:
-  openAPIFile: openapi.yml
+  openAPIFile: ./docs/openapi.yml
 outputPath: .

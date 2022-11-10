@@ -9,6 +9,6 @@ import (
 
 type UnimplementedServer struct{}
 
-func (UnimplementedServer) HeartbeatGet(c *gin.Context, requestModel *models.HeartbeatGetRequest) models.HeartbeatGetResponse {
-	return models.HeartbeatGet200Response{}
+func (UnimplementedServer) StudentGet(c *gin.Context, requestModel *models.StudentGetRequest) models.StudentGetResponse {
+	return models.StudentGet200Response{}
 }

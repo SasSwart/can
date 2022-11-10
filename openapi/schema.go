@@ -2,6 +2,7 @@ package openapi
 
 import (
 	"path/filepath"
+	"strings"
 )
 
 type Schema struct {
@@ -19,21 +20,31 @@ type Schema struct {
 }
 
 func (s *Schema) ResolveRefs(basePath string) error {
-	ref, err := filepath.Abs(filepath.Join(basePath, s.Ref))
-	if err != nil {
-		return err
-	}
+	if s.Ref != "" {
+		splitRef := strings.Split(s.Ref, "#")
+		var file string
+		if len(splitRef) == 1 {
+			file = splitRef[0]
+		} else {
+			file, _ = splitRef[0], splitRef[1]
+		}
 
-	err = readRef(ref, &s)
-	if err != nil {
-		return err
+		ref, err := filepath.Abs(filepath.Join(basePath, file))
+		if err != nil {
+			return err
+		}
+
+		err = readRef(ref, &s)
+		if err != nil {
+			return err
+		}
+		s.Ref = ref
 	}
-	s.Ref = ref
 
 	basePath = filepath.Dir(s.Ref)
 
 	if s.Items != nil && s.Items.Ref != "" {
-		err = s.Items.ResolveRefs(basePath)
+		err := s.Items.ResolveRefs(basePath)
 		if err != nil {
 			return err
 		}
@@ -49,4 +60,21 @@ func (s *Schema) ResolveRefs(basePath string) error {
 		}
 	}
 	return nil
+}
+
+func (s *Schema) GetSchemas(name string) (schemas map[string]Schema) {
+	schemas = map[string]Schema{}
+	if s == nil {
+		return schemas
+	}
+
+	schemas[name] = *s
+
+	for name, schema := range s.Properties {
+		for name, subSchema := range schema.GetSchemas(name) {
+			schemas[name] = subSchema
+		}
+	}
+
+	return schemas
 }

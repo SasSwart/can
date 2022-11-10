@@ -27,3 +27,17 @@ func (o *Operation) ResolveRefs(basePath string) error {
 
 	return nil
 }
+
+func (o *Operation) GetSchemas(name string) (schemas map[string]Schema) {
+	schemas = map[string]Schema{}
+	if o == nil {
+		return schemas
+	}
+	for _, response := range o.Responses {
+		for name, schema := range response.GetSchemas(name) {
+			schemas[name] = schema
+		}
+	}
+
+	return schemas
+}

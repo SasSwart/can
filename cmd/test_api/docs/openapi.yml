@@ -1,11 +1,11 @@
 openapi: 3.0.0
 paths:
-  /heartbeat:
+  /student:
     get:
       responses:
         200:
-          description: "Serves the API's documentation"
           content:
             "application/json":
-              schema: {}
+              schema:
+                $ref: "student.yml" # Test refs to entire file
 info: {}

@@ -54,15 +54,6 @@ type {{ $interfaceName }} interface {
 }
 
 {{ range $code, $response := .Responses }}
-func New{{ $response.Name }}(
-	{{- range $name, $schema := $response.Properties -}}{{ $name | Sanitize | ToTitle }} {{ $schema.Type }}, {{ end -}}
-) {{ .Name }} {
-	return {{ $response.Name }}{
-		{{- range $name, $schema := $response.Properties }}
-    {{ $name | Sanitize | ToTitle }}: &{{ $name | Sanitize | ToTitle }},
-    {{- end }}
-    }
-}
 
 type {{ $response.Name }} struct {
 	{{- range $name, $schema := $response.Properties }}
@@ -79,15 +70,6 @@ func ({{ $response.Name }}) GetStatus() int {
 {{ end -}}
 
 {{ range .ServerInterface.Models }}
-func New{{ .Name }}(
-	{{- range $name, $schema := .Properties -}}{{ $name | Sanitize | ToTitle }} {{ $schema.Type }}, {{ end -}}
-) {{ .Name }} {
-	return {{ .Name }}{
-		{{- range $name, $schema := .Properties }}
-    {{ $name | Sanitize | ToTitle }}: &{{ $name | Sanitize | ToTitle }},
-    {{- end }}
-    }
-}
 
 type {{ .Name }} struct {
 	{{- range $name, $schema := .Properties }}
