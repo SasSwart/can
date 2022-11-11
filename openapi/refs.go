@@ -10,7 +10,7 @@ func readRef(filename string, i interface{}) error {
 	fmt.Printf("Reading reference: %s\n", filename)
 	content, err := os.ReadFile(filename)
 	if err != nil {
-		return fmt.Errorf("unable to resolve PathItem Reference:\n%w", err)
+		return fmt.Errorf("unable to resolve Path Reference:\n%w", err)
 	}
 
 	err = yaml.Unmarshal(content, i)

@@ -32,10 +32,8 @@ func main() {
 	apiSpec, err := openapi.LoadOpenAPI(
 		absoluteOpenAPIFile(config),
 	)
-	// Get all schemas from paths
-	schemas := apiSpec.GetSchemas("test_api")
-	// Add all schemas to components.schemas
-	for name, schema := range schemas {
+	// Get all schemas from paths and add to components.schemas
+	for name, schema := range apiSpec.Paths.GetSchemas("test_api") {
 		apiSpec.Components.Schemas[name] = schema
 	}
 	if err != nil {

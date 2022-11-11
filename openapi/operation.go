@@ -1,5 +1,6 @@
 package openapi
 
+// Operation is a programmatic representation of the Operation object defined here: https://swagger.io/specification/#operation-object
 type Operation struct {
 	Tags         []string
 	Summary      string

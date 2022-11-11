@@ -20,7 +20,7 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 		Components: Components{
 			Schemas: map[string]Schema{},
 		},
-		Paths: map[string]PathItem{},
+		Paths: map[string]Path{},
 	}
 	content, err := os.ReadFile(openAPIFile)
 	if err != nil {
@@ -32,10 +32,11 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	return &api, err
 }
 
+// OpenAPI is a programmatic representation of the OpenApi Document object defined here: https://swagger.io/specification/#openapi-object
 type OpenAPI struct {
-	OpenAPI    string
+	OpenAPI    string `yaml:"openapi"`
 	Info       Info
-	Servers    Servers
+	Servers    []Server // TODO fix bugs after this modification
 	Paths      Paths
 	Components Components
 }
@@ -44,9 +45,8 @@ func (o *OpenAPI) ResolveRefs(basePath string) error {
 	return o.Paths.ResolveRefs(basePath)
 }
 
-func (o *OpenAPI) GetSchemas(name string) map[string]Schema {
-	return o.Paths.GetSchemas(name)
-}
-
+// ExternalDocs is a programmatic representation of the External Docs object defined here: https://swagger.io/specification/#external-documentation-object
 type ExternalDocs struct {
+	Description string `yaml:"description"`
+	Url         string `yaml:"url"`
 }
