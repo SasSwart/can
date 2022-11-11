@@ -1,5 +1,7 @@
 package openapi
 
+import "fmt"
+
 type Operation struct {
 	Tags         []string
 	Summary      string
@@ -23,6 +25,24 @@ func (o *Operation) ResolveRefs(basePath string) error {
 			return err
 		}
 		o.Responses[key] = response
+	}
+
+	return nil
+}
+
+func (o *Operation) Render() error {
+	fmt.Println("Rendering API Operation")
+
+	err := o.RequestBody.Render()
+	if err != nil {
+		return err
+	}
+
+	for _, response := range o.Responses {
+		err := response.Render()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

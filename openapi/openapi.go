@@ -44,6 +44,11 @@ func (o *OpenAPI) ResolveRefs(basePath string) error {
 	return o.Paths.ResolveRefs(basePath)
 }
 
+func (o *OpenAPI) Render() error {
+	fmt.Println("Rendering API Spec")
+	return o.Paths.Render()
+}
+
 func (o *OpenAPI) GetSchemas(name string) map[string]Schema {
 	return o.Paths.GetSchemas(name)
 }

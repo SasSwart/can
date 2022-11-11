@@ -1,6 +1,7 @@
 package openapi
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 )
@@ -19,7 +20,12 @@ type Schema struct {
 	Required             []string
 }
 
-func (s *Schema) ResolveRefs(basePath string) error {
+func (s *Schema) ResolveRefs(basePath string) (err error) {
+	ref, err := filepath.Abs(basePath)
+	if err != nil {
+		return err
+	}
+
 	if s.Ref != "" {
 		splitRef := strings.Split(s.Ref, "#")
 		var file string
@@ -29,22 +35,18 @@ func (s *Schema) ResolveRefs(basePath string) error {
 			file, _ = splitRef[0], splitRef[1]
 		}
 
-		ref, err := filepath.Abs(filepath.Join(basePath, file))
-		if err != nil {
-			return err
-		}
+		ref = filepath.Join(basePath, file)
 
-		err = readRef(ref, &s)
+		err = readRef(ref, s)
 		if err != nil {
 			return err
 		}
 		s.Ref = ref
+		basePath = filepath.Dir(ref)
 	}
 
-	basePath = filepath.Dir(s.Ref)
-
 	if s.Items != nil && s.Items.Ref != "" {
-		err := s.Items.ResolveRefs(basePath)
+		err = s.Items.ResolveRefs(basePath)
 		if err != nil {
 			return err
 		}
@@ -62,6 +64,30 @@ func (s *Schema) ResolveRefs(basePath string) error {
 	return nil
 }
 
+func (s *Schema) Render() (err error) {
+	if s == nil {
+		return nil
+	}
+	fmt.Println("Rendering API Schema")
+
+	if s.Items != nil && s.Items.Ref != "" {
+		err = s.Items.Render()
+		if err != nil {
+			return err
+		}
+	}
+
+	if s.Properties != nil {
+		for _, schema := range s.Properties {
+			err := schema.Render()
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func (s *Schema) GetSchemas(name string) (schemas map[string]Schema) {
 	schemas = map[string]Schema{}
 	if s == nil {
@@ -69,6 +95,8 @@ func (s *Schema) GetSchemas(name string) (schemas map[string]Schema) {
 	}
 
 	schemas[name] = *s
+
+	s.Items.GetSchemas(name + "Item")
 
 	for name, schema := range s.Properties {
 		for name, subSchema := range schema.GetSchemas(name) {

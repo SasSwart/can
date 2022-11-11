@@ -1,5 +1,7 @@
 package openapi
 
+import "fmt"
+
 type Response struct {
 	Description string
 	Content     map[string]MediaType
@@ -12,6 +14,18 @@ func (r *Response) ResolveRefs(basePath string) error {
 			return err
 		}
 		r.Content[key] = mediaType
+	}
+
+	return nil
+}
+
+func (r *Response) Render() error {
+	fmt.Println("Rendering API Response")
+	for _, mediaType := range r.Content {
+		err := mediaType.Render()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

@@ -8,18 +8,33 @@ import (
 type Paths map[string]PathItem
 
 func (p *Paths) ResolveRefs(basePath string) error {
-	for _, pathItem := range *p {
-		if pathItem.Ref != "" {
+	for pathName, pathItem := range *p {
+		ref := pathItem.Ref
+		if ref != "" {
 			var newPathItem PathItem
 			err := readRef(path.Join(basePath, pathItem.Ref), &newPathItem)
 			if err != nil {
 				return fmt.Errorf("Unable to read reference:\n%w", err)
 			}
+			newPathItem.Ref = ref
 			pathItem = newPathItem
 		}
 
 		refBasePath := path.Dir(pathItem.Ref)
 		err := pathItem.ResolveRefs(path.Join(basePath, refBasePath))
+		if err != nil {
+			return err
+		}
+
+		(*p)[pathName] = pathItem
+	}
+	return nil
+}
+
+func (p *Paths) Render() error {
+	fmt.Println("Rendering API Path")
+	for _, pathItem := range *p {
+		err := pathItem.Render()
 		if err != nil {
 			return err
 		}
@@ -55,6 +70,21 @@ func (p *PathItem) ResolveRefs(basePath string) error {
 			continue
 		}
 		err := operation.ResolveRefs(basePath)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (p *PathItem) Render() error {
+	fmt.Println("Rendering API Path Item")
+	for _, operation := range p.Operations() {
+		if operation == nil {
+			continue
+		}
+		err := operation.Render()
 		if err != nil {
 			return err
 		}

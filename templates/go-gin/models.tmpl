@@ -7,68 +7,6 @@ import (
 	"regexp"
 )
 
-{{ range .ServerInterface.Routes -}}
-type {{ .Name }}{{ .Method }}Request struct {
-	{{- range .Parameters }}
-	{{ .Name | ToTitle }} *{{ .Type }}
-	{{- end }}
-	{{ if ne .RequestBody.Type "" -}}
-	Body {{ .RequestBody.Type }}
-	{{- end }}
-}
-
-func (model {{ .Name }}{{ .Method }}Request)IsValid() error {
-	{{- range .Parameters }}
-	{{- if eq .Required true }}
-	if model.{{ .Name | Sanitize | ToTitle }} == nil {
-			return fmt.Errorf("model.{{ .Name | Sanitize | ToTitle }} is required")
-	}
-	{{- end }}
-	{{- if eq .Type "string" }}
-	{{- if ne .MinLength 0 }}
-	if len(*model.{{ .Name | Sanitize | ToTitle }}) < {{ .MinLength }} {
-		return fmt.Errorf("model.{{ .Name | Sanitize | ToTitle }} too short")
-	}
-	{{- end }}
-
-	{{- if ne .MaxLength 0 }}
-	if len(*model.{{ .Name | Sanitize | ToTitle }}) > {{ .MaxLength }} {
-		return fmt.Errorf("model.{{ .Name | Sanitize | ToTitle }} too long")
-	}
-	{{- end }}
-	{{- end }}
-	{{- end }}
-	{{ if ne .RequestBody.Type "" -}}
-	err := model.Body.IsValid()
-	if err != nil {
-		return err
-	}
-	{{- end }}
-	return nil
-}
-
-{{ $interfaceName := (printf "%s%s%s" .Name .Method "Response") }}
-type {{ $interfaceName }} interface {
-	Implements{{ $interfaceName }}()
-	GetStatus() int
-}
-
-{{ range $code, $response := .Responses }}
-
-type {{ $response.Name }} struct {
-	{{- range $name, $schema := $response.Properties }}
-	{{ $name | Sanitize | ToTitle }} *{{ $schema.Type }} `json:"{{ $name }}"`
-	{{- end }}
-}
-
-func ({{ $response.Name }}) Implements{{ $interfaceName }}(){}
-
-func ({{ $response.Name }}) GetStatus() int {
-	return {{ $code }}
-}
-{{ end }}
-{{ end -}}
-
 {{ range .ServerInterface.Models }}
 
 type {{ .Name }} struct {
