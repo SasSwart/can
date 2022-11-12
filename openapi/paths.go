@@ -18,16 +18,17 @@ type Path struct {
 }
 
 func (p *Path) ResolveRefs(basePath string) error {
-	for _, operation := range p.Operations() {
-		if operation == nil {
-			continue
-		}
-		err := operation.ResolveRefs(basePath)
-		if err != nil {
-			return err
+	if p.Ref != "" {
+		for _, operation := range p.Operations() {
+			if operation == nil {
+				continue
+			}
+			err := operation.ResolveRefs(basePath)
+			if err != nil {
+				return err
+			}
 		}
 	}
-
 	return nil
 }
 
