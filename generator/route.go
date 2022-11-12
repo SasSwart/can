@@ -9,9 +9,9 @@ import (
 )
 
 type Route struct {
-	Name        string
-	Path        string
-	Method      string
+	Name        string `yaml:"name"`
+	Path        string `yaml:"path"`
+	Method      string `yaml:"method"`
 	Parameters  []Parameter
 	Responses   map[string]Response
 	RequestBody Model

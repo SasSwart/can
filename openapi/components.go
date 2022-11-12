@@ -15,10 +15,10 @@ type Components struct {
 
 // Example is a programmatic representation of the Example object defined here: https://swagger.io/specification/#components-object
 type Example struct {
-	Summary       string `yaml:"summary"`
-	Description   string `yaml:"description"`
-	Value         any    `yaml:"value"` // TODO: does this imply an explicit need for reflective interpretation of data while marshalling?
-	ExternalValue string `yaml:"externalValue"`
+	Summary       string      `yaml:"summary"`
+	Description   string      `yaml:"description"`
+	Value         interface{} `yaml:"value"` // TODO: does this imply an explicit need for reflective interpretation of data while marshalling?
+	ExternalValue string      `yaml:"externalValue"`
 }
 
 // TODO: work out ABNF expressions for the resolution of $ref strings for below structs
