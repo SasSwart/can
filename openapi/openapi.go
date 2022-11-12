@@ -29,6 +29,9 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	yaml.Unmarshal(content, &api)
 
 	err = api.ResolveRefs(path.Dir(openAPIFile))
+	if err != nil {
+		return nil, fmt.Errorf("could not resolve refs: %w", err)
+	}
 	return &api, err
 }
 
