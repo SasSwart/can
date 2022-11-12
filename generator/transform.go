@@ -8,6 +8,7 @@ import (
 	"golang.org/x/text/language"
 )
 
+// funcName splits up the path, removes illegal characters (for go generation), and formats it to camelCase for use in function names
 func funcName(pathName string) string {
 	caser := cases.Title(language.English)
 

@@ -5,8 +5,9 @@ import (
 	"strings"
 )
 
-// Schema is a programmatic representation of the Schema object defined here: https://swagger.io/specification/#schema-object
 // TODO see if this can be made spec-compliant while retaining original logical flow
+
+// Schema is a programmatic representation of the Schema object defined here: https://swagger.io/specification/#schema-object
 type Schema struct {
 	Description          string
 	Type                 string
