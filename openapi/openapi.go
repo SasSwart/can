@@ -35,34 +35,20 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	}
 	yaml.Unmarshal(content, &api)
 
-	// Populate node children
-	for name, item := range api.getChildren() {
-		item.parent = &api
-		api.children = append(api.children, &item)
-	}
-
 	var resolveRefs = func(n refContainer) refContainer {
 		ref := n.getRef()
 		if ref != "" {
+			var err error
 			switch n.(type) {
 			case pathItem:
-				err := readRef(n.getBasePath(), n)
+				err = readRef(n.getBasePath(), n)
 			case Schema:
-				err := readRef(n.getBasePath(), n)
+				err = readRef(n.getBasePath(), n)
 			}
 			if err != nil {
 				return fmt.Errorf("Unable to read reference:\n%w", err)
 			}
 			return pathItem
-		}
-
-		return n
-	}
-
-	var renderAll = func(n traversable) traversable {
-		err := n.Render()
-		if err != nil {
-			return fmt.Errorf("Unable to read reference:\n%w", err)
 		}
 
 		return n
@@ -84,7 +70,7 @@ func (m openAPIMeta) getBasePath() string {
 
 // OpenAPI is a programmatic representation of the OpenApi Document object defined here: https://swagger.io/specification/#openapi-object
 type OpenAPI struct {
-	parent traversable[int]
+	parent traversable
 	openAPIMeta
 	OpenAPI string `yaml:"openapi"`
 	Info    Info
@@ -94,11 +80,17 @@ type OpenAPI struct {
 	Components Components
 }
 
-func (o *OpenAPI) getChildren() map[string]traversable[any] {
-	return o.Paths
+func (o *OpenAPI) getParent() traversable {
+	return nil
 }
 
-func (o *OpenAPI) setChild(i string, child traversable[any]) {
+func (o *OpenAPI) getChildren() childContainer[string] {
+	return childContainerMap[string]{
+		o.Paths,
+	}
+}
+
+func (o *OpenAPI) setChild(i string, child traversable) {
 	o.Paths[i] = child
 }
 

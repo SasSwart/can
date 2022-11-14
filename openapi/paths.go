@@ -88,7 +88,7 @@ func (p *Path) ResolveRefs(basePath string) error {
 
 // pathItem is a programmatic representation of the Path Item object defined here: https://swagger.io/specification/#path-item-object
 type pathItem struct {
-	node[refContainer, refContainer]
+	parent      *OpenAPI
 	Summary     string
 	Description string
 	Get         *Operation
@@ -97,6 +97,12 @@ type pathItem struct {
 	Delete      *Operation
 	Parameters  []Parameter
 	Ref         string `yaml:"$ref"`
+}
+
+var _ traversable = pathItem{}
+
+func (p pathItem) getParent() traversable {
+	return p.parent
 }
 
 func (p pathItem) getBasePath() string {
@@ -145,12 +151,9 @@ func (p pathItem) Operations() map[string]*Operation {
 	}
 }
 
-func (p pathItem) getChildren() []traversable {
-	return []traversable{
-		p.Delete,
-		p.Get,
-		p.Patch,
-		p.Post,
+func (p pathItem) getChildren() childContainer[int] {
+	return childContainerMap[string]{
+		p.Operations(),
 	}
 }
 

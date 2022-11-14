@@ -1,23 +1,24 @@
 package openapi
 
+type comparable interface {
+	string | int
+}
+type childContainer[I comparable] interface {
+	get(I) traversable
+	set(I, traversable)
+	len() int
+}
+
 type traversable interface {
 	getParent() traversable
-	getChildren() map[T]traversable
-	setChild(i T, t traversable)
+	getChildren() childContainer[comparable]
+	setChild(i int, t traversable)
 }
 
-type node[p, c traversable[comparable]] struct {
-	parent   p
-	children []c
-}
-
-//func (n node[p]) ResolveRefs() error {
-//	return nil
-//}
-
-func traverse[T comparable](n traversable[T], f func(traversable[any]) traversable[any]) traversable[T] {
+func traverse(n traversable, f func(traversable) traversable) traversable {
 	children := n.getChildren()
-	for i, child := range children {
+	for i := 0; i < children.len(); i++ {
+		child := children.get(i)
 		newChild := f(child)
 		n.setChild(i, newChild)
 
@@ -27,10 +28,30 @@ func traverse[T comparable](n traversable[T], f func(traversable[any]) traversab
 	return n
 }
 
-func (n node[p, c]) getChildren() []c {
-	return n.children
+type childContainerMap[T comparable] struct {
+	mapContainer map[T]traversable
 }
 
-func (n node[p, c]) setChild(i int, child c) {
-	n.children[i] = child
+func (c childContainerMap[T]) get(i T) traversable {
+	return c.mapContainer[i]
+}
+func (c childContainerMap[T]) set(i T, child traversable) {
+	c.mapContainer[i] = child
+}
+func (c childContainerMap[T]) len() int {
+	return len(c.mapContainer)
+}
+
+type childContainerSlice struct {
+	sliceContainer []traversable
+}
+
+func (c childContainerSlice) get(i int) traversable {
+	return c.sliceContainer[i]
+}
+func (c childContainerSlice) set(i int, child traversable) {
+	c.sliceContainer[i] = child
+}
+func (c childContainerSlice) len() int {
+	return len(c.sliceContainer)
 }
