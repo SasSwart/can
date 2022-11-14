@@ -1,14 +1,14 @@
 package openapi
 
-type traversable interface {
-	getChildren() map[string]traversable
-	setChild(i string, t traversable)
+type Traversable interface {
+	getChildren() map[string]Traversable
+	setChild(i string, t Traversable)
 }
 
-type traversalFunc func(parent, child traversable) (traversable, error)
+type TraversalFunc func(parent, child Traversable) (Traversable, error)
 
-// traverse takes a traversable node and applies some function to the node within the tree. It recursively calls itself and fails early when an error is thrown
-func traverse(node traversable, f traversalFunc) (traversable, error) {
+// Traverse takes a Traversable node and applies some function to the node within the tree. It recursively calls itself and fails early when an error is thrown
+func Traverse(node Traversable, f TraversalFunc) (Traversable, error) {
 	children := node.getChildren()
 	for i, child := range children {
 		newChild, err := f(node, child)
@@ -16,7 +16,7 @@ func traverse(node traversable, f traversalFunc) (traversable, error) {
 			return nil, err
 		}
 		node.setChild(i, newChild)
-		_, err = traverse(newChild, f)
+		_, err = Traverse(newChild, f)
 		if err != nil {
 			return nil, err
 		}
@@ -26,13 +26,13 @@ func traverse(node traversable, f traversalFunc) (traversable, error) {
 }
 
 type childContainerMap struct {
-	mapContainer map[string]traversable
+	mapContainer map[string]Traversable
 }
 
-func (c childContainerMap) get(i string) traversable {
+func (c childContainerMap) get(i string) Traversable {
 	return c.mapContainer[i]
 }
-func (c childContainerMap) set(i string, child traversable) {
+func (c childContainerMap) set(i string, child Traversable) {
 	c.mapContainer[i] = child
 }
 func (c childContainerMap) len() int {
@@ -40,13 +40,13 @@ func (c childContainerMap) len() int {
 }
 
 type childContainerSlice struct {
-	sliceContainer []traversable
+	sliceContainer []Traversable
 }
 
-func (c childContainerSlice) get(i int) traversable {
+func (c childContainerSlice) get(i int) Traversable {
 	return c.sliceContainer[i]
 }
-func (c childContainerSlice) set(i int, child traversable) {
+func (c childContainerSlice) set(i int, child Traversable) {
 	c.sliceContainer[i] = child
 }
 func (c childContainerSlice) len() int {

@@ -4,12 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"github.com/sasswart/gin-in-a-can/config"
+	"github.com/sasswart/gin-in-a-can/render"
 	"os"
-	"path"
 	"path/filepath"
 
 	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/sasswart/gin-in-a-can/render"
 	"github.com/spf13/viper"
 )
 
@@ -33,51 +32,72 @@ func main() {
 	apiSpec, err := openapi.LoadOpenAPI(
 		absoluteOpenAPIFile(config),
 	)
-	apiSpec.Render()
 	if err != nil {
 		fmt.Println(fmt.Errorf("openapi.LoadOpenAPI error: %w", err))
 		os.Exit(1)
 	}
+	renderNode := buildRenderNode(config)
+	_, err = openapi.Traverse(apiSpec, renderNode)
+	if err != nil {
+		fmt.Println(fmt.Errorf("openapi.Traverse(apiSpec, renderNode) error: %w", err))
+		os.Exit(1)
+	}
 
-	generatorConfig := config.Generator.WithServer(absoluteOpenAPIFile(config), *apiSpec)
-	for _, target := range []struct {
-		pkg      string
-		file     string
-		template string
-	}{
-		{"controller", "controller.go", "controller.tmpl"},
-		{"controller", "unimplemented.go", "unimplemented.tmpl"},
-		{"models", "model.go", "models.tmpl"},
-	} {
-		file, err := render.Render(generatorConfig, target.template)
-		if err != nil {
-			fmt.Println(err)
-		}
+	//templateData := server.NewServerInterface(absoluteOpenAPIFile(config), *apiSpec)
+	//for _, target := range []struct {
+	//	pkg      string
+	//	file     string
+	//	template string
+	//}{
+	//	{"controller", "controller.go", "controller.tmpl"},
+	//	{"controller", "unimplemented.go", "unimplemented.tmpl"},
+	//	{"models", "model.go", "models.tmpl"},
+	//} {
+	//	file, err := render.Render(config.Generator, templateData, target.template)
+	//	if err != nil {
+	//		fmt.Println(err)
+	//	}
+	//
+	//	outputPath := path.Join(
+	//		filepath.Dir(config.ConfigFilePath),
+	//		config.OutputPath,
+	//		config.Generator.BasePackageName,
+	//		target.pkg,
+	//	)
+	//	_, err = os.Stat(outputPath)
+	//	switch true {
+	//	case os.IsNotExist(err):
+	//		fmt.Printf("Output path \"%s\" does not exist. Creating it now.\n", outputPath)
+	//		err = os.MkdirAll(outputPath, 0755)
+	//		if err != nil {
+	//			fmt.Println(fmt.Errorf("could not create outputPath: %w\n", err))
+	//		}
+	//	case err != nil:
+	//		fmt.Println(fmt.Errorf("could not determine whether outputPath exists: %w\n", err))
+	//		os.Exit(1)
+	//	}
+	//
+	//	fmt.Printf("Rendering %s\n", path.Join(outputPath, target.file))
+	//	err = os.WriteFile(path.Join(outputPath, target.file), file, 0777)
+	//	if err != nil {
+	//		fmt.Println(err)
+	//	}
+	//}
+}
 
-		outputPath := path.Join(
-			filepath.Dir(config.ConfigFilePath),
-			config.OutputPath,
-			config.Generator.BasePackageName,
-			target.pkg,
-		)
-		_, err = os.Stat(outputPath)
-		switch true {
-		case os.IsNotExist(err):
-			fmt.Printf("Output path \"%s\" does not exist. Creating it now.\n", outputPath)
-			err = os.MkdirAll(outputPath, 0755)
+func buildRenderNode(config Config) openapi.TraversalFunc {
+	return func(parent, child openapi.Traversable) (openapi.Traversable, error) {
+		switch child.(type) {
+		case *openapi.Schema:
+			fmt.Println("Rendering Schema")
+			bytes, err := render.Render(config.Generator, child, "schema.tmpl")
 			if err != nil {
-				fmt.Println(fmt.Errorf("could not create outputPath: %w\n", err))
+				return child, err
 			}
-		case err != nil:
-			fmt.Println(fmt.Errorf("could not determine whether outputPath exists: %w\n", err))
-			os.Exit(1)
+			fmt.Println(string(bytes))
 		}
 
-		fmt.Printf("Rendering %s\n", path.Join(outputPath, target.file))
-		err = os.WriteFile(path.Join(outputPath, target.file), file, 0777)
-		if err != nil {
-			fmt.Println(err)
-		}
+		return child, nil
 	}
 }
 

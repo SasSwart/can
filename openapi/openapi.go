@@ -12,8 +12,7 @@ type Config struct {
 }
 
 type refContainer interface {
-	traversable
-	ResolveRefs() error
+	Traversable
 	getBasePath() string
 	getRef() string
 }
@@ -25,7 +24,7 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 		Components: Components{
 			Schemas: map[string]Schema{},
 		},
-		Paths: map[string]pathItem{},
+		Paths: map[string]PathItem{},
 	}
 
 	// Read yaml file
@@ -36,7 +35,7 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	yaml.Unmarshal(content, &api)
 
 	// Resolve references
-	newapi, err := traverse(&api, resolveRefs)
+	newapi, err := Traverse(&api, resolveRefs)
 	if err != nil {
 		return nil, err
 	}
@@ -44,42 +43,66 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	return newapi.(*OpenAPI), err
 }
 
-func resolveRefs(parent, child traversable) (traversable, error) {
+func resolveRefs(parent, child Traversable) (Traversable, error) {
 	node, ok := child.(refContainer)
 	if !ok {
 		return child, nil
 	}
 
-	ref := node.getRef()
-	if ref != "" {
-		var err error
-		switch child.(type) {
-		case *pathItem:
-			pathItemChild := child.(*pathItem)
-			pathItemChild.parent = parent.(*OpenAPI)
-			err = readRef(pathItemChild.getBasePath(), &pathItemChild)
+	var err error
+	switch child.(type) {
+	case *PathItem:
+		pathItemChild := child.(*PathItem)
+		pathItemChild.parent = parent.(*OpenAPI)
+		ref := node.getRef()
+		if ref != "" {
+			basePath := pathItemChild.getBasePath()
+			ref := filepath.Base(pathItemChild.Ref)
+			err = readRef(filepath.Join(basePath, ref), pathItemChild)
 			if err != nil {
 				return nil, fmt.Errorf("Unable to read reference:\n%w", err)
 			}
-			return pathItemChild, nil
-		case *Schema:
-			schemaChild := child.(*Schema)
-			schemaChild.parent = parent
-			err = readRef(schemaChild.getBasePath(), &schemaChild)
-			if err != nil {
-				return nil, fmt.Errorf("Unable to read reference:\n%w", err)
-			}
-			return schemaChild, nil
 		}
-
-		return child, nil
+		return pathItemChild, nil
+	case *Operation:
+		operationChild := child.(*Operation)
+		if operationChild == nil {
+			return child, nil
+		}
+		operationChild.parent = parent.(refContainer)
+		return operationChild, nil
+	case *RequestBody:
+		requestBodyChild := child.(*RequestBody)
+		requestBodyChild.parent = parent.(refContainer)
+		return requestBodyChild, nil
+	case *Response:
+		responseChild := child.(*Response)
+		responseChild.parent = parent.(refContainer)
+		return responseChild, nil
+	case *MediaType:
+		mediaTypeChild := child.(*MediaType)
+		mediaTypeChild.parent = parent.(refContainer)
+		return mediaTypeChild, nil
+	case *Schema:
+		schemaChild := child.(*Schema)
+		schemaChild.parent = parent.(refContainer)
+		ref := node.getRef()
+		if ref != "" {
+			basePath := schemaChild.getBasePath()
+			ref := filepath.Base(schemaChild.Ref)
+			err = readRef(filepath.Join(basePath, ref), schemaChild)
+			if err != nil {
+				return nil, fmt.Errorf("Unable to read reference:\n%w", err)
+			}
+		}
+		return schemaChild, nil
 	}
 
 	return child, nil
 }
 
 type openAPIMeta struct {
-	parent   traversable
+	parent   Traversable
 	basePath string
 }
 
@@ -94,31 +117,25 @@ type OpenAPI struct {
 	Info    Info
 	//Servers Servers
 	Servers    []Server // TODO fix bugs after this modification
-	Paths      map[string]pathItem
+	Paths      map[string]PathItem
 	Components Components
 }
 
-func (o *OpenAPI) getParent() traversable {
+func (o *OpenAPI) getParent() Traversable {
 	return nil
 }
 
-func (o *OpenAPI) getChildren() map[string]traversable {
-	traversables := map[string]traversable{}
+func (o *OpenAPI) getChildren() map[string]Traversable {
+	traversables := map[string]Traversable{}
 	for s, item := range o.Paths {
 		traversables[s] = &item
 	}
 	return traversables
 }
 
-func (o *OpenAPI) setChild(i string, child traversable) {
-	c, _ := child.(*pathItem)
+func (o *OpenAPI) setChild(i string, child Traversable) {
+	c, _ := child.(*PathItem)
 	o.Paths[i] = *c
-}
-
-func (o *OpenAPI) Render() error {
-	// TODO: redefine this in terms of the traverse method
-	fmt.Println("Rendering API Spec")
-	return nil
 }
 
 // ExternalDocs is a programmatic representation of the External Docs object defined here: https://swagger.io/specification/#external-documentation-object

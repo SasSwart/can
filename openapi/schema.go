@@ -1,9 +1,7 @@
 package openapi
 
 import (
-	"fmt"
 	"path/filepath"
-	"strings"
 )
 
 // TODO see if this can be made spec-compliant while retaining original logical flow
@@ -12,7 +10,7 @@ var _ refContainer = &Schema{}
 
 // Schema is a programmatic representation of the Schema object defined here: https://swagger.io/specification/#schema-object
 type Schema struct {
-	parent               traversable
+	parent               refContainer
 	Description          string
 	Type                 string
 	Properties           map[string]Schema
@@ -26,78 +24,23 @@ type Schema struct {
 	Required             []string
 }
 
-func (s *Schema) getParent() traversable {
-	//TODO implement me
-	panic("implement me")
+func (s *Schema) getChildren() map[string]Traversable {
+	children := map[string]Traversable{}
+	for name, property := range s.Properties {
+		children[name] = &property
+	}
+	return children
 }
 
-func (s *Schema) getChildren() map[string]traversable {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (s *Schema) setChild(i string, t traversable) {
-	//TODO implement me
-	panic("implement me")
+func (s *Schema) setChild(i string, t Traversable) {
+	// TODO: Decide how to implement this, given that Schema is used as a pointer
 }
 
 func (s *Schema) getBasePath() string {
-	//TODO implement me
-	panic("implement me")
+	basePath := filepath.Join(s.parent.getBasePath(), filepath.Dir(s.Ref))
+	return basePath
 }
 
 func (s *Schema) getRef() string {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (s *Schema) ResolveRefs() (err error) {
-	ref, err := filepath.Abs(s.getBasePath())
-	if err != nil {
-		return err
-	}
-
-	if s.Ref != "" {
-		splitRef := strings.Split(s.Ref, "#")
-		var file string
-		if len(splitRef) == 1 {
-			file = splitRef[0]
-		} else {
-			file, _ = splitRef[0], splitRef[1]
-		}
-
-		ref = filepath.Join(s.getBasePath(), file)
-
-		err = readRef(ref, s)
-		if err != nil {
-			return err
-		}
-		s.Ref = ref
-	}
-
-	return nil
-}
-
-func (s *Schema) Render() (err error) {
-	if s == nil {
-		return nil
-	}
-	fmt.Println("Rendering API Schema")
-
-	if s.Items != nil && s.Items.Ref != "" {
-		err = s.Items.Render()
-		if err != nil {
-			return err
-		}
-	}
-
-	if s.Properties != nil {
-		for _, schema := range s.Properties {
-			err := schema.Render()
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
+	return s.Ref
 }

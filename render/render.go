@@ -13,7 +13,7 @@ import (
 )
 
 // Render is the main parsing and rendering steps within the render library
-func Render(config config.Config, templateFile string) ([]byte, error) {
+func Render(config config.Config, data any, templateFile string) ([]byte, error) {
 	buff := bytes.NewBuffer([]byte{})
 
 	templater := template.New(templateFile)
@@ -25,7 +25,7 @@ func Render(config config.Config, templateFile string) ([]byte, error) {
 		return nil, err
 	}
 
-	err = parsedTemplate.Execute(buff, config)
+	err = parsedTemplate.Execute(buff, data)
 	if err != nil {
 		return nil, err
 	}
