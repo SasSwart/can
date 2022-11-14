@@ -57,20 +57,20 @@ func NewRoute(openAPIFile string, pathName, method string, parameters []openapi.
 }
 
 func newRoutes(openAPIFile string, apiSpec openapi.OpenAPI) (routes []Route) {
-	for pathName, pathItem := range apiSpec.Paths {
-		for method, operation := range pathItem.Operations() {
-			if operation == nil {
-				continue
-			}
-			routes = append(routes, NewRoute(
-				openAPIFile,
-				pathName,
-				method,
-				append(pathItem.Parameters, operation.Parameters...),
-				*operation,
-			))
-		}
-	}
+	//for pathName, pathItem := range apiSpec.Paths {
+	//	for method, operation := range pathItem.Operations() {
+	//		if operation == nil {
+	//			continue
+	//		}
+	//		//routes = append(routes, NewRoute(
+	//		//	openAPIFile,
+	//		//	pathName,
+	//		//	method,
+	//		//	append(pathItem.Parameters, operation.Parameters...),
+	//		//	*operation,
+	//		//))
+	//	}
+	//}
 
 	return routes
 }

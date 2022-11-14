@@ -35,15 +35,19 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	}
 	yaml.Unmarshal(content, &api)
 
-	var resolveRefs = func(n refContainer) (traversable, error) {
-		ref := n.getRef()
+	var resolveRefs = func(n traversable) (traversable, error) {
+		node, ok := n.(refContainer)
+		if !ok {
+			return nil, fmt.Errorf("not a valid refContainer")
+		}
+		ref := node.getRef()
 		if ref != "" {
 			var err error
 			switch n.(type) {
 			case pathItem:
-				err = readRef(n.getBasePath(), n)
+				err = readRef(node.getBasePath(), n)
 			case *Schema:
-				err = readRef(n.getBasePath(), n)
+				err = readRef(node.getBasePath(), n)
 			}
 			if err != nil {
 				return nil, fmt.Errorf("Unable to read reference:\n%w", err)
@@ -79,7 +83,7 @@ type OpenAPI struct {
 	Info    Info
 	//Servers Servers
 	Servers    []Server // TODO fix bugs after this modification
-	Paths      Paths
+	Paths      map[string]pathItem
 	Components Components
 }
 
@@ -87,14 +91,16 @@ func (o *OpenAPI) getParent() traversable {
 	return nil
 }
 
-func (o *OpenAPI) getChildren() childContainer[string] {
-	return childContainerMap[string]{
-		o.Paths,
+func (o *OpenAPI) getChildren() map[string]traversable {
+	traversables := map[string]traversable{}
+	for s, item := range o.Paths {
+		traversables[s] = item
 	}
+	return traversables
 }
 
 func (o *OpenAPI) setChild(i string, child traversable) {
-	o.Paths[i] = child
+	o.Paths[i] = child.(pathItem)
 }
 
 func (o *OpenAPI) Render() error {

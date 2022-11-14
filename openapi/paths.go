@@ -73,8 +73,7 @@ func (p pathItem) getChildren() map[string]traversable {
 }
 
 func (p pathItem) getRef() string {
-	//TODO implement me
-	panic("implement me")
+	return p.Ref
 }
 
 var _ traversable = pathItem{}
@@ -100,10 +99,10 @@ func (p pathItem) Render() error {
 		if operation == nil {
 			continue
 		}
-		err := operation.Render()
-		if err != nil {
-			return err
-		}
+		//err := operation.Render()
+		//if err != nil {
+		//	return err
+		//}
 	}
 
 	return nil
