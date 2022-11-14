@@ -64,7 +64,7 @@ func resolveRefs(parent, child traversable) (traversable, error) {
 			return pathItemChild, nil
 		case *Schema:
 			schemaChild := child.(*Schema)
-			schemaChild.parent = parent.(*OpenAPI)
+			schemaChild.parent = parent
 			err = readRef(schemaChild.getBasePath(), &schemaChild)
 			if err != nil {
 				return nil, fmt.Errorf("Unable to read reference:\n%w", err)
