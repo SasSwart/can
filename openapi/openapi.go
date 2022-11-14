@@ -79,6 +79,7 @@ func resolveRefs(parent, child traversable) (traversable, error) {
 }
 
 type openAPIMeta struct {
+	parent   traversable
 	basePath string
 }
 
@@ -88,7 +89,6 @@ func (m openAPIMeta) getBasePath() string {
 
 // OpenAPI is a programmatic representation of the OpenApi Document object defined here: https://swagger.io/specification/#openapi-object
 type OpenAPI struct {
-	parent traversable
 	openAPIMeta
 	OpenAPI string `yaml:"openapi"`
 	Info    Info
@@ -120,11 +120,6 @@ func (o *OpenAPI) Render() error {
 	fmt.Println("Rendering API Spec")
 	return nil
 }
-
-//
-//func (o *OpenAPI) GetSchemas(name string) map[string]Schema {
-//	return o.paths.GetSchemas(name)
-//}
 
 // ExternalDocs is a programmatic representation of the External Docs object defined here: https://swagger.io/specification/#external-documentation-object
 type ExternalDocs struct {

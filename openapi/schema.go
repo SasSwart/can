@@ -101,22 +101,3 @@ func (s *Schema) Render() (err error) {
 	}
 	return nil
 }
-
-func (s *Schema) GetSchemas(name string) (schemas map[string]Schema) {
-	schemas = map[string]Schema{}
-	if s == nil {
-		return schemas
-	}
-
-	schemas[name] = *s
-
-	s.Items.GetSchemas(name + "Item")
-
-	for name, schema := range s.Properties {
-		for name, subSchema := range schema.GetSchemas(name) {
-			schemas[name] = subSchema
-		}
-	}
-
-	return schemas
-}

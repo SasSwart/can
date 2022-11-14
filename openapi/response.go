@@ -20,14 +20,3 @@ func (r *Response) Render() error {
 
 	return nil
 }
-
-func (r *Response) GetSchemas(name string) (schemas map[string]Schema) {
-	schemas = map[string]Schema{}
-	for _, mediaType := range r.Content {
-		for name, schema := range mediaType.GetSchemas(name) {
-			schemas[name] = schema
-		}
-	}
-
-	return schemas
-}
