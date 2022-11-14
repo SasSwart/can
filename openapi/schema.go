@@ -12,6 +12,7 @@ var _ refContainer = &Schema{}
 
 // Schema is a programmatic representation of the Schema object defined here: https://swagger.io/specification/#schema-object
 type Schema struct {
+	parent               traversable
 	Description          string
 	Type                 string
 	Properties           map[string]Schema
@@ -99,23 +100,4 @@ func (s *Schema) Render() (err error) {
 		}
 	}
 	return nil
-}
-
-func (s *Schema) GetSchemas(name string) (schemas map[string]Schema) {
-	schemas = map[string]Schema{}
-	if s == nil {
-		return schemas
-	}
-
-	schemas[name] = *s
-
-	s.Items.GetSchemas(name + "Item")
-
-	for name, schema := range s.Properties {
-		for name, subSchema := range schema.GetSchemas(name) {
-			schemas[name] = subSchema
-		}
-	}
-
-	return schemas
 }

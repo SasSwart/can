@@ -35,29 +35,6 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	}
 	yaml.Unmarshal(content, &api)
 
-	var resolveRefs = func(n traversable) (traversable, error) {
-		node, ok := n.(refContainer)
-		if !ok {
-			return nil, fmt.Errorf("not a valid refContainer")
-		}
-		ref := node.getRef()
-		if ref != "" {
-			var err error
-			switch n.(type) {
-			case pathItem:
-				err = readRef(node.getBasePath(), n)
-			case *Schema:
-				err = readRef(node.getBasePath(), n)
-			}
-			if err != nil {
-				return nil, fmt.Errorf("Unable to read reference:\n%w", err)
-			}
-			return n, nil
-		}
-
-		return n, nil
-	}
-
 	// Resolve references
 	newapi, err := traverse(&api, resolveRefs)
 	if err != nil {
@@ -67,7 +44,42 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	return newapi.(*OpenAPI), err
 }
 
+func resolveRefs(parent, child traversable) (traversable, error) {
+	node, ok := child.(refContainer)
+	if !ok {
+		return child, nil
+	}
+
+	ref := node.getRef()
+	if ref != "" {
+		var err error
+		switch child.(type) {
+		case *pathItem:
+			pathItemChild := child.(*pathItem)
+			pathItemChild.parent = parent.(*OpenAPI)
+			err = readRef(pathItemChild.getBasePath(), &pathItemChild)
+			if err != nil {
+				return nil, fmt.Errorf("Unable to read reference:\n%w", err)
+			}
+			return pathItemChild, nil
+		case *Schema:
+			schemaChild := child.(*Schema)
+			schemaChild.parent = parent
+			err = readRef(schemaChild.getBasePath(), &schemaChild)
+			if err != nil {
+				return nil, fmt.Errorf("Unable to read reference:\n%w", err)
+			}
+			return schemaChild, nil
+		}
+
+		return child, nil
+	}
+
+	return child, nil
+}
+
 type openAPIMeta struct {
+	parent   traversable
 	basePath string
 }
 
@@ -77,7 +89,6 @@ func (m openAPIMeta) getBasePath() string {
 
 // OpenAPI is a programmatic representation of the OpenApi Document object defined here: https://swagger.io/specification/#openapi-object
 type OpenAPI struct {
-	parent traversable
 	openAPIMeta
 	OpenAPI string `yaml:"openapi"`
 	Info    Info
@@ -94,13 +105,14 @@ func (o *OpenAPI) getParent() traversable {
 func (o *OpenAPI) getChildren() map[string]traversable {
 	traversables := map[string]traversable{}
 	for s, item := range o.Paths {
-		traversables[s] = item
+		traversables[s] = &item
 	}
 	return traversables
 }
 
 func (o *OpenAPI) setChild(i string, child traversable) {
-	o.Paths[i] = child.(pathItem)
+	c, _ := child.(*pathItem)
+	o.Paths[i] = *c
 }
 
 func (o *OpenAPI) Render() error {
@@ -108,11 +120,6 @@ func (o *OpenAPI) Render() error {
 	fmt.Println("Rendering API Spec")
 	return nil
 }
-
-//
-//func (o *OpenAPI) GetSchemas(name string) map[string]Schema {
-//	return o.paths.GetSchemas(name)
-//}
 
 // ExternalDocs is a programmatic representation of the External Docs object defined here: https://swagger.io/specification/#external-documentation-object
 type ExternalDocs struct {

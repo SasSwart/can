@@ -42,16 +42,6 @@ import (
 //	return nil
 //}
 //
-//func (p *paths) GetSchemas(name string) (schemas map[string]Schema) {
-//	schemas = map[string]Schema{}
-//	for _, pathItem := range *p {
-//		for name, schema := range pathItem.GetSchemas(name) {
-//			schemas[name] = schema
-//		}
-//	}
-//
-//	return schemas
-//}
 
 var _ refContainer = pathItem{}
 

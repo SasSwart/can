@@ -18,14 +18,14 @@ func TestSchema_ResolveRefs(t *testing.T) {
 		Ref: ref,
 	}
 
-	schema.ResolveRefs(basePath)
+	newSchema, _ := traverse(&schema, resolveRefs)
 
-	if schema.Ref != absoluteRef {
+	if newSchema.(*Schema).Ref != absoluteRef {
 		t.Log("Schema reference was not correctly resolved to an absolute path")
 		t.Fail()
 	}
 
-	if schema.Items.Ref != absoluteSubRef {
+	if newSchema.(*Schema).Items.Ref != absoluteSubRef {
 		t.Log("Recursive Schema reference was not correctly resolved to an absolute path")
 		t.Fail()
 	}
