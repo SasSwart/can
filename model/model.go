@@ -1,24 +1,11 @@
-package generator
+package model
 
 import (
 	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/sanitizer"
 	"path/filepath"
 	"strings"
 )
-
-func newModels(openAPIFile string, apiSpec openapi.OpenAPI) []Model {
-	components := make([]Model, 0)
-	for ref, schema := range apiSpec.Components.Schemas {
-		model := newModel(openAPIFile, schema)
-
-		name := strings.ReplaceAll(ref, filepath.Dir(openAPIFile), "")
-		name = strings.ReplaceAll(name, filepath.Ext(ref), "")
-		model.Name = funcName(name)
-
-		components = append(components, model)
-	}
-	return components
-}
 
 type Model struct {
 	Name       string
@@ -31,10 +18,10 @@ type Model struct {
 	Required   bool
 }
 
-func newModel(name string, schema openapi.Schema) Model {
+func NewModel(name string, schema openapi.Schema) Model {
 	properties := make(map[string]Model)
 	for name, property := range schema.Properties {
-		model := newModel(name, property)
+		model := NewModel(name, property)
 		for _, p := range schema.Required {
 			if p == name {
 				model.Required = true
@@ -54,7 +41,7 @@ func newModel(name string, schema openapi.Schema) Model {
 	}
 
 	if schema.Items != nil {
-		item := newModel(name+"Item", *schema.Items)
+		item := NewModel(name+"Item", *schema.Items)
 		model.Items = &item
 	}
 
@@ -76,4 +63,36 @@ func newModel(name string, schema openapi.Schema) Model {
 	}
 
 	return model
+}
+
+func NewModels(openAPIFile string, apiSpec openapi.OpenAPI) []Model {
+	components := make([]Model, 0)
+	for ref, schema := range apiSpec.Components.Schemas {
+		model := NewModel(openAPIFile, schema)
+
+		name := strings.ReplaceAll(ref, filepath.Dir(openAPIFile), "")
+		name = strings.ReplaceAll(name, filepath.Ext(ref), "")
+		model.Name = sanitizer.GoFuncName(name)
+
+		components = append(components, model)
+	}
+	return components
+}
+
+// Type: What does this do???
+func Type(schema Model) string {
+	switch schema.Type {
+	case "boolean":
+		return "*bool"
+	case "array":
+		//if schema.Items == nil {
+		//	return "[]interface{}"
+		//}
+		return "[]" //+ Type(*schema.Items)
+	case "integer":
+		return "int"
+	case "object":
+		return schema.Name
+	}
+	return schema.Type
 }

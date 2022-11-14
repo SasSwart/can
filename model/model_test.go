@@ -1,4 +1,4 @@
-package generator
+package model
 
 import (
 	"github.com/sasswart/gin-in-a-can/openapi"
@@ -25,7 +25,7 @@ func TestNewModel(t *testing.T) {
 		},
 	}
 
-	model := newModel("", schema)
+	model := NewModel("", schema)
 
 	if !model.Properties["required_field"].Required {
 		t.Log("required_field's Required property is not set to true")
