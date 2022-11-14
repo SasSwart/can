@@ -9,6 +9,7 @@ import (
 	"text/template"
 )
 
+// Generate
 func Generate(config Config, templateFile string) ([]byte, error) {
 	buff := bytes.NewBuffer([]byte{})
 
@@ -31,12 +32,12 @@ func Generate(config Config, templateFile string) ([]byte, error) {
 
 var templateFuncMap = template.FuncMap{
 	"ToUpper":  strings.ToUpper,
-	"ToTitle":  toTitle,
+	"ToTitle":  toTitleCase,
 	"Type":     Type,
 	"Sanitize": Sanitize,
 }
 
-func toTitle(s string) string {
+func toTitleCase(s string) string {
 	caser := cases.Title(language.English)
 	return caser.String(s)
 }

@@ -82,13 +82,15 @@ func (m openAPIMeta) getBasePath() string {
 	return m.basePath
 }
 
+// OpenAPI is a programmatic representation of the OpenApi Document object defined here: https://swagger.io/specification/#openapi-object
 type OpenAPI struct {
 	parent traversable[int]
 	openAPIMeta
-	OpenAPI    string
-	Info       Info
-	Servers    Servers
-	Paths      map[string]pathItem
+	OpenAPI string `yaml:"openapi"`
+	Info    Info
+	//Servers Servers
+	Servers    []Server // TODO fix bugs after this modification
+	Paths      Paths
 	Components Components
 }
 
@@ -111,5 +113,8 @@ func (o *OpenAPI) Render() error {
 //	return o.paths.GetSchemas(name)
 //}
 
+// ExternalDocs is a programmatic representation of the External Docs object defined here: https://swagger.io/specification/#external-documentation-object
 type ExternalDocs struct {
+	Description string `yaml:"description"`
+	Url         string `yaml:"url"`
 }

@@ -3,8 +3,10 @@ package openapi
 import "fmt"
 
 type Response struct {
-	Description string
+	Description string            `yaml:"description"`
+	Headers     map[string]Header // can also be a $ref
 	Content     map[string]MediaType
+	Links       map[string]Link // can also be a $ref
 }
 
 func (r *Response) ResolveRefs(basePath string) error {

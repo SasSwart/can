@@ -12,3 +12,49 @@ The features I need are:
 * use nullable types in parameters and request bodies
 * Add parameter validation based on the `required` flag, regex patterns and other OpenAPI format specifications
 * Add API Fuzz testing
+
+# HackDay Plans
+```mermaid
+graph LR
+    Yaml --> Spec --> Output[File]
+```
+
+```go 
+type File struct {
+    content []byte
+    path    string
+}
+```
+
+## OpenAPI spec - _Can_ tree representation
+```mermaid
+graph TD
+    Spec --> Path
+    Spec --> Components
+    Components --> S1[Schemas] --> S1
+    Path --> PathItem --> Operation
+    Operation --> Parameters --> S3[Schemas] --> S3
+    Operation --> Responses
+    Operation --> RequestBody
+    RequestBody --> MediaType
+    Responses --> MediaType --> S2[Schemas] --> S2
+```
+
+## Process Representation
+```mermaid
+graph LR 
+    1[1. Unmarshal]
+    2[2. ReadRefs] --- TT[Traverse Tree]
+    3[3. Render] --- TT[Traverse Tree]
+```
+
+Spec is a Directed Acyclic Graph of composed nodes:
+```go 
+type Node struct {
+    outputPath  string
+    fileName    string 
+    content     []byte
+    parent      *Node
+    children    []Node
+}
+```
