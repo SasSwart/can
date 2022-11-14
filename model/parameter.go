@@ -1,42 +1,43 @@
-package generator
+package model
 
 import (
 	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/sanitizer"
 	"path/filepath"
 	"strings"
 )
 
 type Parameter struct {
-	Model
 	In string
+	Model
 }
 
-func newParameterModel(openAPIFile string, openAPIParameter openapi.Parameter) Parameter {
-	model := Model{
+func NewParameterModel(openAPIFile string, openAPIParameter openapi.Parameter) Parameter {
+	m := Model{
 		Name: openAPIParameter.Name,
 	}
 
 	switch openAPIParameter.Schema.Type {
 	case "boolean":
-		model.Type = "*bool"
+		m.Type = "*bool"
 		break
 	case "array":
 		name := strings.ReplaceAll(openAPIParameter.Schema.Items.Ref, filepath.Dir(openAPIFile), "")
 		name = strings.ReplaceAll(name, filepath.Ext(openAPIParameter.Schema.Items.Ref), "")
 
-		model.Type = "[]" + funcName(name)
+		m.Type = "[]" + sanitizer.GoFuncName(name)
 		break
 	case "integer":
-		model.Type = "int"
+		m.Type = "int"
 		break
 	default:
-		model.Type = openAPIParameter.Schema.Type
+		m.Type = openAPIParameter.Schema.Type
 	}
 
-	parameter := Parameter{
-		Model: model,
+	parameterModel := Parameter{
+		Model: m,
 		In:    openAPIParameter.In,
 	}
 
-	return parameter
+	return parameterModel
 }

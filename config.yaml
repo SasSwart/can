@@ -1,4 +1,4 @@
-# generator:
+# render:
 #   moduleName: github.com/<account>/<repository>
 #   basePackageName: api
 #   InvalidRequestStatus: 400

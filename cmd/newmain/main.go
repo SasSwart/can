@@ -3,15 +3,15 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/sasswart/gin-in-a-can/generator"
 	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/render"
 	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
 )
 
 type Config struct {
-	Generator         generator.Config
+	Generator         render.Config
 	OpenAPI           openapi.Config
 	OutputPath        string
 	TemplateDirectory string

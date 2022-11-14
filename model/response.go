@@ -1,7 +1,7 @@
-package generator
+package model
 
 type Response struct {
-	Name string
-	Model
+	Name       string
 	StatusCode string
+	Model
 }

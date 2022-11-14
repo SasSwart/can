@@ -1,11 +1,11 @@
-package generator
+package sanitizer
 
 import (
 	"regexp"
 	"testing"
 )
 
-func TestFuncName(t *testing.T) {
+func TestGoFuncName(t *testing.T) {
 	//TODO: add more test data
 	testStrings := []string{
 		"",
@@ -19,7 +19,7 @@ func TestFuncName(t *testing.T) {
 		"/path.name",
 	}
 	for _, testString := range testStrings {
-		res := funcName(testString)
+		res := GoFuncName(testString)
 
 		// test Go Compatibility
 		// TODO: format this regex to go function name spec
