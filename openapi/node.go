@@ -1,44 +1,40 @@
 package openapi
 
-type comparable interface {
-	string | int
-}
-type childContainer[I comparable] interface {
-	get(I) traversable
-	set(I, traversable)
-	len() int
-}
-
 type traversable interface {
 	getParent() traversable
-	getChildren() childContainer[comparable]
-	setChild(i int, t traversable)
+	getChildren() map[string]traversable
+	setChild(i string, t traversable)
 }
 
-func traverse(n traversable, f func(traversable) traversable) traversable {
+// traverse takes a traversable node and applies some function to the node within the tree. It recursively calls itself and fails early when an error is thrown
+func traverse(n traversable, f func(traversable) (traversable, error)) (traversable, error) {
 	children := n.getChildren()
-	for i := 0; i < children.len(); i++ {
-		child := children.get(i)
-		newChild := f(child)
+	for i, child := range children {
+		newChild, err := f(child)
+		if err != nil {
+			return nil, err
+		}
 		n.setChild(i, newChild)
-
-		traverse(newChild, f)
+		_, err = traverse(newChild, f)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return n
+	return n, nil
 }
 
-type childContainerMap[T comparable] struct {
-	mapContainer map[T]traversable
+type childContainerMap struct {
+	mapContainer map[string]traversable
 }
 
-func (c childContainerMap[T]) get(i T) traversable {
+func (c childContainerMap) get(i string) traversable {
 	return c.mapContainer[i]
 }
-func (c childContainerMap[T]) set(i T, child traversable) {
+func (c childContainerMap) set(i string, child traversable) {
 	c.mapContainer[i] = child
 }
-func (c childContainerMap[T]) len() int {
+func (c childContainerMap) len() int {
 	return len(c.mapContainer)
 }
 

@@ -35,29 +35,32 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	}
 	yaml.Unmarshal(content, &api)
 
-	var resolveRefs = func(n refContainer) refContainer {
+	var resolveRefs = func(n refContainer) (traversable, error) {
 		ref := n.getRef()
 		if ref != "" {
 			var err error
 			switch n.(type) {
 			case pathItem:
 				err = readRef(n.getBasePath(), n)
-			case Schema:
+			case *Schema:
 				err = readRef(n.getBasePath(), n)
 			}
 			if err != nil {
-				return fmt.Errorf("Unable to read reference:\n%w", err)
+				return nil, fmt.Errorf("Unable to read reference:\n%w", err)
 			}
-			return pathItem
+			return n, nil
 		}
 
-		return n
+		return n, nil
 	}
 
 	// Resolve references
-	newapi := traverse(&api, resolveRefs).(*OpenAPI)
+	newapi, err := traverse(&api, resolveRefs)
+	if err != nil {
+		return nil, err
+	}
 
-	return newapi, err
+	return newapi.(*OpenAPI), err
 }
 
 type openAPIMeta struct {

@@ -14,8 +14,8 @@ func readRef(filename string, i interface{}) error {
 		return fmt.Errorf("unable to resolve pathItem Reference:\n%w", err)
 	}
 
-	// TODO: schema.go passes in reference to base struct for unmarshalling. This should instead be the ref object within the struct.
-	// TODO: look to reduce complexity. Possibly return values instead of OO style manipulation.
+	// TODO Alex: schema.go passes in reference to base struct for unmarshalling. This should instead be the ref object within the struct.
+	// TODO Alex: look to reduce complexity. Possibly return values instead of OO style manipulation.
 	err = yaml.Unmarshal(content, i)
 	if err != nil {
 		return fmt.Errorf("unable to unmarshal reference file:\n%w", err)

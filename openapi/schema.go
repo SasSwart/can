@@ -8,6 +8,8 @@ import (
 
 // TODO see if this can be made spec-compliant while retaining original logical flow
 
+var _ refContainer = &Schema{}
+
 // Schema is a programmatic representation of the Schema object defined here: https://swagger.io/specification/#schema-object
 type Schema struct {
 	Description          string
@@ -23,8 +25,33 @@ type Schema struct {
 	Required             []string
 }
 
-func (s *Schema) ResolveRefs(basePath string) (err error) {
-	ref, err := filepath.Abs(basePath)
+func (s *Schema) getParent() traversable {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *Schema) getChildren() map[string]traversable {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *Schema) setChild(i string, t traversable) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *Schema) getBasePath() string {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *Schema) getRef() string {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *Schema) ResolveRefs() (err error) {
+	ref, err := filepath.Abs(s.getBasePath())
 	if err != nil {
 		return err
 	}
@@ -38,32 +65,15 @@ func (s *Schema) ResolveRefs(basePath string) (err error) {
 			file, _ = splitRef[0], splitRef[1]
 		}
 
-		ref = filepath.Join(basePath, file)
+		ref = filepath.Join(s.getBasePath(), file)
 
 		err = readRef(ref, s)
 		if err != nil {
 			return err
 		}
 		s.Ref = ref
-		basePath = filepath.Dir(ref)
 	}
 
-	if s.Items != nil && s.Items.Ref != "" {
-		err = s.Items.ResolveRefs(basePath)
-		if err != nil {
-			return err
-		}
-	}
-
-	if s.Properties != nil {
-		for key, schema := range s.Properties {
-			err := schema.ResolveRefs(basePath)
-			if err != nil {
-				return err
-			}
-			s.Properties[key] = schema
-		}
-	}
 	return nil
 }
 

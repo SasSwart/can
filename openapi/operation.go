@@ -14,7 +14,8 @@ type Operation struct {
 	ExternalDocs ExternalDocs
 }
 
-var _ traversable = Operation{}
+// communicate by sharing memory ;)
+var _ traversable = &Operation{}
 
 func (o *Operation) ResolveRefs(basePath string) error {
 	err := o.RequestBody.ResolveRefs(basePath)
@@ -65,14 +66,14 @@ func (o *Operation) GetSchemas(name string) (schemas map[string]Schema) {
 	return schemas
 }
 
-func (o Operation) getParent() traversable {
+func (o *Operation) getParent() traversable {
 	return nil
 }
 
-func (o Operation) getChildren() childContainer[string] {
-	return childContainerMap[string]{}
+func (o *Operation) getChildren() map[string]traversable {
+	return map[string]traversable{}
 }
 
-func (o Operation) setChild(i int, child traversable) {
+func (o *Operation) setChild(i string, child traversable) {
 	// TODO
 }

@@ -2,10 +2,10 @@ package openapi
 
 import (
 	"fmt"
-	"path"
 	"path/filepath"
 )
 
+// Paths is the collection of Path objects contained within the OpenAPI object
 //type paths map[string]pathItem
 
 //func (p *paths) ResolveRefs() error {
@@ -30,24 +30,6 @@ import (
 //	}
 //	return nil
 //}
-
-// Paths is the collection of Path objects contained within the OpenAPI object
-type Paths map[string]Path
-
-func (p *Paths) ResolveRefs(basePath string) error {
-	for _, pathItem := range *p {
-		if pathItem.Ref != "" {
-			var newPathItem Path
-			err := readRef(path.Join(basePath, pathItem.Ref), &newPathItem)
-			if err != nil {
-				return fmt.Errorf("Unable to read reference:\n%w", err)
-			}
-			pathItem = newPathItem
-		}
-	}
-	return nil
-}
-
 //
 //func (p *paths) Render() error {
 //	fmt.Println("Rendering API Path")
@@ -71,20 +53,7 @@ func (p *Paths) ResolveRefs(basePath string) error {
 //	return schemas
 //}
 
-func (p *Path) ResolveRefs(basePath string) error {
-	if p.Ref != "" {
-		for _, operation := range p.Operations() {
-			if operation == nil {
-				continue
-			}
-			err := operation.ResolveRefs(basePath)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
+var _ refContainer = pathItem{}
 
 // pathItem is a programmatic representation of the Path Item object defined here: https://swagger.io/specification/#path-item-object
 type pathItem struct {
@@ -97,6 +66,15 @@ type pathItem struct {
 	Delete      *Operation
 	Parameters  []Parameter
 	Ref         string `yaml:"$ref"`
+}
+
+func (p pathItem) getChildren() map[string]traversable {
+	return p.Operations()
+}
+
+func (p pathItem) getRef() string {
+	//TODO implement me
+	panic("implement me")
 }
 
 var _ traversable = pathItem{}
@@ -131,19 +109,8 @@ func (p pathItem) Render() error {
 	return nil
 }
 
-func (p pathItem) GetSchemas(name string) (schemas map[string]Schema) {
-	schemas = map[string]Schema{}
-	for _, operation := range p.Operations() {
-		for name, schema := range operation.GetSchemas(name) {
-			schemas[name] = schema
-		}
-	}
-
-	return schemas
-}
-
-func (p pathItem) Operations() map[string]*Operation {
-	return map[string]*Operation{
+func (p pathItem) Operations() map[string]traversable {
+	return map[string]traversable{
 		"delete": p.Delete,
 		"get":    p.Get,
 		"patch":  p.Patch,
@@ -151,12 +118,6 @@ func (p pathItem) Operations() map[string]*Operation {
 	}
 }
 
-func (p pathItem) getChildren() childContainer[int] {
-	return childContainerMap[string]{
-		p.Operations(),
-	}
-}
-
-func (p pathItem) setChild(i int, child traversable) {
+func (p pathItem) setChild(i string, child traversable) {
 	// TODO
 }
