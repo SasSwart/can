@@ -1,27 +1,28 @@
 package openapi
 
 type traversable interface {
-	getParent() traversable
 	getChildren() map[string]traversable
 	setChild(i string, t traversable)
 }
 
+type traversalFunc func(parent, child traversable) (traversable, error)
+
 // traverse takes a traversable node and applies some function to the node within the tree. It recursively calls itself and fails early when an error is thrown
-func traverse(n traversable, f func(traversable) (traversable, error)) (traversable, error) {
-	children := n.getChildren()
+func traverse(node traversable, f traversalFunc) (traversable, error) {
+	children := node.getChildren()
 	for i, child := range children {
-		newChild, err := f(child)
+		newChild, err := f(node, child)
 		if err != nil {
 			return nil, err
 		}
-		n.setChild(i, newChild)
+		node.setChild(i, newChild)
 		_, err = traverse(newChild, f)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return n, nil
+	return node, nil
 }
 
 type childContainerMap struct {

@@ -12,6 +12,7 @@ var _ refContainer = &Schema{}
 
 // Schema is a programmatic representation of the Schema object defined here: https://swagger.io/specification/#schema-object
 type Schema struct {
+	parent               traversable
 	Description          string
 	Type                 string
 	Properties           map[string]Schema
