@@ -23,7 +23,7 @@ func NewRoute(openAPIFile string, pathName, method string, parameters []openapi.
 	for r, response := range operation.Responses {
 
 		transformedResponses[r] = Response{
-			Name:       funcName(pathName) + caser.String(method) + r + "Response",
+			Name:       FuncName(pathName) + caser.String(method) + r + "Response",
 			Model:      newModel(openAPIFile, *response.Content["application/json"].Schema),
 			StatusCode: r,
 		}
@@ -31,7 +31,7 @@ func NewRoute(openAPIFile string, pathName, method string, parameters []openapi.
 
 	route := Route{
 		Method:    caser.String(method),
-		Name:      funcName(pathName),
+		Name:      FuncName(pathName),
 		Path:      ginPathName(pathName),
 		Responses: transformedResponses,
 	}
@@ -51,7 +51,7 @@ func NewRoute(openAPIFile string, pathName, method string, parameters []openapi.
 		schema := operation.RequestBody.Content["application/json"].Schema
 		name := strings.ReplaceAll(schema.Ref, filepath.Dir(openAPIFile), "")
 		name = strings.ReplaceAll(name, filepath.Ext(schema.Ref), "")
-		route.RequestBody.Name = funcName(name)
+		route.RequestBody.Name = FuncName(name)
 	}
 	return route
 }

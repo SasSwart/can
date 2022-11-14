@@ -52,7 +52,7 @@ func main() {
 	}{
 		{"controller", "controller.go", "controller.tmpl"},
 		{"controller", "unimplemented.go", "unimplemented.tmpl"},
-		{"models", "models.go", "models.tmpl"},
+		{"models", "model.go", "models.tmpl"},
 	} {
 		file, err := generator.Generate(generatorConfig, target.template)
 		if err != nil {

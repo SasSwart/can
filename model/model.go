@@ -1,6 +1,7 @@
-package generator
+package model
 
 import (
+	"github.com/sasswart/gin-in-a-can/generator"
 	"github.com/sasswart/gin-in-a-can/openapi"
 	"path/filepath"
 	"strings"
@@ -13,7 +14,7 @@ func newModels(openAPIFile string, apiSpec openapi.OpenAPI) []Model {
 
 		name := strings.ReplaceAll(ref, filepath.Dir(openAPIFile), "")
 		name = strings.ReplaceAll(name, filepath.Ext(ref), "")
-		model.Name = funcName(name)
+		model.Name = generator.FuncName(name)
 
 		components = append(components, model)
 	}

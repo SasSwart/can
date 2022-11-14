@@ -24,7 +24,7 @@ func newParameterModel(openAPIFile string, openAPIParameter openapi.Parameter) P
 		name := strings.ReplaceAll(openAPIParameter.Schema.Items.Ref, filepath.Dir(openAPIFile), "")
 		name = strings.ReplaceAll(name, filepath.Ext(openAPIParameter.Schema.Items.Ref), "")
 
-		model.Type = "[]" + funcName(name)
+		model.Type = "[]" + FuncName(name)
 		break
 	case "integer":
 		model.Type = "int"

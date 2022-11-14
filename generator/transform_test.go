@@ -19,7 +19,7 @@ func TestFuncName(t *testing.T) {
 		"/path.name",
 	}
 	for _, testString := range testStrings {
-		res := funcName(testString)
+		res := FuncName(testString)
 
 		// test Go Compatibility
 		// TODO: format this regex to go function name spec

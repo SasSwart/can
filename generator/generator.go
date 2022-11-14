@@ -3,14 +3,15 @@ package generator
 import (
 	"bytes"
 	"fmt"
+	"github.com/sasswart/gin-in-a-can/config"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"strings"
 	"text/template"
 )
 
-// Generate
-func Generate(config Config, templateFile string) ([]byte, error) {
+// Generate is the main parsing and rendering steps within the generator library
+func Generate(config config.Config, templateFile string) ([]byte, error) {
 	buff := bytes.NewBuffer([]byte{})
 
 	templater := template.New(templateFile)

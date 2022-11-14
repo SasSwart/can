@@ -1,4 +1,4 @@
-package generator
+package model
 
 import (
 	"github.com/sasswart/gin-in-a-can/openapi"
