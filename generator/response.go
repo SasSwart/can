@@ -1,7 +1,9 @@
 package generator
 
+import "github.com/sasswart/gin-in-a-can/model"
+
 type Response struct {
 	Name string
-	Model
+	model.Model
 	StatusCode string
 }

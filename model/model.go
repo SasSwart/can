@@ -7,10 +7,10 @@ import (
 	"strings"
 )
 
-func newModels(openAPIFile string, apiSpec openapi.OpenAPI) []Model {
+func NewModels(openAPIFile string, apiSpec openapi.OpenAPI) []Model {
 	components := make([]Model, 0)
 	for ref, schema := range apiSpec.Components.Schemas {
-		model := newModel(openAPIFile, schema)
+		model := NewModel(openAPIFile, schema)
 
 		name := strings.ReplaceAll(ref, filepath.Dir(openAPIFile), "")
 		name = strings.ReplaceAll(name, filepath.Ext(ref), "")
@@ -32,10 +32,10 @@ type Model struct {
 	Required   bool
 }
 
-func newModel(name string, schema openapi.Schema) Model {
+func NewModel(name string, schema openapi.Schema) Model {
 	properties := make(map[string]Model)
 	for name, property := range schema.Properties {
-		model := newModel(name, property)
+		model := NewModel(name, property)
 		for _, p := range schema.Required {
 			if p == name {
 				model.Required = true
@@ -55,7 +55,7 @@ func newModel(name string, schema openapi.Schema) Model {
 	}
 
 	if schema.Items != nil {
-		item := newModel(name+"Item", *schema.Items)
+		item := NewModel(name+"Item", *schema.Items)
 		model.Items = &item
 	}
 

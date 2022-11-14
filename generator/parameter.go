@@ -1,40 +1,41 @@
 package generator
 
 import (
+	"github.com/sasswart/gin-in-a-can/model"
 	"github.com/sasswart/gin-in-a-can/openapi"
 	"path/filepath"
 	"strings"
 )
 
 type Parameter struct {
-	Model
+	model.Model
 	In string
 }
 
-func newParameterModel(openAPIFile string, openAPIParameter openapi.Parameter) Parameter {
-	model := Model{
+func NewParameterModel(openAPIFile string, openAPIParameter openapi.Parameter) Parameter {
+	m := model.Model{
 		Name: openAPIParameter.Name,
 	}
 
 	switch openAPIParameter.Schema.Type {
 	case "boolean":
-		model.Type = "*bool"
+		m.Type = "*bool"
 		break
 	case "array":
 		name := strings.ReplaceAll(openAPIParameter.Schema.Items.Ref, filepath.Dir(openAPIFile), "")
 		name = strings.ReplaceAll(name, filepath.Ext(openAPIParameter.Schema.Items.Ref), "")
 
-		model.Type = "[]" + FuncName(name)
+		m.Type = "[]" + FuncName(name)
 		break
 	case "integer":
-		model.Type = "int"
+		m.Type = "int"
 		break
 	default:
-		model.Type = openAPIParameter.Schema.Type
+		m.Type = openAPIParameter.Schema.Type
 	}
 
 	parameter := Parameter{
-		Model: model,
+		Model: m,
 		In:    openAPIParameter.In,
 	}
 

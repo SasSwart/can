@@ -45,7 +45,7 @@ func FuncName(pathName string) string {
 	return strings.Join(nameSegments, "")
 }
 
-func ginPathName(pathName string) string {
+func GinPathName(pathName string) string {
 	pathSegments := strings.Split(pathName, "/")
 	for i, segment := range pathSegments {
 		if len(segment) == 0 {

@@ -1,10 +1,11 @@
 package generator
 
 import (
+	"github.com/sasswart/gin-in-a-can/model"
 	"strings"
 )
 
-func Type(schema Model) string {
+func Type(schema model.Model) string {
 	switch schema.Type {
 	case "boolean":
 		return "*bool"
