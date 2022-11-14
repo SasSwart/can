@@ -1,19 +1,19 @@
-package generator
+package model
 
 import (
-	"github.com/sasswart/gin-in-a-can/model"
 	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/sanitizer"
 	"path/filepath"
 	"strings"
 )
 
 type Parameter struct {
-	model.Model
 	In string
+	Model
 }
 
 func NewParameterModel(openAPIFile string, openAPIParameter openapi.Parameter) Parameter {
-	m := model.Model{
+	m := Model{
 		Name: openAPIParameter.Name,
 	}
 
@@ -25,7 +25,7 @@ func NewParameterModel(openAPIFile string, openAPIParameter openapi.Parameter) P
 		name := strings.ReplaceAll(openAPIParameter.Schema.Items.Ref, filepath.Dir(openAPIFile), "")
 		name = strings.ReplaceAll(name, filepath.Ext(openAPIParameter.Schema.Items.Ref), "")
 
-		m.Type = "[]" + FuncName(name)
+		m.Type = "[]" + sanitizer.GoFuncName(name)
 		break
 	case "integer":
 		m.Type = "int"
@@ -34,10 +34,10 @@ func NewParameterModel(openAPIFile string, openAPIParameter openapi.Parameter) P
 		m.Type = openAPIParameter.Schema.Type
 	}
 
-	parameter := Parameter{
+	parameterModel := Parameter{
 		Model: m,
 		In:    openAPIParameter.In,
 	}
 
-	return parameter
+	return parameterModel
 }

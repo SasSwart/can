@@ -1,15 +1,21 @@
-package generator
+package sanitizer
 
 import (
 	"fmt"
-	"strings"
-
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"strings"
 )
 
-// FuncName splits up the path, removes illegal characters (for go generation), and formats it to camelCase for use in function names
-func FuncName(pathName string) string {
+// GoSanitize removes colons and dashes from a string
+func GoSanitize(s string) string {
+	noColons := strings.ReplaceAll(s, ":", "_")
+	noDashes := strings.ReplaceAll(noColons, "-", "_")
+	return noDashes
+}
+
+// GoFuncName splits up the path, removes illegal characters for the generation of go code and formats it to camelCase for use in function names
+func GoFuncName(pathName string) string {
 	caser := cases.Title(language.English)
 
 	// Replace - with _ (- is not allowed in go func names)

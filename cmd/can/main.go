@@ -7,13 +7,13 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/sasswart/gin-in-a-can/generator"
 	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/render"
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Generator         generator.Config
+	Generator         render.Config
 	OpenAPI           openapi.Config
 	OutputPath        string
 	TemplateDirectory string
@@ -54,7 +54,7 @@ func main() {
 		{"controller", "unimplemented.go", "unimplemented.tmpl"},
 		{"models", "model.go", "models.tmpl"},
 	} {
-		file, err := generator.Generate(generatorConfig, target.template)
+		file, err := render.Render(generatorConfig, target.template)
 		if err != nil {
 			fmt.Println(err)
 		}

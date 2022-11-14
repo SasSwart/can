@@ -1,25 +1,11 @@
 package model
 
 import (
-	"github.com/sasswart/gin-in-a-can/generator"
 	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/sanitizer"
 	"path/filepath"
 	"strings"
 )
-
-func NewModels(openAPIFile string, apiSpec openapi.OpenAPI) []Model {
-	components := make([]Model, 0)
-	for ref, schema := range apiSpec.Components.Schemas {
-		model := NewModel(openAPIFile, schema)
-
-		name := strings.ReplaceAll(ref, filepath.Dir(openAPIFile), "")
-		name = strings.ReplaceAll(name, filepath.Ext(ref), "")
-		model.Name = generator.FuncName(name)
-
-		components = append(components, model)
-	}
-	return components
-}
 
 type Model struct {
 	Name       string
@@ -77,4 +63,36 @@ func NewModel(name string, schema openapi.Schema) Model {
 	}
 
 	return model
+}
+
+func NewModels(openAPIFile string, apiSpec openapi.OpenAPI) []Model {
+	components := make([]Model, 0)
+	for ref, schema := range apiSpec.Components.Schemas {
+		model := NewModel(openAPIFile, schema)
+
+		name := strings.ReplaceAll(ref, filepath.Dir(openAPIFile), "")
+		name = strings.ReplaceAll(name, filepath.Ext(ref), "")
+		model.Name = sanitizer.GoFuncName(name)
+
+		components = append(components, model)
+	}
+	return components
+}
+
+// Type: What does this do???
+func Type(schema Model) string {
+	switch schema.Type {
+	case "boolean":
+		return "*bool"
+	case "array":
+		//if schema.Items == nil {
+		//	return "[]interface{}"
+		//}
+		return "[]" //+ Type(*schema.Items)
+	case "integer":
+		return "int"
+	case "object":
+		return schema.Name
+	}
+	return schema.Type
 }

@@ -1,9 +1,9 @@
 package route
 
 import (
-	"github.com/sasswart/gin-in-a-can/generator"
 	"github.com/sasswart/gin-in-a-can/model"
 	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/sanitizer"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"path/filepath"
@@ -14,18 +14,18 @@ type Route struct {
 	Name        string `yaml:"name"`
 	Path        string `yaml:"path"`
 	Method      string `yaml:"method"`
-	Parameters  []generator.Parameter
-	Responses   map[string]generator.Response
+	Parameters  []model.Parameter
+	Responses   map[string]model.Response
 	RequestBody model.Model
 }
 
 func NewRoute(openAPIFile string, pathName, method string, parameters []openapi.Parameter, operation openapi.Operation) Route {
 	caser := cases.Title(language.English)
-	transformedResponses := make(map[string]generator.Response)
+	transformedResponses := make(map[string]model.Response)
 	for r, response := range operation.Responses {
 
-		transformedResponses[r] = generator.Response{
-			Name:       generator.FuncName(pathName) + caser.String(method) + r + "Response",
+		transformedResponses[r] = model.Response{
+			Name:       sanitizer.GoFuncName(pathName) + caser.String(method) + r + "Response",
 			Model:      model.NewModel(openAPIFile, *response.Content["application/json"].Schema),
 			StatusCode: r,
 		}
@@ -33,14 +33,14 @@ func NewRoute(openAPIFile string, pathName, method string, parameters []openapi.
 
 	route := Route{
 		Method:    caser.String(method),
-		Name:      generator.FuncName(pathName),
-		Path:      generator.GinPathName(pathName),
+		Name:      sanitizer.GoFuncName(pathName),
+		Path:      sanitizer.GinPathName(pathName),
 		Responses: transformedResponses,
 	}
 
-	wrappedParameters := make([]generator.Parameter, len(parameters))
+	wrappedParameters := make([]model.Parameter, len(parameters))
 	for p, parameter := range parameters {
-		wrappedParameters[p] = generator.NewParameterModel(openAPIFile, parameter)
+		wrappedParameters[p] = model.NewParameterModel(openAPIFile, parameter)
 	}
 	route.Parameters = wrappedParameters
 
@@ -53,7 +53,7 @@ func NewRoute(openAPIFile string, pathName, method string, parameters []openapi.
 		schema := operation.RequestBody.Content["application/json"].Schema
 		name := strings.ReplaceAll(schema.Ref, filepath.Dir(openAPIFile), "")
 		name = strings.ReplaceAll(name, filepath.Ext(schema.Ref), "")
-		route.RequestBody.Name = generator.FuncName(name)
+		route.RequestBody.Name = sanitizer.GoFuncName(name)
 	}
 	return route
 }

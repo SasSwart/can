@@ -1,17 +1,19 @@
-package generator
+package render
 
 import (
 	"bytes"
 	"fmt"
 	"github.com/sasswart/gin-in-a-can/config"
+	"github.com/sasswart/gin-in-a-can/model"
+	"github.com/sasswart/gin-in-a-can/sanitizer"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"strings"
 	"text/template"
 )
 
-// Generate is the main parsing and rendering steps within the generator library
-func Generate(config config.Config, templateFile string) ([]byte, error) {
+// Render is the main parsing and rendering steps within the render library
+func Render(config config.Config, templateFile string) ([]byte, error) {
 	buff := bytes.NewBuffer([]byte{})
 
 	templater := template.New(templateFile)
@@ -34,8 +36,8 @@ func Generate(config config.Config, templateFile string) ([]byte, error) {
 var templateFuncMap = template.FuncMap{
 	"ToUpper":  strings.ToUpper,
 	"ToTitle":  toTitleCase,
-	"Type":     Type,
-	"Sanitize": Sanitize,
+	"Type":     model.Type,
+	"Sanitize": sanitizer.GoSanitize,
 }
 
 func toTitleCase(s string) string {
