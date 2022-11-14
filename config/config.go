@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/sasswart/gin-in-a-can/generator"
 	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/server"
 )
 
 type Config struct {
@@ -10,10 +10,10 @@ type Config struct {
 	BasePackageName      string
 	InvalidRequestStatus string
 	TemplateDirectory    string
-	ServerInterface      generator.ServerInterface
+	ServerInterface      server.Interface
 }
 
-func (tc *Config) WithServer(openAPIFile string, api openapi.OpenAPI) Config {
-	tc.ServerInterface = generator.NewServerInterface(openAPIFile, api)
-	return *tc
+func (c *Config) WithServer(openAPIFile string, api openapi.OpenAPI) Config {
+	c.ServerInterface = server.NewServerInterface(openAPIFile, api)
+	return *c
 }
