@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/sasswart/gin-in-a-can/config"
 	"os"
 	"path"
 	"path/filepath"
@@ -13,7 +14,7 @@ import (
 )
 
 type Config struct {
-	Generator         render.Config
+	Generator         config.Config
 	OpenAPI           openapi.Config
 	OutputPath        string
 	TemplateDirectory string
