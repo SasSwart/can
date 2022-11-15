@@ -1,22 +1,32 @@
 package openapi
 
-import "fmt"
-
 type Response struct {
+	parent      refContainer
 	Description string            `yaml:"description"`
 	Headers     map[string]Header // can also be a $ref
 	Content     map[string]MediaType
 	Links       map[string]Link // can also be a $ref
 }
 
-func (r *Response) Render() error {
-	fmt.Println("Rendering API Response")
-	for _, mediaType := range r.Content {
-		err := mediaType.Render()
-		if err != nil {
-			return err
-		}
-	}
+func (r *Response) getBasePath() string {
+	return r.parent.getBasePath()
+}
 
-	return nil
+func (r *Response) getRef() string {
+	return ""
+}
+
+var _ refContainer = &Response{}
+
+func (r *Response) getChildren() map[string]Traversable {
+	children := map[string]Traversable{}
+	for name, mediaType := range r.Content {
+		children[name] = &mediaType
+	}
+	return children
+}
+
+func (r *Response) setChild(i string, t Traversable) {
+	mediaType, _ := t.(*MediaType)
+	r.Content[i] = *mediaType
 }
