@@ -35,10 +35,11 @@ func (o *Operation) getChildren() map[string]Traversable {
 	if o == nil {
 		return children
 	}
-	for i := range o.Parameters {
-		parameter := o.Parameters[i]
-		children[string(i)] = &parameter
-	}
+	// TODO: Figure out why parameters cause segfaults
+	//for i := range o.Parameters {
+	//	parameter := o.Parameters[i]
+	//	children[string(i)] = &parameter
+	//}
 	children["RequestBody"] = &o.RequestBody
 	for name := range o.Responses {
 		response := o.Responses[name]
@@ -71,4 +72,8 @@ func (o operationChildNode) getBasePath() string {
 
 func (o operationChildNode) GetName() string {
 	return o.parent.GetName() + o.name
+}
+
+func (o operationChildNode) SetRenderer(r Renderer) {
+	o.renderer = r
 }

@@ -1,5 +1,0 @@
-type Server interface {
-  {{- range . }}
-  {{ .Name }}{{ .Method }}(*gin.Context, *models.{{ .Name }}{{ .Method }}Request) models.{{ .Name }}{{ .Method }}Response
-  {{- end }}
-}

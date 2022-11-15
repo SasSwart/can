@@ -36,6 +36,9 @@ func main() {
 		fmt.Println(fmt.Errorf("openapi.LoadOpenAPI error: %w", err))
 		os.Exit(1)
 	}
+
+	openapi.SetRenderer(apiSpec, openapi.GinRenderer{})
+
 	renderNode := buildRenderNode(config)
 	_, err = openapi.Traverse(apiSpec, renderNode)
 	if err != nil {
@@ -46,15 +49,23 @@ func main() {
 
 func buildRenderNode(config Config) openapi.TraversalFunc {
 	return func(key string, parent, child openapi.Traversable) (openapi.Traversable, error) {
+		var templateFile string
 		switch child.(type) {
+		case *openapi.OpenAPI:
+			templateFile = "openapi.tmpl"
+		case *openapi.PathItem:
+			templateFile = "path_item.tmpl"
 		case *openapi.Schema:
-			fmt.Println("Rendering Schema")
-			bytes, err := render.Render(config.Generator, child.(*openapi.Schema), "schema.tmpl")
-			if err != nil {
-				return child, err
-			}
-			fmt.Println(string(bytes))
+			templateFile = "schema.tmpl"
 		}
+		if templateFile == "" {
+			return child, nil
+		}
+		bytes, err := render.Render(config.Generator, child, templateFile)
+		if err != nil {
+			return child, err
+		}
+		fmt.Println(string(bytes))
 
 		return child, nil
 	}

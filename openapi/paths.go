@@ -8,6 +8,7 @@ var _ refContainer = PathItem{}
 
 // PathItem is a programmatic representation of the Path Item object defined here: https://swagger.io/specification/#path-item-object
 type PathItem struct {
+	renderer Renderer
 	node[*OpenAPI]
 	Summary     string
 	Description string
@@ -19,8 +20,12 @@ type PathItem struct {
 	Ref         string `yaml:"$ref"`
 }
 
+func (p *PathItem) SetRenderer(r Renderer) {
+	p.renderer = r
+}
+
 func (p PathItem) GetName() string {
-	return p.parent.GetName() + p.name
+	return p.renderer.sanitiseName(p.parent.GetName() + p.name)
 }
 
 func (p PathItem) getChildren() map[string]Traversable {
@@ -45,11 +50,18 @@ func (p PathItem) getBasePath() string {
 }
 
 func (p PathItem) Operations() map[string]Traversable {
-	operations := map[string]Traversable{
-		"delete": p.Delete,
-		"get":    p.Get,
-		"patch":  p.Patch,
-		"post":   p.Post,
+	operations := map[string]Traversable{}
+	if p.Get != nil {
+		operations["get"] = p.Get
+	}
+	if p.Post != nil {
+		operations["post"] = p.Post
+	}
+	if p.Patch != nil {
+		operations["patch"] = p.Patch
+	}
+	if p.Delete != nil {
+		operations["delete"] = p.Delete
 	}
 	return operations
 }
