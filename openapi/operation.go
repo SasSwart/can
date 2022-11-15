@@ -1,8 +1,13 @@
 package openapi
 
+import "strconv"
+
+// communicate by sharing memory ;)
+var _ refContainer = &Operation{}
+
 // Operation is a programmatic representation of the Operation object defined here: https://swagger.io/specification/#operation-object
 type Operation struct {
-	parent       refContainer
+	refContainerNode
 	Tags         []string
 	Summary      string
 	Description  string
@@ -21,9 +26,6 @@ func (o *Operation) getRef() string {
 	return ""
 }
 
-// communicate by sharing memory ;)
-var _ refContainer = &Operation{}
-
 func (o *Operation) getParent() Traversable {
 	return nil
 }
@@ -33,9 +35,9 @@ func (o *Operation) getChildren() map[string]Traversable {
 	if o == nil {
 		return children
 	}
-	//for _, parameter := range o.Parameters {
-	//	children[parameter.Name] = parameter
-	//}
+	for i, parameter := range o.Parameters {
+		children[string(i)] = &parameter
+	}
 	children["RequestBody"] = &o.RequestBody
 	for name, response := range o.Responses {
 		children[name] = &response
@@ -44,5 +46,27 @@ func (o *Operation) getChildren() map[string]Traversable {
 }
 
 func (o *Operation) setChild(i string, child Traversable) {
-	// TODO
+	switch child.(type) {
+	case *Parameter:
+		// TODO: Handle this error
+		j, _ := strconv.Atoi(i)
+		param, _ := child.(*Parameter)
+		o.Parameters[j] = *param
+	case *RequestBody:
+		requestBody, _ := child.(*RequestBody)
+		o.RequestBody = *requestBody
+	case *Response:
+		response, _ := child.(*Response)
+		o.Responses[i] = *response
+	}
+}
+
+type operationChildNode node[*Operation]
+
+func (o operationChildNode) getBasePath() string {
+	return o.parent.getBasePath()
+}
+
+func (o operationChildNode) GetName() string {
+	return o.parent.GetName() + o.name
 }

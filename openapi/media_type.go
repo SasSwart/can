@@ -4,7 +4,12 @@ var _ refContainer = &MediaType{}
 
 type MediaType struct {
 	parent refContainer
+	name   string
 	Schema *Schema
+}
+
+func (m *MediaType) GetName() string {
+	return m.parent.GetName() + m.name
 }
 
 func (m *MediaType) getBasePath() string {
