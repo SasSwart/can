@@ -36,8 +36,6 @@ func (p PathItem) getRef() string {
 	return p.Ref
 }
 
-var _ Traversable = PathItem{}
-
 func (p PathItem) getParent() Traversable {
 	return p.parent
 }

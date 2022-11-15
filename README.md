@@ -58,3 +58,15 @@ type Node struct {
     children    []Node
 }
 ```
+
+## Can Package Structure
+```mermaid 
+graph TD
+    Can[main]
+    Can --> Render
+    Can --> Sanitize
+    Can --> Server
+    Can --> Model
+    Can --> Route
+    Can --> OpenAPI
+```
