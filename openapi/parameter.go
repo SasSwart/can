@@ -11,6 +11,7 @@ type Parameter struct {
 	Schema          Schema // Acts as alternative description of param
 }
 
+// TODO: dead code?
 func (p *Parameter) ResolveRefs(basePath string) error {
 	return nil
 }

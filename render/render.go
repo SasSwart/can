@@ -12,7 +12,8 @@ import (
 	"text/template"
 )
 
-// Render is the main parsing and rendering steps within the render library
+// Render contains the main parsing and rendering steps within the render library
+// It wraps text/template and creates the output to be written to io.Writer
 func Render(config config.Config, data any, templateFile string) ([]byte, error) {
 	buff := bytes.NewBuffer([]byte{})
 

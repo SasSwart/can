@@ -113,10 +113,9 @@ func (m openAPIMeta) getBasePath() string {
 // OpenAPI is a programmatic representation of the OpenApi Document object defined here: https://swagger.io/specification/#openapi-object
 type OpenAPI struct {
 	openAPIMeta
-	OpenAPI string `yaml:"openapi"`
-	Info    Info
-	//Servers Servers
-	Servers    []Server // TODO fix bugs after this modification
+	OpenAPI    string `yaml:"openapi"`
+	Info       Info
+	Servers    []Server
 	Paths      map[string]PathItem
 	Components Components
 }

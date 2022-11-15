@@ -17,20 +17,52 @@ type Components struct {
 type Example struct {
 	Summary       string      `yaml:"summary"`
 	Description   string      `yaml:"description"`
-	Value         interface{} `yaml:"value"` // TODO: does this imply an explicit need for reflective interpretation of data while marshalling?
+	Value         interface{} `yaml:"value"`
 	ExternalValue string      `yaml:"externalValue"`
 }
 
 // TODO: work out ABNF expressions for the resolution of $ref strings for below structs
 
 // Header is a programmatic representation of the Header object defined here:https://swagger.io/specification/#header-object
-type Header struct{}
+type Header struct {
+	Description     string `yaml:"description"`
+	Required        bool   `yaml:"required"`
+	Deprecated      bool   `yaml:"deprecated"`
+	AllowEmptyValue bool   `yaml:"allowEmptyValue"`
+	Schema          Schema
+}
 
 // SecurityScheme is a programmatic representation of the SecurityScheme object defined here: https://swagger.io/specification/#security-scheme-object
-type SecurityScheme struct{}
+type SecurityScheme struct {
+	Type             string `yaml:"type"`
+	Description      string `yaml:"description"`
+	Name             string `yaml:"name"`
+	In               string `yaml:"in"`
+	Scheme           string `yaml:"scheme"`
+	BearerFormat     string `yaml:"BearerFormat"`
+	Flows            OAuthFlows
+	OpenIdConnectUrl string `yaml:"openIdConnectUrl"`
+}
 
 // Link is a programmatic representation of the Link object defined here: https://swagger.io/specification/#link-object
-type Link struct{}
+type Link struct {
+	OperationRef string `yaml:"operationRef"`
+	OperationId  string `yaml:"operationId"`
+	Parameters   map[string]interface{}
+	RequestBody  interface{}
+	Description  string `yaml:"description"`
+	Server       Server
+}
 
 // Callback is a programmatic representation of the Callback object defined here: https://swagger.io/specification/#callback-object
 type Callback struct{}
+
+// OAuthFlows is a programmatic representation of the OAuthFlows object defined here: https://swagger.io/specification/#oauth-flow-object
+// Allows configuration of the following types of OAuth flows: implicit, password, clientCredentials, authorizationCode
+// TODO: make sure that the keys listed above are tested in parent map containing OAuthFlows
+type OAuthFlows struct {
+	AuthorizationUrl string `yaml:"authorizationUrl"`
+	TokenUrl         string `yaml:"tokenUrl"`
+	RefreshUrl       string `yaml:"refreshUrl"`
+	Scopes           map[string]string
+}

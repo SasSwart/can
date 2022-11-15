@@ -7,7 +7,9 @@ type Traversable interface {
 
 type TraversalFunc func(parent, child Traversable) (Traversable, error)
 
-// Traverse takes a Traversable node and applies some function to the node within the tree. It recursively calls itself and fails early when an error is thrown
+// Traverse takes a Traversable node and applies some function to the node within the tree.
+// It recursively calls itself and fails early if an error is thrown
+// The Traversable returned is only used when defining the top of the tree.
 func Traverse(node Traversable, f TraversalFunc) (Traversable, error) {
 	children := node.getChildren()
 	for i, child := range children {
