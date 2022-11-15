@@ -1,14 +1,10 @@
 package openapi
 
 type RequestBody struct {
-	parent      refContainer
+	operationChildNode
 	Description string
 	Content     map[string]MediaType
 	Required    bool
-}
-
-func (r *RequestBody) getBasePath() string {
-	return r.parent.getBasePath()
 }
 
 func (r *RequestBody) getRef() string {
@@ -26,6 +22,7 @@ func (r *RequestBody) getChildren() map[string]Traversable {
 }
 
 func (r *RequestBody) setChild(i string, t Traversable) {
-	//TODO implement me
-	panic("implement me")
+	// TODO: handle this error
+	content, _ := t.(*MediaType)
+	r.Content[i] = *content
 }

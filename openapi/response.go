@@ -1,7 +1,8 @@
 package openapi
 
 type Response struct {
-	parent      refContainer
+	parent      *Operation
+	name        string
 	Description string            `yaml:"description"`
 	Headers     map[string]Header // can also be a $ref
 	Content     map[string]MediaType
@@ -10,6 +11,10 @@ type Response struct {
 
 func (r *Response) getBasePath() string {
 	return r.parent.getBasePath()
+}
+
+func (r *Response) GetName() string {
+	return r.parent.GetName() + r.name
 }
 
 func (r *Response) getRef() string {

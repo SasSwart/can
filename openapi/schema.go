@@ -11,6 +11,7 @@ var _ refContainer = &Schema{}
 // Schema is a programmatic representation of the Schema object defined here: https://swagger.io/specification/#schema-object
 type Schema struct {
 	parent               refContainer
+	name                 string
 	Description          string
 	Type                 string
 	Properties           map[string]Schema
@@ -24,16 +25,23 @@ type Schema struct {
 	Required             []string
 }
 
+func (s *Schema) GetName() string {
+	return s.parent.GetName() + s.name
+}
+
 func (s *Schema) getChildren() map[string]Traversable {
 	children := map[string]Traversable{}
-	for name, property := range s.Properties {
+	for name := range s.Properties {
+		property := s.Properties[name]
 		children[name] = &property
 	}
 	return children
 }
 
 func (s *Schema) setChild(i string, t Traversable) {
-	// TODO: Decide how to implement this, given that Schema is used as a pointer
+	// TODO: handle this error
+	schema, _ := t.(*Schema)
+	s.Properties[i] = *schema
 }
 
 func (s *Schema) getBasePath() string {

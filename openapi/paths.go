@@ -5,12 +5,10 @@ import (
 )
 
 var _ refContainer = PathItem{}
-var _ refContainer = &PathItem{}
-var _ Traversable = PathItem{}
 
 // PathItem is a programmatic representation of the Path Item object defined here: https://swagger.io/specification/#path-item-object
 type PathItem struct {
-	parent      *OpenAPI
+	node[*OpenAPI]
 	Summary     string
 	Description string
 	Get         *Operation
@@ -21,13 +19,8 @@ type PathItem struct {
 	Ref         string `yaml:"$ref"`
 }
 
-func (p PathItem) Operations() map[string]Traversable {
-	return map[string]Traversable{
-		"delete": p.Delete,
-		"get":    p.Get,
-		"patch":  p.Patch,
-		"post":   p.Post,
-	}
+func (p PathItem) GetName() string {
+	return p.parent.GetName() + p.name
 }
 
 func (p PathItem) getChildren() map[string]Traversable {
@@ -37,6 +30,8 @@ func (p PathItem) getChildren() map[string]Traversable {
 func (p PathItem) getRef() string {
 	return p.Ref
 }
+
+var _ Traversable = PathItem{}
 
 func (p PathItem) getParent() Traversable {
 	return p.parent
@@ -49,6 +44,18 @@ func (p PathItem) getBasePath() string {
 	return basePath
 }
 
+func (p PathItem) Operations() map[string]Traversable {
+	operations := map[string]Traversable{
+		"delete": p.Delete,
+		"get":    p.Get,
+		"patch":  p.Patch,
+		"post":   p.Post,
+	}
+	return operations
+}
+
 func (p PathItem) setChild(i string, child Traversable) {
-	// TODO
+	// TODO: handle this error
+	operation, _ := child.(*Operation)
+	p.Operations()[i] = operation
 }
