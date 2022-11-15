@@ -18,7 +18,7 @@ func TestSchema_ResolveRefs(t *testing.T) {
 		Ref: ref,
 	}
 
-	newSchema, _ := traverse(&schema, resolveRefs)
+	newSchema, _ := Traverse(&schema, resolveRefs)
 
 	if newSchema.(*Schema).Ref != absoluteRef {
 		t.Log("Schema reference was not correctly resolved to an absolute path")
