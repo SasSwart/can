@@ -37,7 +37,7 @@ func Render(config config.Config, data any, templateFile string) ([]byte, error)
 var templateFuncMap = template.FuncMap{
 	"ToUpper":  strings.ToUpper,
 	"ToTitle":  toTitleCase,
-	"Type":     model.Type,
+	"GoType":   model.GoType,
 	"Sanitize": sanitizer.GoSanitize,
 }
 
