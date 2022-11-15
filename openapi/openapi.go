@@ -52,10 +52,7 @@ func resolveRefs(key string, parent, child Traversable) (Traversable, error) {
 	switch child.(type) {
 	case *PathItem:
 		pathItemChild := child.(*PathItem)
-		pathItemChild.node = node[*OpenAPI]{
-			parent: parent.(*OpenAPI),
-			name:   key,
-		}
+		pathItemChild.name = key
 		pathItemChild.parent = parent.(*OpenAPI)
 		ref := childNode.getRef()
 		if ref != "" {
@@ -73,17 +70,12 @@ func resolveRefs(key string, parent, child Traversable) (Traversable, error) {
 			return child, nil
 		}
 		operationChild.parent = parent.(refContainer)
-		operationChild.refContainerNode = refContainerNode{
-			parent: parent.(refContainer),
-			name:   key,
-		}
+		operationChild.name = key
 		return operationChild, nil
 	case *RequestBody:
 		requestBodyChild := child.(*RequestBody)
-		requestBodyChild.operationChildNode = operationChildNode{
-			parent: parent.(*Operation),
-			name:   key,
-		}
+		requestBodyChild.parent = parent.(*Operation)
+		requestBodyChild.name = key
 		return requestBodyChild, nil
 	case *Response:
 		responseChild := child.(*Response)
@@ -92,10 +84,8 @@ func resolveRefs(key string, parent, child Traversable) (Traversable, error) {
 		return responseChild, nil
 	case *Parameter:
 		parameterChild := child.(*Parameter)
-		parameterChild.operationChildNode = operationChildNode{
-			parent: parent.(*Operation),
-			name:   key,
-		}
+		parameterChild.parent = parent.(*Operation)
+		parameterChild.name = key
 		return parameterChild, nil
 	case *MediaType:
 		mediaTypeChild := child.(*MediaType)
@@ -147,8 +137,9 @@ func (o *OpenAPI) getParent() Traversable {
 
 func (o *OpenAPI) getChildren() map[string]Traversable {
 	traversables := map[string]Traversable{}
-	for s, item := range o.Paths {
-		traversables[s] = &item
+	for s := range o.Paths {
+		path := o.Paths[s]
+		traversables[s] = &path
 	}
 	return traversables
 }

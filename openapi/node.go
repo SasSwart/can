@@ -28,7 +28,8 @@ func (n refContainerNode) GetName() string {
 // Traverse takes a Traversable node and applies some function to the node within the tree. It recursively calls itself and fails early when an error is thrown
 func Traverse(node Traversable, f TraversalFunc) (Traversable, error) {
 	children := node.getChildren()
-	for i, child := range children {
+	for i := range children {
+		child := children[i]
 		// Update Child Node
 		newChild, err := f(i, node, child)
 		if err != nil {

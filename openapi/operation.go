@@ -35,11 +35,13 @@ func (o *Operation) getChildren() map[string]Traversable {
 	if o == nil {
 		return children
 	}
-	for i, parameter := range o.Parameters {
+	for i := range o.Parameters {
+		parameter := o.Parameters[i]
 		children[string(i)] = &parameter
 	}
 	children["RequestBody"] = &o.RequestBody
-	for name, response := range o.Responses {
+	for name := range o.Responses {
+		response := o.Responses[name]
 		children[name] = &response
 	}
 	return children

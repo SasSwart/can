@@ -45,12 +45,13 @@ func (p PathItem) getBasePath() string {
 }
 
 func (p PathItem) Operations() map[string]Traversable {
-	return map[string]Traversable{
+	operations := map[string]Traversable{
 		"delete": p.Delete,
 		"get":    p.Get,
 		"patch":  p.Patch,
 		"post":   p.Post,
 	}
+	return operations
 }
 
 func (p PathItem) setChild(i string, child Traversable) {

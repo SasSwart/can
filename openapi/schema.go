@@ -31,7 +31,8 @@ func (s *Schema) GetName() string {
 
 func (s *Schema) getChildren() map[string]Traversable {
 	children := map[string]Traversable{}
-	for name, property := range s.Properties {
+	for name := range s.Properties {
+		property := s.Properties[name]
 		children[name] = &property
 	}
 	return children
