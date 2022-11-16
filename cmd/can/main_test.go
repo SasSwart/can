@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/sasswart/gin-in-a-can/config"
 	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/sasswart/gin-in-a-can/render"
 	"os"
 	"reflect"
 	"testing"
@@ -17,10 +17,11 @@ func TestLoadConfig(t *testing.T) {
 	}{
 		{configFile: "", expectedConfig: Config{}, expectedErr: true},
 		{configFile: "test_fixtures/example.yaml", expectedConfig: Config{
-			Generator: render.Config{
+			Generator: config.Config{
 				ModuleName:           "github.com/sasswart/gin-in-a-can",
 				BasePackageName:      "api",
 				InvalidRequestStatus: "400",
+				TemplateDirectory:    "",
 			},
 			OpenAPI: openapi.Config{
 				OpenAPIFile: "./docs/openapi.yml",
@@ -47,5 +48,49 @@ func TestLoadConfig(t *testing.T) {
 			t.Log("Loaded Config did not match expected config")
 			t.Fail()
 		}
+	}
+}
+
+func TestBuildRenderNode(t *testing.T) {
+	testFunc := buildRenderNode(Config{
+		Generator: config.Config{
+			ModuleName:           "Test",
+			BasePackageName:      "Test",
+			InvalidRequestStatus: "500",
+			TemplateDirectory:    "",
+		},
+		OpenAPI: openapi.Config{
+			OpenAPIFile: "./openapi/fixtures/petstore_openapi.yml",
+		},
+		OutputPath:        "",
+		TemplateDirectory: "",
+		WorkingDirectory:  "",
+		ConfigFilePath:    "",
+	})
+
+	schema := openapi.Schema{
+		Description: "",
+		Type:        "",
+		Properties: map[string]openapi.Schema{
+			"required_field": {},
+			"optional_field": {},
+		},
+		Items:                nil,
+		Ref:                  "",
+		AdditionalProperties: false,
+		MinLength:            0,
+		MaxLength:            0,
+		Pattern:              "",
+		Format:               "",
+		Required: []string{
+			"required_field",
+		},
+	}
+
+	//  func(key string, parent Traversable, child Traversable) (Traversable, error)
+	_, err := testFunc("", nil, &schema)
+	if err != nil {
+		t.Errorf("Traversal function error: %v", err)
+		t.Fail()
 	}
 }
