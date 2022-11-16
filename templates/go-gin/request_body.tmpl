@@ -1,5 +1,0 @@
-type {{ .Name }} struct {
-	{{- range $name, $schema := .Schema.Properties }}
-	{{ $name | Sanitize| ToTitle }} {{ Type $schema }} `json:"{{ $name }}"`
-	{{- end }}
-}

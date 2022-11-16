@@ -42,6 +42,44 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	return newapi.(*OpenAPI), err
 }
 
+func SetRenderer(api *OpenAPI, renderer Renderer) {
+	Traverse(api, func(_ string, _, child Traversable) (Traversable, error) {
+		switch child.(type) {
+		case *PathItem:
+			pathItemChild := child.(*PathItem)
+			pathItemChild.SetRenderer(renderer)
+		case *Operation:
+			schemaChild := child.(*Operation)
+			schemaChild.SetRenderer(renderer)
+			schemaParent, ok := schemaChild.parent.(*PathItem)
+			if ok {
+				schemaParent.SetRenderer(renderer)
+			}
+		case *Response:
+			schemaChild := child.(*Response)
+			schemaChild.SetRenderer(renderer)
+			schemaChild.parent.SetRenderer(renderer)
+		case *Parameter:
+			parameterChild := child.(*Parameter)
+			parameterChild.SetRenderer(renderer)
+			parameterChild.parent.SetRenderer(renderer)
+		case *RequestBody:
+			schemaChild := child.(*RequestBody)
+			schemaChild.SetRenderer(renderer)
+			schemaChild.parent.SetRenderer(renderer)
+		case *Schema:
+			schemaChild := child.(*Schema)
+			schemaChild.SetRenderer(renderer)
+			schemaParent, ok := schemaChild.parent.(*Schema)
+			if ok {
+				schemaParent.SetRenderer(renderer)
+			}
+		}
+
+		return child, nil
+	})
+}
+
 func resolveRefs(key string, parent, child Traversable) (Traversable, error) {
 	childNode, ok := child.(refContainer)
 	if !ok {
@@ -123,9 +161,10 @@ func (m openAPIMeta) getBasePath() string {
 // OpenAPI is a programmatic representation of the OpenApi Document object defined here: https://swagger.io/specification/#openapi-object
 type OpenAPI struct {
 	openAPIMeta
-	OpenAPI    string `yaml:"openapi"`
-	Info       Info
-	Servers    []Server
+	OpenAPI string `yaml:"openapi"`
+	Info    Info
+	//Servers Servers
+	Servers    []Server // TODO fix bugs after this modification
 	Paths      map[string]PathItem
 	Components Components
 }

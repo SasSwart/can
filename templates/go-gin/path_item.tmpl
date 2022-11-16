@@ -1,0 +1,42 @@
+
+// GENERATED INTERFACE. DO NOT EDIT
+
+type {{ .GetName }} interface {
+{{- range $name, $operation := .Operations }}
+  {{ $operation.GetName }}(*gin.Context, *{{ $operation.GetName }}Parameters, *{{ $operation.RequestBody.GetName }}) {{ $operation.GetName }}Response
+{{- end }}
+}
+
+{{ $pathItemStructName := printf "Unimplemented%s" .GetName -}}
+type {{ $pathItemStructName }} struct {}
+
+{{- range $name, $operation := .Operations }}
+func (u {{ $pathItemStructName }}) {{ $operation.GetName }}(*gin.Context, *{{ $operation.GetName }}Parameters, *{{ $operation.RequestBody.GetName }}) {{ $operation.GetName }}Response {}
+{{- end }}
+
+func Register{{ .GetName }}Path(e *gin.Engine, srv {{ .GetName }}) {
+{{- range $name, $operation := .Operations }}
+  e.{{ $name }}("/path", func(c *gin.Context) {
+  	params := &{{ $operation.GetName }}Parameters{}
+  	body := &{{ $operation.RequestBody.GetName }}{}
+    response := srv.{{ $operation.GetName }}(c, params, body)
+    c.JSON(response.GetStatus(), response)
+  })
+{{- end }}
+}
+
+{{- range $name, $operation := .Operations }}
+type {{ $operation.GetName }}Response interface {
+	GetStatus() int
+}
+
+type {{ $operation.GetName }}Parameters struct {}
+
+{{- range $name, $requestBody := $operation.RequestBody.Content }}
+type {{ $operation.RequestBody.GetName }} {{ $requestBody.Schema.GetName }}
+{{- end }}
+{{- if not $operation.RequestBody.Content }}
+type {{ $operation.RequestBody.GetName }} struct {}
+{{- end }}
+
+{{- end }}

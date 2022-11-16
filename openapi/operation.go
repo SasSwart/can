@@ -1,9 +1,6 @@
 package openapi
 
-import (
-	"fmt"
-	"strconv"
-)
+import "strconv"
 
 // communicate by sharing memory ;)
 var _ refContainer = &Operation{}
@@ -38,10 +35,11 @@ func (o *Operation) getChildren() map[string]Traversable {
 	if o == nil {
 		return children
 	}
-	for i := range o.Parameters {
-		parameter := o.Parameters[i]
-		children[fmt.Sprint(i)] = &parameter // Todo seems less than ideal to use a slice index that originates from string
-	}
+	// TODO: Figure out why parameters cause segfaults
+	//for i := range o.Parameters {
+	//	parameter := o.Parameters[i]
+	//	children[string(i)] = &parameter
+	//}
 	children["RequestBody"] = &o.RequestBody
 	for name := range o.Responses {
 		response := o.Responses[name]
@@ -53,7 +51,7 @@ func (o *Operation) getChildren() map[string]Traversable {
 func (o *Operation) setChild(i string, child Traversable) {
 	switch child.(type) {
 	case *Parameter:
-		// TODO: Handle this error, also seems less than ideal
+		// TODO: Handle this error
 		j, _ := strconv.Atoi(i)
 		param, _ := child.(*Parameter)
 		o.Parameters[j] = *param
@@ -74,4 +72,8 @@ func (o operationChildNode) getBasePath() string {
 
 func (o operationChildNode) GetName() string {
 	return o.parent.GetName() + o.name
+}
+
+func (o operationChildNode) SetRenderer(r Renderer) {
+	o.renderer = r
 }

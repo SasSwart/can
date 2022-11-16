@@ -1,6 +1,13 @@
+
+// GENERATED MODEL. DO NOT EDIT
+{{ if ne .Description "" }}
+// {{ .GetName }} description:
 // {{ .Description }}
-<<<<<<< HEAD
-type {{ .Type }}
-=======
-type {{ .GetName }} {{ .Type }}
->>>>>>> hackday-sas
+{{- end }}
+type {{ .GetName }} {{ .GetType }}
+{{- if eq "object" .Type }} {
+{{- range $name, $schema := .Properties }}
+  {{ $name }} {{ $schema.GetName }}
+{{- end }}
+}
+{{- end }}

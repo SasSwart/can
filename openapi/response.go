@@ -1,8 +1,7 @@
 package openapi
 
 type Response struct {
-	parent      *Operation
-	name        string
+	operationChildNode
 	Description string            `yaml:"description"`
 	Headers     map[string]Header // can also be a $ref
 	Content     map[string]MediaType
