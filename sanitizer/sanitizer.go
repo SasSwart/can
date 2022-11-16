@@ -78,7 +78,7 @@ func (s Sanitizer) FuncName(pathName string) string {
 	return ""
 }
 
-func (s Sanitizer) GinPathName(pathName string) string {
+func (s Sanitizer) PathName(pathName string) string {
 	switch s.language {
 	case "gin":
 		pathSegments := strings.Split(pathName, "/")
