@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/sasswart/gin-in-a-can/config"
 	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/sasswart/gin-in-a-can/render"
 	"os"
 	"reflect"
 	"testing"
@@ -17,7 +17,7 @@ func TestLoadConfig(t *testing.T) {
 	}{
 		{configFile: "", expectedConfig: Config{}, expectedErr: true},
 		{configFile: "test_fixtures/example.yaml", expectedConfig: Config{
-			Generator: render.Config{
+			Generator: config.Config{
 				ModuleName:           "github.com/sasswart/gin-in-a-can",
 				BasePackageName:      "api",
 				InvalidRequestStatus: "400",
