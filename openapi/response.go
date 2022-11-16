@@ -12,8 +12,8 @@ func (r *Response) getBasePath() string {
 	return r.parent.getBasePath()
 }
 
-func (r *Response) GetName() string {
-	return r.parent.GetName() + r.name
+func (r Response) GetName() string {
+	return r.parent.GetName() + r.name + "Response"
 }
 
 func (r *Response) getRef() string {

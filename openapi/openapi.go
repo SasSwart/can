@@ -128,7 +128,7 @@ func resolveRefs(key string, parent, child Traversable) (Traversable, error) {
 	case *MediaType:
 		mediaTypeChild := child.(*MediaType)
 		mediaTypeChild.parent = parent.(refContainer)
-		mediaTypeChild.name = key
+		mediaTypeChild.name = ""
 		return mediaTypeChild, nil
 	case *Schema:
 		schemaChild := child.(*Schema)
