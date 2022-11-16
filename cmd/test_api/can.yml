@@ -6,3 +6,4 @@ generator:
 openAPI:
   openAPIFile: ./docs/openapi.yml
 outputPath: .
+language: go-gin

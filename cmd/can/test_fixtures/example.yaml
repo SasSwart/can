@@ -5,3 +5,4 @@ generator:
 openapi:
   openAPIFile: ./docs/openapi.yml
 outputPath: .
+language: go-gin

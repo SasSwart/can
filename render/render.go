@@ -33,10 +33,12 @@ func Render(config config.Config, data any, templateFile string) ([]byte, error)
 	return buff.Bytes(), nil
 }
 
+var s, _ = sanitizer.NewSanitizer("go-gin") // TODO read language from config
+
 var templateFuncMap = template.FuncMap{
 	"ToUpper":  strings.ToUpper,
 	"ToTitle":  toTitleCase,
-	"Sanitize": sanitizer.GoSanitize,
+	"Sanitize": s.Sanitize,
 }
 
 func toTitleCase(s string) string {

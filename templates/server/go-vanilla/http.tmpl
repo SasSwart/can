@@ -1,0 +1,133 @@
+// Documentation https://pkg.go.dev/net/http
+
+package main
+
+import (
+    "fmt"
+    "net/http"
+)
+
+func hello(w http.ResponseWriter, req *http.Request) {
+
+    fmt.Fprintf(w, "hello\n")
+}
+
+func headers(w http.ResponseWriter, req *http.Request) {
+
+    for name, headers := range req.Header {
+        for _, h := range headers {
+            fmt.Fprintf(w, "%v: %v\n", name, h)
+        }
+    }
+}
+
+func main() {
+
+    http.HandleFunc("/hello", hello)
+    http.HandleFunc("/headers", headers)
+
+    http.ListenAndServe(":8090", nil)
+}
+
+
+OPENAPI
+// GENERATED CODE. DO NOT EDIT
+
+package main
+
+type Server interface {
+{{- range $name, $pathItem := .Paths }}
+  {{ $pathItem.GetName }}
+{{- end }}
+}
+
+func RegisterServer(e *gin.Engine, srv Server) {
+{{- range $name, $pathItem := .Paths }}
+  Register{{ $pathItem.GetName }}Path(e, srv)
+{{- end }}
+}
+
+type UnimplementedServer struct {
+{{- range $name, $pathItem := .Paths }}
+  Unimplemented{{ $pathItem.GetName }}
+{{- end }}
+}
+
+
+
+PATH_ITEM
+
+// GENERATED INTERFACE. DO NOT EDIT
+
+type {{ .GetName }} interface {
+{{- range $name, $operation := .Operations }}
+  {{ $operation.GetName }}(*gin.Context, *{{ $operation.GetName }}Parameters, *{{ $operation.RequestBody.GetName }}) {{ $operation.GetName }}Response
+{{- end }}
+}
+
+{{ $pathItemStructName := printf "Unimplemented%s" .GetName -}}
+type {{ $pathItemStructName }} struct {}
+
+{{- range $name, $operation := .Operations }}
+func (u {{ $pathItemStructName }}) {{ $operation.GetName }}(*gin.Context, *{{ $operation.GetName }}Parameters, *{{ $operation.RequestBody.GetName }}) {{ $operation.GetName }}Response {}
+{{- end }}
+
+func Register{{ .GetName }}Path(e *gin.Engine, srv {{ .GetName }}) {
+{{- range $name, $operation := .Operations }}
+  e.{{ $name }}("/path", func(c *gin.Context) {
+  	params := &{{ $operation.GetName }}Parameters{}
+  	body := &{{ $operation.RequestBody.GetName }}{}
+    response := srv.{{ $operation.GetName }}(c, params, body)
+    c.JSON(response.GetStatus(), response)
+  })
+{{- end }}
+}
+
+{{- range $name, $operation := .Operations }}
+type {{ $operation.GetName }}Response interface {
+	GetStatus() int
+}
+
+type {{ $operation.GetName }}Parameters struct {}
+
+{{- range $name, $requestBody := $operation.RequestBody.Content }}
+type {{ $operation.RequestBody.GetName }} {{ $requestBody.Schema.GetName }}
+{{- end }}
+{{- if not $operation.RequestBody.Content }}
+type {{ $operation.RequestBody.GetName }} struct {}
+{{- end }}
+
+{{- end }}
+
+SCHEMA
+// GENERATED MODEL. DO NOT EDIT
+{{ if ne .Description "" }}
+// {{ .GetName }} description:
+// {{ .Description }}
+{{- end }}
+type {{ .GetName }} {{ .GetType }}
+{{- if eq "object" .Type }} {
+{{- range $name, $schema := .Properties }}
+  {{ $name }} {{ $schema.GetName }}
+{{- end }}
+}
+{{- end }}
+
+UNIMPLEMENTED
+
+// GENERATED CODE. DO NOT EDIT
+
+package controller
+
+import (
+    "{{ .ModuleName }}/{{ .BasePackageName }}/models"
+    "github.com/gin-gonic/gin"
+)
+
+type UnimplementedServer struct{}
+{{ $InvalidRequestStatus := .InvalidRequestStatus }}
+{{ range .ServerInterface.Routes }}
+func (UnimplementedServer) {{ .Name }}{{ .Method }}(c *gin.Context, requestModel *models.{{ .Name }}{{ .Method }}Request) models.{{ .Name }}{{ .Method }}Response {
+  return models.{{ .Name }}{{ .Method }}{{ $InvalidRequestStatus }}Response{}
+}
+{{- end -}}

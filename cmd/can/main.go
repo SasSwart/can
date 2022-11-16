@@ -15,6 +15,7 @@ import (
 type Config struct {
 	Generator         config.Config
 	OpenAPI           openapi.Config
+	Language          string
 	OutputPath        string
 	TemplateDirectory string
 	WorkingDirectory  string
@@ -66,7 +67,7 @@ func buildRenderNode(config Config) openapi.TraversalFunc {
 			return child, err
 		}
 		fmt.Println(string(bytes))
-			fmt.Println(string(bytes))
+		fmt.Println(string(bytes))
 
 		return child, nil
 	}

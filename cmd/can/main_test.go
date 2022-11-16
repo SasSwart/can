@@ -29,6 +29,7 @@ func TestLoadConfig(t *testing.T) {
 			OutputPath:       ".",
 			WorkingDirectory: wd,
 			ConfigFilePath:   "test_fixtures/example.yaml",
+			Language:         "go-gin",
 		}},
 	}
 	for i, test := range tests {
@@ -66,12 +67,13 @@ func TestBuildRenderNode(t *testing.T) {
 		TemplateDirectory: "",
 		WorkingDirectory:  "",
 		ConfigFilePath:    "",
+		Language:          "go-gin",
 	})
 
 	schema := openapi.Schema{
 		Description: "",
 		Type:        "",
-		Properties: map[string]openapi.Schema{
+		Properties: map[string]*openapi.Schema{
 			"required_field": {},
 			"optional_field": {},
 		},

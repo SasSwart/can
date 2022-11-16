@@ -6,3 +6,4 @@
 #   openAPIFile: ./docs/openapi.yml
 # outputPath: .
 # templateDirectory: ./templates
+# language: go-gin
