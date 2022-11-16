@@ -10,10 +10,12 @@ var _ refContainer = &Schema{}
 
 // Schema is a programmatic representation of the Schema object defined here: https://swagger.io/specification/#schema-object
 type Schema struct {
+	renderer             Renderer
 	parent               refContainer
+	name                 string
 	Description          string
 	Type                 string
-	Properties           map[string]Schema
+	Properties           map[string]*Schema
 	Items                *Schema
 	Ref                  string `yaml:"$ref"`
 	AdditionalProperties bool
@@ -24,16 +26,38 @@ type Schema struct {
 	Required             []string
 }
 
+func (s *Schema) SetRenderer(r Renderer) {
+	s.renderer = r
+}
+
+func (s *Schema) GetName() string {
+	return s.renderer.sanitiseName(s.parent.GetName() + s.name)
+}
+
+func (s *Schema) GetType() string {
+	return s.renderer.sanitiseType(s)
+}
+
 func (s *Schema) getChildren() map[string]Traversable {
 	children := map[string]Traversable{}
-	for name, property := range s.Properties {
-		children[name] = &property
+	for name := range s.Properties {
+		property := s.Properties[name]
+		children[name] = property
+	}
+	if s.Items != nil {
+		children["item"] = s.Items
 	}
 	return children
 }
 
 func (s *Schema) setChild(i string, t Traversable) {
-	// TODO: Decide how to implement this, given that Schema is used as a pointer
+	// TODO: handle this error
+	schema, _ := t.(*Schema)
+	if i == "item" {
+		s.Items = schema
+	} else {
+		s.Properties[i] = schema
+	}
 }
 
 func (s *Schema) getBasePath() string {

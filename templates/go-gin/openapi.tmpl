@@ -1,0 +1,21 @@
+// GENERATED CODE. DO NOT EDIT
+
+package main
+
+type Server interface {
+{{- range $name, $pathItem := .Paths }}
+  {{ $pathItem.GetName }}
+{{- end }}
+}
+
+func RegisterServer(e *gin.Engine, srv Server) {
+{{- range $name, $pathItem := .Paths }}
+  Register{{ $pathItem.GetName }}Path(e, srv)
+{{- end }}
+}
+
+type UnimplementedServer struct {
+{{- range $name, $pathItem := .Paths }}
+  Unimplemented{{ $pathItem.GetName }}
+{{- end }}
+}

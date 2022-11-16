@@ -36,66 +36,36 @@ func main() {
 		fmt.Println(fmt.Errorf("openapi.LoadOpenAPI error: %w", err))
 		os.Exit(1)
 	}
+
+	openapi.SetRenderer(apiSpec, openapi.GinRenderer{})
+
 	renderNode := buildRenderNode(config)
 	_, err = openapi.Traverse(apiSpec, renderNode)
 	if err != nil {
 		fmt.Println(fmt.Errorf("openapi.Traverse(apiSpec, renderNode) error: %w", err))
 		os.Exit(1)
 	}
-
-	//templateData := server.NewServerInterface(absoluteOpenAPIFile(config), *apiSpec)
-	//for _, target := range []struct {
-	//	pkg      string
-	//	file     string
-	//	template string
-	//}{
-	//	{"controller", "controller.go", "controller.tmpl"},
-	//	{"controller", "unimplemented.go", "unimplemented.tmpl"},
-	//	{"models", "model.go", "models.tmpl"},
-	//} {
-	//	file, err := render.Render(config.Generator, templateData, target.template)
-	//	if err != nil {
-	//		fmt.Println(err)
-	//	}
-	//
-	//	outputPath := path.Join(
-	//		filepath.Dir(config.ConfigFilePath),
-	//		config.OutputPath,
-	//		config.Generator.BasePackageName,
-	//		target.pkg,
-	//	)
-	//	_, err = os.Stat(outputPath)
-	//	switch true {
-	//	case os.IsNotExist(err):
-	//		fmt.Printf("Output path \"%s\" does not exist. Creating it now.\n", outputPath)
-	//		err = os.MkdirAll(outputPath, 0755)
-	//		if err != nil {
-	//			fmt.Println(fmt.Errorf("could not create outputPath: %w\n", err))
-	//		}
-	//	case err != nil:
-	//		fmt.Println(fmt.Errorf("could not determine whether outputPath exists: %w\n", err))
-	//		os.Exit(1)
-	//	}
-	//
-	//	fmt.Printf("Rendering %s\n", path.Join(outputPath, target.file))
-	//	err = os.WriteFile(path.Join(outputPath, target.file), file, 0777)
-	//	if err != nil {
-	//		fmt.Println(err)
-	//	}
-	//}
 }
 
 func buildRenderNode(config Config) openapi.TraversalFunc {
-	return func(parent, child openapi.Traversable) (openapi.Traversable, error) {
+	return func(key string, parent, child openapi.Traversable) (openapi.Traversable, error) {
+		var templateFile string
 		switch child.(type) {
+		case *openapi.OpenAPI:
+			templateFile = "openapi.tmpl"
+		case *openapi.PathItem:
+			templateFile = "path_item.tmpl"
 		case *openapi.Schema:
-			fmt.Println("Rendering Schema")
-			bytes, err := render.Render(config.Generator, child, "schema.tmpl")
-			if err != nil {
-				return child, err
-			}
-			fmt.Println(string(bytes))
+			templateFile = "schema.tmpl"
 		}
+		if templateFile == "" {
+			return child, nil
+		}
+		bytes, err := render.Render(config.Generator, child, templateFile)
+		if err != nil {
+			return child, err
+		}
+		fmt.Println(string(bytes))
 
 		return child, nil
 	}

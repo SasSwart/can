@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/sasswart/gin-in-a-can/config"
-	"github.com/sasswart/gin-in-a-can/model"
 	"github.com/sasswart/gin-in-a-can/sanitizer"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -36,7 +35,6 @@ func Render(config config.Config, data any, templateFile string) ([]byte, error)
 var templateFuncMap = template.FuncMap{
 	"ToUpper":  strings.ToUpper,
 	"ToTitle":  toTitleCase,
-	"Type":     model.Type,
 	"Sanitize": sanitizer.GoSanitize,
 }
 
