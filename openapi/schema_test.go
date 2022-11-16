@@ -2,8 +2,99 @@ package openapi
 
 import (
 	"path/filepath"
+	"reflect"
 	"testing"
 )
+
+var (
+	properties = map[string]*Schema{
+		"renderable":        &Schema{},
+		"anotherRenderable": &Schema{},
+	}
+	item = &Schema{}
+	p    = &MediaType{ // PARENT
+		parent: nil, // RESPONSE USED
+		name:   "parentName",
+		Schema: &Schema{
+			parent:      &MediaType{},
+			name:        "parentModel",
+			Description: "",
+			Type:        "string",
+		},
+	}
+)
+
+func EmptySchemaWith(childProperties, childItems, parent bool) *Schema {
+	switch {
+	case parent && !childProperties && !childItems:
+		return &Schema{ // BASE SCHEMA
+			renderer:   nil,
+			parent:     p, // PARENT POINT
+			name:       "mainModel",
+			Type:       "string",
+			Properties: nil, // CHILD POINT
+			Items:      nil, // CHILD POINT
+		}
+	case !parent && childProperties && !childItems:
+		return &Schema{ // BASE SCHEMA
+			renderer:   nil,
+			parent:     p, // PARENT POINT
+			name:       "mainModel",
+			Type:       "string",
+			Properties: properties, // CHILD POINT
+			Items:      nil,        // CHILD POINT
+		}
+	case !parent && !childProperties && childItems:
+		return &Schema{ // BASE SCHEMA
+			renderer:   nil,
+			parent:     p, // PARENT POINT
+			name:       "mainModel",
+			Type:       "string",
+			Properties: nil,  // CHILD POINT
+			Items:      item, // CHILD POINT
+		}
+	case !parent && childProperties && childItems:
+
+		return &Schema{ // BASE SCHEMA
+			renderer:   nil,
+			parent:     p, // PARENT POINT
+			name:       "mainModel",
+			Type:       "string",
+			Properties: properties, // CHILD POINT
+			Items:      item,       // CHILD POINT
+		}
+	}
+	return &Schema{}
+}
+
+func TestGetChildren(t *testing.T) {
+	// Sanity Check
+	schemaWithChildren := EmptySchemaWith(false, false, false)
+	shouldBeEmpty := schemaWithChildren.getChildren()
+	s := &Schema{}
+	if !reflect.DeepEqual(shouldBeEmpty, s.getChildren()) {
+		t.Error("shouldBeEmpty is not empty")
+		t.Fail()
+	}
+	schemaWithChildren = EmptySchemaWith(true, true, false)
+	shouldBePropAndItemChildren := schemaWithChildren.getChildren()
+	if shouldBePropAndItemChildren == nil {
+		t.Error("shouldBePropAndItemChildren is nil")
+		t.Fail()
+	}
+	schemaWithChildren = EmptySchemaWith(false, true, false)
+	shouldBeItemChildren := schemaWithChildren.getChildren()
+	if shouldBeItemChildren == nil {
+		t.Error("shouldBeItemChildren is nil")
+		t.Fail()
+	}
+	schemaWithChildren = EmptySchemaWith(true, false, false)
+	shouldBePropChildren := schemaWithChildren.getChildren()
+	if shouldBePropChildren == nil {
+		t.Error("shouldBePropChildren is nil")
+		t.Fail()
+	}
+}
 
 func TestSchema_ResolveRefs(t *testing.T) {
 	basePath := "../"
