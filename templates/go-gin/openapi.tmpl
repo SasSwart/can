@@ -13,3 +13,9 @@ func RegisterServer(e *gin.Engine, srv Server) {
   Register{{ $pathItem.GetName }}Path(e, srv)
 {{- end }}
 }
+
+type UnimplementedServer struct {
+{{- range $name, $pathItem := .Paths }}
+  Unimplemented{{ $pathItem.GetName }}
+{{- end }}
+}

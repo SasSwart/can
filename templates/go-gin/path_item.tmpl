@@ -7,6 +7,13 @@ type {{ .GetName }} interface {
 {{- end }}
 }
 
+{{ $pathItemStructName := printf "Unimplemented%s" .GetName -}}
+type {{ $pathItemStructName }} struct {}
+
+{{- range $name, $operation := .Operations }}
+func (u {{ $pathItemStructName }}) {{ $operation.GetName }}(*gin.Context, *{{ $operation.GetName }}Parameters, *{{ $operation.RequestBody.GetName }}) {{ $operation.GetName }}Response {}
+{{- end }}
+
 func Register{{ .GetName }}Path(e *gin.Engine, srv {{ .GetName }}) {
 {{- range $name, $operation := .Operations }}
   e.{{ $name }}("/path", func(c *gin.Context) {
