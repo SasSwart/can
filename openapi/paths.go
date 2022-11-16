@@ -20,8 +20,12 @@ type PathItem struct {
 	Ref         string `yaml:"$ref"`
 }
 
-func (p *PathItem) SetRenderer(r Renderer) {
+func (p *PathItem) setRenderer(r Renderer) {
 	p.renderer = r
+}
+
+func (p PathItem) getRenderer() Renderer {
+	return p.renderer
 }
 
 func (p PathItem) GetName() string {

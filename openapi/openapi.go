@@ -47,32 +47,32 @@ func SetRenderer(api *OpenAPI, renderer Renderer) {
 		switch child.(type) {
 		case *PathItem:
 			pathItemChild := child.(*PathItem)
-			pathItemChild.SetRenderer(renderer)
+			pathItemChild.setRenderer(renderer)
 		case *Operation:
 			schemaChild := child.(*Operation)
-			schemaChild.SetRenderer(renderer)
+			schemaChild.setRenderer(renderer)
 			schemaParent, ok := schemaChild.parent.(*PathItem)
 			if ok {
-				schemaParent.SetRenderer(renderer)
+				schemaParent.setRenderer(renderer)
 			}
 		case *Response:
 			schemaChild := child.(*Response)
-			schemaChild.SetRenderer(renderer)
-			schemaChild.parent.SetRenderer(renderer)
+			schemaChild.setRenderer(renderer)
+			schemaChild.parent.setRenderer(renderer)
 		case *Parameter:
 			parameterChild := child.(*Parameter)
-			parameterChild.SetRenderer(renderer)
-			parameterChild.parent.SetRenderer(renderer)
+			parameterChild.setRenderer(renderer)
+			parameterChild.parent.setRenderer(renderer)
 		case *RequestBody:
 			schemaChild := child.(*RequestBody)
-			schemaChild.SetRenderer(renderer)
-			schemaChild.parent.SetRenderer(renderer)
+			schemaChild.setRenderer(renderer)
+			schemaChild.parent.setRenderer(renderer)
 		case *Schema:
 			schemaChild := child.(*Schema)
-			schemaChild.SetRenderer(renderer)
+			schemaChild.setRenderer(renderer)
 			schemaParent, ok := schemaChild.parent.(*Schema)
 			if ok {
-				schemaParent.SetRenderer(renderer)
+				schemaParent.setRenderer(renderer)
 			}
 		}
 

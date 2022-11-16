@@ -26,8 +26,12 @@ func (n refContainerNode) GetName() string {
 	return n.parent.GetName() + n.name
 }
 
-func (n refContainerNode) SetRenderer(r Renderer) {
+func (n refContainerNode) setRenderer(r Renderer) {
 	n.renderer = r
+}
+
+func (n refContainerNode) getRenderer() Renderer {
+	return n.renderer
 }
 
 // Traverse takes a Traversable node and applies some function to the node within the tree. It recursively calls itself and fails early when an error is thrown

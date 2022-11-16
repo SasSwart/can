@@ -26,7 +26,7 @@ type Schema struct {
 	Required             []string
 }
 
-func (s *Schema) SetRenderer(r Renderer) {
+func (s *Schema) setRenderer(r Renderer) {
 	s.renderer = r
 }
 
