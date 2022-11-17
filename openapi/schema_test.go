@@ -24,7 +24,7 @@ var (
 	}
 )
 
-func EmptySchemaWith(childProperties, childItems, parent bool) *Schema {
+func emptySchemaWith(childProperties, childItems, parent bool) *Schema {
 	switch {
 	case parent && !childProperties && !childItems:
 		return &Schema{ // BASE SCHEMA
@@ -69,26 +69,26 @@ func EmptySchemaWith(childProperties, childItems, parent bool) *Schema {
 
 func TestGetChildren(t *testing.T) {
 	// Sanity Check
-	schemaWithChildren := EmptySchemaWith(false, false, false)
+	schemaWithChildren := emptySchemaWith(false, false, false)
 	shouldBeEmpty := schemaWithChildren.getChildren()
 	s := &Schema{}
 	if !reflect.DeepEqual(shouldBeEmpty, s.getChildren()) {
 		t.Error("shouldBeEmpty is not empty")
 		t.Fail()
 	}
-	schemaWithChildren = EmptySchemaWith(true, true, false)
+	schemaWithChildren = emptySchemaWith(true, true, false)
 	shouldBePropAndItemChildren := schemaWithChildren.getChildren()
 	if shouldBePropAndItemChildren == nil {
 		t.Error("shouldBePropAndItemChildren is nil")
 		t.Fail()
 	}
-	schemaWithChildren = EmptySchemaWith(false, true, false)
+	schemaWithChildren = emptySchemaWith(false, true, false)
 	shouldBeItemChildren := schemaWithChildren.getChildren()
 	if shouldBeItemChildren == nil {
 		t.Error("shouldBeItemChildren is nil")
 		t.Fail()
 	}
-	schemaWithChildren = EmptySchemaWith(true, false, false)
+	schemaWithChildren = emptySchemaWith(true, false, false)
 	shouldBePropChildren := schemaWithChildren.getChildren()
 	if shouldBePropChildren == nil {
 		t.Error("shouldBePropChildren is nil")
@@ -109,6 +109,7 @@ func TestSchema_ResolveRefs(t *testing.T) {
 		Ref: ref,
 	}
 
+	t.Errorf("Fix me")
 	t.FailNow() // Panic on next line
 	newSchema, _ := Traverse(&schema, resolveRefs)
 

@@ -25,11 +25,18 @@ func TestPathItem_Operations(t *testing.T) {
 	openapi, _ := LoadOpenAPI(openapiFile)
 	for _, v := range openapi.getChildren() {
 		p := v.(*PathItem)
-		for _, op := range p.Operations() {
-			_, ok := op.(*Operation)
-			if !ok {
-				t.Errorf("PathItem.Operations() is not successfully returning *Operations")
-				t.Fail()
+		for method, op := range p.Operations() {
+			switch method {
+			case "post":
+			case "get":
+			case "patch":
+			case "delete":
+				o, ok := op.(*Operation)
+				if !ok {
+					t.Errorf("PathItem.Operations() is not successfully returning *Operations")
+					t.Fail()
+				}
+				t.Logf(o.OperationId)
 			}
 		}
 	}

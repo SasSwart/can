@@ -17,7 +17,7 @@ func getMediaType() *MediaType {
 
 func TestMediaType_GetName(t *testing.T) {
 	//mt := getMediaType()
-	// TODO
+	t.Errorf("Implement me")
 	t.Fail()
 }
 

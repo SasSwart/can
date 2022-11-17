@@ -1,6 +1,7 @@
 package openapi
 
 import (
+	"path"
 	"reflect"
 	"strings"
 	"testing"
@@ -8,6 +9,7 @@ import (
 
 var openapiFile = "fixtures/validation.yaml"
 var expectedPathInFile = "/endpoint"
+var expectedBasePath = path.Dir(openapiFile)
 
 func TestOpenAPI_LoadOpenAPI(t *testing.T) {
 	openapi, err := LoadOpenAPI(openapiFile)
