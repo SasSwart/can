@@ -74,7 +74,7 @@ func (o operationChildNode) GetName() string {
 	return o.parent.GetName() + o.name
 }
 
-func (o operationChildNode) setRenderer(r Renderer) {
+func (o operationChildNode) SetRenderer(r Renderer) {
 	o.renderer = r
 }
 

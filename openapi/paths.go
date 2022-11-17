@@ -20,7 +20,7 @@ type PathItem struct {
 	Ref         string `yaml:"$ref"`
 }
 
-func (p *PathItem) setRenderer(r Renderer) {
+func (p *PathItem) SetRenderer(r Renderer) {
 	p.renderer = r
 }
 

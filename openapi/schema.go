@@ -26,8 +26,12 @@ type Schema struct {
 	Required             []string
 }
 
-func (s *Schema) setRenderer(r Renderer) {
+func (s *Schema) SetRenderer(r Renderer) {
 	s.renderer = r
+}
+
+func (s *Schema) getRenderer() Renderer {
+	return s.renderer
 }
 
 func (s *Schema) GetName() string {

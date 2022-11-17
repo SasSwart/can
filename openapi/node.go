@@ -26,7 +26,7 @@ func (n refContainerNode) GetName() string {
 	return n.parent.GetName() + n.name
 }
 
-func (n refContainerNode) setRenderer(r Renderer) {
+func (n refContainerNode) SetRenderer(r Renderer) {
 	n.renderer = r
 }
 

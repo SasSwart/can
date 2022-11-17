@@ -41,32 +41,112 @@ func TestSetRenderer(t *testing.T) {
 	//Check *Operation
 	operations := paths["/endpoint"].(*PathItem).getChildren()
 	// TODO currently faiing
-	//for key, operation := range operations {
-	//	if operation != nil {
-	//		o := operation.(*Operation)
-	//		if o.getRenderer() == nil {
-	//			t.Errorf("Operation %v is missing a renderer", key)
-	//			t.Fail()
-	//		}
-	//	}
-	//}
+	for key, operation := range operations {
+		if operation != nil {
+			o := operation.(*Operation)
+			if o.getRenderer() == nil {
+				t.Errorf("Operation %v is missing a renderer", key)
+				t.Fail()
+			}
+		}
+	}
 
 	//Check *RequestBody
-	requestBody := operations["post"].(*Operation).getChildren()
-	for key, mediaTypes := range requestBody {
-		r := mediaTypes.(*RequestBody)
+	requestBodyAndResponses := operations["post"].(*Operation).getChildren()
+	// TODO currently faiing
+	for key, mediaTypes := range requestBodyAndResponses {
+		if key == "RequestBody" {
+			r := mediaTypes.(*RequestBody)
+			if r.getRenderer() == nil {
+				t.Errorf("%v is missing a renderer", key)
+				t.Fail()
+			}
+			continue
+		}
+		//Check *Response
+		r := mediaTypes.(*Response)
 		if r.getRenderer() == nil {
-			t.Errorf("RequestBody %v is missing a renderer", key)
+			t.Errorf("Response %v is missing a renderer", key)
 			t.Fail()
 		}
 	}
 
-	//Check *Response
 	//Check *Parameter
-	//Check *MediaType
-	//Check *Schema
-	//Check *Schema within *Schema
+	// TODO *PathItem.getParameters() still to be done
 
+	//Check *MediaType
+	//Check *Schema and *Schema within *Schemae
+	//	RequestBody
+	requestBodyMediaTypes := requestBodyAndResponses["RequestBody"].getChildren()
+	for mt, val := range requestBodyMediaTypes {
+		if mt == "application/json" {
+			container, _ := val.(*MediaType)
+			schemae := container.getChildren()
+			schema, ok := schemae["Model"].(*Schema)
+			if !ok {
+				t.Errorf("Schema cast failed")
+				t.Fail()
+			}
+			if schema.getRenderer() == nil {
+				t.Errorf("RequestBody Schema of  %v is missing a renderer", mt)
+				t.Fail()
+			}
+			c := schema.getChildren()
+			for propKey, s := range c {
+				if propKey == "item" { // check everything but "item"
+					continue
+				}
+				s, ok := s.(*Schema)
+				if !ok {
+					t.Errorf("Invalid schema nesting")
+					t.Fail()
+				}
+				if s.getRenderer() == nil {
+					t.Errorf("%v:%v property schema is missing a renderer", mt, propKey)
+					t.Fail()
+				}
+			}
+		}
+	}
+	//	Responses
+	for k, val := range requestBodyAndResponses {
+		if k == "RequestBody" {
+			continue
+		}
+		content := val.(*Response).getChildren()
+		if content == nil {
+			continue
+		}
+		for mt, val := range content {
+			container, _ := val.(*MediaType)
+			schemae := container.getChildren()
+			schema, ok := schemae["Model"].(*Schema)
+			if !ok {
+				t.Errorf("Schema cast failed")
+				t.Fail()
+			}
+			if schema.getRenderer() == nil {
+				t.Errorf("%v Response Schema of type %v is missing a renderer", k, mt)
+				t.Fail()
+			}
+			c := schema.getChildren()
+			for propKey, s := range c {
+				if propKey == "item" { // check everything but "item"
+					continue
+				}
+				s, ok := s.(*Schema)
+				if !ok {
+					t.Errorf("Invalid schema nesting")
+					t.Fail()
+				}
+				if s.getRenderer() == nil {
+					t.Errorf("%v Response Schema of type %v is missing a renderer", k, mt)
+					t.Fail()
+				}
+			}
+		}
+	}
+	//Parameter
 }
 
 func TestGetOpenAPIBasePath(t *testing.T) {
