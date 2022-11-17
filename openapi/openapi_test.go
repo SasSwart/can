@@ -1,6 +1,7 @@
 package openapi
 
 import (
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -145,7 +146,7 @@ func TestOpenAPI_SetRenderer(t *testing.T) {
 	//Parameter
 }
 
-func TestGetOpenAPIBasePath(t *testing.T) {
+func TestOpenAPI_GetBasePath(t *testing.T) {
 	openapi, _ := LoadOpenAPI(openapiFile)
 	before, _, _ := strings.Cut(openapiFile, "/")
 	if openapi.basePath != before {
@@ -154,7 +155,7 @@ func TestGetOpenAPIBasePath(t *testing.T) {
 	}
 }
 
-func TestGetOpenAPI_Parent(t *testing.T) {
+func TestOpenAPI_GetParent(t *testing.T) {
 	openapi, _ := LoadOpenAPI(openapiFile)
 	p := openapi.getParent()
 	if p != nil {
@@ -163,7 +164,7 @@ func TestGetOpenAPI_Parent(t *testing.T) {
 	}
 }
 
-func TestGetOpenAPI_Children(t *testing.T) {
+func TestGetOpenAPI_GetChildren(t *testing.T) {
 	openapi, _ := LoadOpenAPI(openapiFile)
 	paths := openapi.getChildren()
 	if len(paths) == 0 {
@@ -185,22 +186,21 @@ func TestGetOpenAPI_Children(t *testing.T) {
 func TestOpenAPI_SetChild(t *testing.T) {
 	openapi, _ := LoadOpenAPI(openapiFile)
 	pathKey := "new"
-	description := "new path item"
 	p := PathItem{
-		Description: description,
+		Description: "new path item",
 	}
 	openapi.setChild(pathKey, &p)
 
 	paths := openapi.getChildren()
 	for k, v := range paths {
 		if k == pathKey {
-			p, ok := v.(*PathItem) // test that it's a *PathItem
+			path, ok := v.(*PathItem) // test that it's a *PathItem
 			if !ok {
 				t.Errorf("Non-valid pathItem found")
 				t.Fail()
 			}
-			if p.Description != description {
-				t.Errorf("new key description is %v when it should be %v", p.Description, description)
+			if !reflect.DeepEqual(*path, p) {
+				t.Errorf("path item set is not equivalent to path item retrieved")
 				t.Fail()
 			}
 		}
@@ -208,5 +208,6 @@ func TestOpenAPI_SetChild(t *testing.T) {
 }
 
 func TestOpenAPI_ResolveRefs(t *testing.T) {
+	// TODO
 	//(key string, parent, child Traversable) (Traversable, error) {
 }
