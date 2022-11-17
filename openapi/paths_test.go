@@ -60,3 +60,16 @@ func TestPathItem_GetBasePath(t *testing.T) {
 		}
 	}
 }
+
+func TestPathItem_GetParent(t *testing.T) {
+	openapi, _ := LoadOpenAPI(openapiFile)
+	for _, v := range openapi.getChildren() {
+		p := v.(*PathItem)
+		parent := p.getParent()
+		_, ok := parent.(*OpenAPI)
+		if !ok {
+			t.Errorf("PathItem.getParent() did not return an OpenAPI type")
+			t.Fail()
+		}
+	}
+}
