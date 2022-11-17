@@ -8,7 +8,7 @@ import (
 var openapiFile = "fixtures/validation.yaml"
 var expectedPathInFile = "/endpoint"
 
-func TestLoadOpenAPI(t *testing.T) {
+func TestOpenAPI_LoadOpenAPI(t *testing.T) {
 	openapi, err := LoadOpenAPI(openapiFile)
 	if err != nil {
 		t.Errorf("could not load file %s:%s", openapiFile, err.Error())
@@ -18,13 +18,9 @@ func TestLoadOpenAPI(t *testing.T) {
 		t.Errorf("could not load file %s:%s", openapiFile, err.Error())
 		t.Fail()
 	}
-	paths := openapi.getChildren()
-	if paths == nil {
-		t.Fail()
-	}
 }
 
-func TestSetRenderer(t *testing.T) {
+func TestOpenAPI_SetRenderer(t *testing.T) {
 	openapi, _ := LoadOpenAPI(openapiFile)
 	SetRenderer(openapi, GinRenderer{})
 
@@ -158,7 +154,7 @@ func TestGetOpenAPIBasePath(t *testing.T) {
 	}
 }
 
-func TestGetOpenAPIParent(t *testing.T) {
+func TestGetOpenAPI_Parent(t *testing.T) {
 	openapi, _ := LoadOpenAPI(openapiFile)
 	p := openapi.getParent()
 	if p != nil {
@@ -167,7 +163,7 @@ func TestGetOpenAPIParent(t *testing.T) {
 	}
 }
 
-func TestGetOpenAPIChildren(t *testing.T) {
+func TestGetOpenAPI_Children(t *testing.T) {
 	openapi, _ := LoadOpenAPI(openapiFile)
 	paths := openapi.getChildren()
 	if len(paths) == 0 {
@@ -186,7 +182,7 @@ func TestGetOpenAPIChildren(t *testing.T) {
 	t.Fail()
 }
 
-func TestOpenAPISetChild(t *testing.T) {
+func TestOpenAPI_SetChild(t *testing.T) {
 	openapi, _ := LoadOpenAPI(openapiFile)
 	pathKey := "new"
 	description := "new path item"
@@ -209,4 +205,8 @@ func TestOpenAPISetChild(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestOpenAPI_ResolveRefs(t *testing.T) {
+	//(key string, parent, child Traversable) (Traversable, error) {
 }
