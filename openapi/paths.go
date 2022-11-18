@@ -24,6 +24,10 @@ func (p *PathItem) SetRenderer(r Renderer) {
 	p.renderer = r
 }
 
+func (p PathItem) getRenderer() Renderer {
+	return p.renderer
+}
+
 func (p PathItem) GetName() string {
 	return p.renderer.sanitiseName(p.parent.GetName() + p.name)
 }
