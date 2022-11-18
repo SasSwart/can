@@ -35,7 +35,7 @@ func (o *Operation) getChildren() map[string]Traversable {
 	if o == nil {
 		return children
 	}
-	// TODO: Figure out why parameters cause segfaults
+	// TODO: Figure out why parameters cause segfaults and then implement testing
 	//for i := range o.Parameters {
 	//	parameter := o.Parameters[i]
 	//	children[string(i)] = &parameter
@@ -76,4 +76,8 @@ func (o operationChildNode) GetName() string {
 
 func (o operationChildNode) SetRenderer(r Renderer) {
 	o.renderer = r
+}
+
+func (o operationChildNode) getRenderer() Renderer {
+	return o.renderer
 }
