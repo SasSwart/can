@@ -35,6 +35,7 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 
 	// Resolve references
 	newapi, err := Traverse(&api, resolveRefs)
+
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,8 @@
 package openapi
 
-import "strconv"
+import (
+	"strconv"
+)
 
 // communicate by sharing memory ;)
 var _ refContainer = &Operation{}

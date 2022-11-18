@@ -32,6 +32,9 @@ func (n refContainerNode) SetRenderer(r Renderer) {
 
 // Traverse takes a Traversable node and applies some function to the node within the tree. It recursively calls itself and fails early when an error is thrown
 func Traverse(node Traversable, f TraversalFunc) (Traversable, error) {
+	if node == nil || f == nil {
+		return node, nil
+	}
 	var recurse func(node Traversable, f TraversalFunc) (Traversable, error)
 	recurse = func(node Traversable, f TraversalFunc) (Traversable, error) {
 		children := node.getChildren()
@@ -60,4 +63,11 @@ func Traverse(node Traversable, f TraversalFunc) (Traversable, error) {
 	}
 	node, _ = f("", nil, node)
 	return recurse(node, f)
+}
+
+func Dig(node Traversable, key ...string) Traversable {
+	if len(key) == 0 {
+		return node
+	}
+	return Dig(node.getChildren()[key[0]], key[1:]...)
 }
