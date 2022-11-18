@@ -30,6 +30,10 @@ func (n refContainerNode) SetRenderer(r Renderer) {
 	n.renderer = r
 }
 
+func (n refContainerNode) getRenderer() Renderer {
+	return n.renderer
+}
+
 // Traverse takes a Traversable node and applies some function to the node within the tree. It recursively calls itself and fails early when an error is thrown
 func Traverse(node Traversable, f TraversalFunc) (Traversable, error) {
 	var recurse func(node Traversable, f TraversalFunc) (Traversable, error)

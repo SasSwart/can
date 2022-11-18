@@ -80,6 +80,7 @@ func SetRenderer(api *OpenAPI, renderer Renderer) {
 	})
 }
 
+// resolveRefs walks the tree and
 func resolveRefs(key string, parent, child Traversable) (Traversable, error) {
 	childNode, ok := child.(refContainer)
 	if !ok {
