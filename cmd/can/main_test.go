@@ -12,12 +12,12 @@ func TestLoadConfig(t *testing.T) {
 	wd, _ := os.Getwd()
 	tests := []struct {
 		configFile     string
-		expectedConfig Config
+		expectedConfig config.Config
 		expectedErr    bool
 	}{
-		{configFile: "", expectedConfig: Config{}, expectedErr: true},
-		{configFile: "test_fixtures/example.yaml", expectedConfig: Config{
-			Generator: config.Config{
+		{configFile: "", expectedConfig: config.Config{}, expectedErr: true},
+		{configFile: "test_fixtures/example.yaml", expectedConfig: config.Config{
+			Generator: config.GeneratorConfig{
 				ModuleName:           "github.com/sasswart/gin-in-a-can",
 				BasePackageName:      "api",
 				InvalidRequestStatus: "400",

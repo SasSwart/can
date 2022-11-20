@@ -42,7 +42,11 @@ func TestMediaType_SetChild(t *testing.T) {
 	sOld := *s
 	t.Logf("Original schema name: %v", s.name)
 	newSchemaName := "NewSchema"
-	mt.setChild("Model", &Schema{name: newSchemaName})
+	mt.setChild("Model", &Schema{
+		node: node{
+			name: newSchemaName,
+		},
+	})
 	transversable = mt.getChildren()
 	sNew, _ := transversable["Model"].(*Schema)
 	if reflect.DeepEqual(s, sNew) {
