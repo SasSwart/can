@@ -6,6 +6,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/config"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"path/filepath"
 	"strings"
 	"text/template"
 )
@@ -18,7 +19,12 @@ func Render(config config.Config, data any, templateFile string) ([]byte, error)
 
 	templater.Funcs(templateFuncMap)
 
-	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", config.TemplateDirectory))
+	absoluteTemplateDirectory := filepath.Join(
+		config.WorkingDirectory,
+		filepath.Dir(config.OpenAPI.OpenAPIFile),
+		config.Generator.TemplateDirectory,
+	)
+	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", absoluteTemplateDirectory))
 	if err != nil {
 		return nil, err
 	}

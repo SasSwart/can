@@ -1,10 +1,10 @@
 package openapi
 
-var _ refContainer = &Parameter{}
+var _ Traversable = &Parameter{}
 
 // Parameter is a programmatic representation of the Parameter object defined here: https://swagger.io/specification/#parameter-object
 type Parameter struct {
-	operationChildNode
+	node
 	Name            string `yaml:"name"`
 	In              string `yaml:"in"`
 	Description     string `yaml:"description"`

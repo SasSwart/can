@@ -18,7 +18,7 @@ func (u {{ $pathItemStructName }}) {{ $operation.GetName }}(*gin.Context, *{{ $o
 
 func Register{{ .GetName }}Path(e *gin.Engine, srv {{ .GetName }}) {
 {{- range $name, $operation := .Operations }}
-  e.{{ $name | ToUpper }}("/path", func(c *gin.Context) {
+  e.{{ $name | ToUpper }}("{{ .GetName }}", func(c *gin.Context) {
   	params := &{{ $operation.GetName }}Parameters{}
   	body := &{{ $operation.RequestBody.GetName }}{}
     response := srv.{{ $operation.GetName }}(c, params, body)

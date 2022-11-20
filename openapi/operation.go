@@ -5,11 +5,11 @@ import (
 )
 
 // communicate by sharing memory ;)
-var _ refContainer = &Operation{}
+var _ Traversable = &Operation{}
 
 // Operation is a programmatic representation of the Operation object defined here: https://swagger.io/specification/#operation-object
 type Operation struct {
-	refContainerNode
+	node
 	Tags         []string
 	Summary      string
 	Description  string
@@ -18,10 +18,6 @@ type Operation struct {
 	Responses    map[string]Response
 	OperationId  string `yaml:"operationId"`
 	ExternalDocs ExternalDocs
-}
-
-func (o *Operation) getBasePath() string {
-	return o.parent.getBasePath()
 }
 
 func (o *Operation) getRef() string {
@@ -64,22 +60,4 @@ func (o *Operation) setChild(i string, child Traversable) {
 		response, _ := child.(*Response)
 		o.Responses[i] = *response
 	}
-}
-
-type operationChildNode node[*Operation]
-
-func (o operationChildNode) getBasePath() string {
-	return o.parent.getBasePath()
-}
-
-func (o operationChildNode) GetName() string {
-	return o.parent.GetName() + o.name
-}
-
-func (o operationChildNode) SetRenderer(r Renderer) {
-	o.renderer = r
-}
-
-func (o operationChildNode) getRenderer() Renderer {
-	return o.renderer
 }
