@@ -21,7 +21,7 @@ func Render(config config.Config, data any, templateFile string) ([]byte, error)
 
 	absoluteTemplateDirectory := filepath.Join(
 		config.WorkingDirectory,
-		filepath.Dir(config.OpenAPI.OpenAPIFile),
+		filepath.Dir(config.ConfigFilePath),
 		config.Generator.TemplateDirectory,
 	)
 	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", absoluteTemplateDirectory))
