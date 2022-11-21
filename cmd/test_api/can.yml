@@ -1,8 +1,0 @@
-generator:
-  templateDirectory: /home/alex/Documents/gin-in-a-can/templates/go-gin
-  moduleName: github.com/sasswart/gin-in-a-can/cmd/test_api
-  basePackageName: api
-  InvalidRequestStatus: 200
-openAPI:
-  openAPIFile: ./docs/openapi.yml
-outputPath: .

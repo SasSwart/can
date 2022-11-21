@@ -57,6 +57,7 @@ func (g GinRenderer) sanitiseName(s string) string {
 			continue
 		}
 		if segment[0] == '{' {
+			nameSegments[i] = caser.String(segment[1 : len(segment)-1])
 			continue
 		}
 

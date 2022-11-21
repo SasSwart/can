@@ -3,39 +3,73 @@ package openapi
 type Traversable interface {
 	getChildren() map[string]Traversable
 	setChild(i string, t Traversable)
-}
-
-type refContainer interface {
-	Traversable
+	getParent() Traversable
+	setParent(parent Traversable)
+	GetName() string
+	setName(name string)
 	getBasePath() string
 	getRef() string
-	GetName() string
+	setRenderer(r Renderer)
+	getRenderer() Renderer
 }
 
 type TraversalFunc func(key string, parent, child Traversable) (Traversable, error)
 
-type node[T Traversable] struct {
-	parent   T
+type node struct {
+	basePath string
+	parent   Traversable
 	name     string
 	renderer Renderer
+	ref      string
 }
 
-type refContainerNode node[refContainer]
+var _ Traversable = &node{}
 
-func (n refContainerNode) GetName() string {
-	return n.parent.GetName() + n.name
+func (n *node) getChildren() map[string]Traversable {
+	panic("not implemented by composed type")
 }
 
-func (n refContainerNode) SetRenderer(r Renderer) {
+func (n *node) setChild(i string, t Traversable) {
+	panic("not implemented by composed type")
+}
+
+func (n *node) getParent() Traversable {
+	return n.parent
+}
+
+func (n *node) setParent(parent Traversable) {
+	n.parent = parent
+}
+
+func (n *node) getBasePath() string {
+	return n.parent.getBasePath()
+}
+
+func (n *node) getRef() string {
+	return n.ref
+}
+
+func (n *node) GetName() string {
+	return n.renderer.sanitiseName(n.parent.GetName() + n.name)
+}
+
+func (n *node) setName(name string) {
+	n.name = name
+}
+
+func (n *node) setRenderer(r Renderer) {
 	n.renderer = r
 }
 
-func (n refContainerNode) getRenderer() Renderer {
+func (n *node) getRenderer() Renderer {
 	return n.renderer
 }
 
 // Traverse takes a Traversable node and applies some function to the node within the tree. It recursively calls itself and fails early when an error is thrown
 func Traverse(node Traversable, f TraversalFunc) (Traversable, error) {
+	if node == nil || f == nil {
+		return node, nil
+	}
 	var recurse func(node Traversable, f TraversalFunc) (Traversable, error)
 	recurse = func(node Traversable, f TraversalFunc) (Traversable, error) {
 		children := node.getChildren()
@@ -62,6 +96,17 @@ func Traverse(node Traversable, f TraversalFunc) (Traversable, error) {
 
 		return node, nil
 	}
-	node, _ = f("", nil, node)
+	node, err := f("", nil, node)
+	if err != nil {
+		return nil, err
+	}
+
 	return recurse(node, f)
+}
+
+func Dig(node Traversable, key ...string) Traversable {
+	if len(key) == 0 {
+		return node
+	}
+	return Dig(node.getChildren()[key[0]], key[1:]...)
 }
