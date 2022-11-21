@@ -19,11 +19,22 @@ func Render(config config.Config, data any, templateFile string) ([]byte, error)
 
 	templater.Funcs(templateFuncMap)
 
-	absoluteTemplateDirectory := filepath.Join(
-		config.WorkingDirectory,
-		filepath.Dir(config.ConfigFilePath),
-		config.Generator.TemplateDirectory,
-	)
+	var absoluteTemplateDirectory string
+	switch true {
+	case filepath.IsAbs(config.Generator.TemplateDirectory):
+		absoluteTemplateDirectory = config.Generator.TemplateDirectory
+	case filepath.IsAbs(config.ConfigFilePath):
+		absoluteTemplateDirectory = filepath.Join(
+			filepath.Dir(config.ConfigFilePath),
+			config.Generator.TemplateDirectory,
+		)
+	default:
+		absoluteTemplateDirectory = filepath.Join(
+			config.WorkingDirectory,
+			filepath.Dir(config.ConfigFilePath),
+			config.Generator.TemplateDirectory,
+		)
+	}
 	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", absoluteTemplateDirectory))
 	if err != nil {
 		return nil, err

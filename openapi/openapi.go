@@ -45,7 +45,7 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 func SetRenderer(api *OpenAPI, renderer Renderer) {
 	Traverse(api, func(_ string, _, child Traversable) (Traversable, error) {
 		child.setRenderer(renderer)
-		parent := child.getParent()
+		parent := child.GetParent()
 		if parent != nil {
 			parent.setRenderer(renderer)
 		}
@@ -87,10 +87,6 @@ func (o *OpenAPI) getBasePath() string {
 }
 
 func (o *OpenAPI) GetName() string {
-	return o.name
-}
-
-func (o *OpenAPI) GetRawName() string {
 	return o.name
 }
 

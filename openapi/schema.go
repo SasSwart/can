@@ -24,10 +24,6 @@ type Schema struct {
 	Required             []string
 }
 
-func (s *Schema) GetName() string {
-	return s.renderer.sanitiseName(s.parent.GetName() + s.name)
-}
-
 func (s *Schema) GetType() string {
 	return s.renderer.sanitiseType(s)
 }

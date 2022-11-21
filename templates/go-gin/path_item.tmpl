@@ -5,6 +5,7 @@ type {{ .GetName }} interface {
 {{- range $name, $operation := .Operations }}
   {{ $operation.GetName }}(*gin.Context, *{{ $operation.GetName }}Parameters, *{{ $operation.RequestBody.GetName }}) {{ $operation.GetName }}Response
 {{- end }}
+	InvalidRequest(*gin.Context, error)
 }
 
 {{ $pathItemStructName := printf "Unimplemented%s" .GetName -}}
@@ -15,12 +16,20 @@ func (u {{ $pathItemStructName }}) {{ $operation.GetName }}(*gin.Context, *{{ $o
 	return {{ $operation.GetName }}405Response{}
 }
 {{- end }}
+func (u {{ $pathItemStructName }}) InvalidRequest(c *gin.Context, err error) {
+	c.JSON(400, err.Error())
+}
 
 func Register{{ .GetName }}Path(e *gin.Engine, srv {{ .GetName }}) {
 {{- range $name, $operation := .Operations }}
-  e.{{ $name | ToUpper }}("{{ .GetName }}", func(c *gin.Context) {
+	{{ $parent := .GetParent }}
+  e.{{ $name | ToUpper }}("{{ $parent.GetPath }}", func(c *gin.Context) {
   	params := &{{ $operation.GetName }}Parameters{}
   	body := &{{ $operation.RequestBody.GetName }}{}
+		err := c.ShouldBindJSON(body)
+		if err != nil {
+			srv.InvalidRequest(c, err)
+		}
     response := srv.{{ $operation.GetName }}(c, params, body)
     c.JSON(response.GetStatus(), response)
   })

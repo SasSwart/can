@@ -3,7 +3,7 @@ package openapi
 type Traversable interface {
 	getChildren() map[string]Traversable
 	setChild(i string, t Traversable)
-	getParent() Traversable
+	GetParent() Traversable
 	setParent(parent Traversable)
 	GetName() string
 	setName(name string)
@@ -33,7 +33,7 @@ func (n *node) setChild(i string, t Traversable) {
 	panic("not implemented by composed type")
 }
 
-func (n *node) getParent() Traversable {
+func (n *node) GetParent() Traversable {
 	return n.parent
 }
 
@@ -50,7 +50,8 @@ func (n *node) getRef() string {
 }
 
 func (n *node) GetName() string {
-	return n.renderer.sanitiseName(n.parent.GetName() + n.name)
+	name := n.parent.GetName() + n.renderer.sanitiseName(n.name)
+	return name
 }
 
 func (n *node) setName(name string) {

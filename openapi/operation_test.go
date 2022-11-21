@@ -40,7 +40,7 @@ func TestOperation_GetParent(t *testing.T) {
 	ops := getOperation()
 	for _, operation := range ops {
 		if op, ok := operation.(*Operation); ok {
-			if op.getParent() != nil {
+			if op.GetParent() != nil {
 				t.Fail()
 			}
 		}
