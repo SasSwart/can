@@ -35,7 +35,6 @@ func Render(config config.Config, data any, templateFile string) ([]byte, error)
 			config.Generator.TemplateDirectory,
 		)
 	}
-
 	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", absoluteTemplateDirectory))
 	if err != nil {
 		return nil, err
