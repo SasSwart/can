@@ -159,7 +159,7 @@ func TestOpenAPI_GetBasePath(t *testing.T) {
 
 func TestOpenAPI_GetParent(t *testing.T) {
 	openapi, _ := LoadOpenAPI(openapiFile)
-	p := openapi.getParent()
+	p := openapi.GetParent()
 	if p != nil {
 		t.Errorf("the root openapi file found a parent: %v", p)
 		t.Fail()

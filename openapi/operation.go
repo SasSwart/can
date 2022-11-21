@@ -15,17 +15,13 @@ type Operation struct {
 	Description  string
 	Parameters   []Parameter
 	RequestBody  RequestBody `yaml:"requestBody"`
-	Responses    map[string]Response
+	Responses    map[string]*Response
 	OperationId  string `yaml:"operationId"`
 	ExternalDocs ExternalDocs
 }
 
 func (o *Operation) getRef() string {
 	return ""
-}
-
-func (o *Operation) getParent() Traversable {
-	return nil
 }
 
 func (o *Operation) getChildren() map[string]Traversable {
@@ -41,7 +37,7 @@ func (o *Operation) getChildren() map[string]Traversable {
 	children["RequestBody"] = &o.RequestBody
 	for name := range o.Responses {
 		response := o.Responses[name]
-		children[name] = &response
+		children[name] = response
 	}
 	return children
 }
@@ -58,6 +54,11 @@ func (o *Operation) setChild(i string, child Traversable) {
 		o.RequestBody = *requestBody
 	case *Response:
 		response, _ := child.(*Response)
-		o.Responses[i] = *response
+		o.Responses[i] = response
 	}
+}
+
+func (o *Operation) GetName() string {
+	name := o.renderer.sanitiseName(o.name) + o.parent.GetName()
+	return name
 }

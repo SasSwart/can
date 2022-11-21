@@ -27,8 +27,9 @@ func (p *PathItem) getRef() string {
 	return p.Ref
 }
 
-func (p *PathItem) getParent() Traversable {
-	return p.parent
+func (p *PathItem) GetPath() string {
+	name := p.name
+	return name
 }
 
 func (p *PathItem) getBasePath() string {

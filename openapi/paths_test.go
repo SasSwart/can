@@ -72,10 +72,10 @@ func TestPathItem_GetParent(t *testing.T) {
 	openapi, _ := LoadOpenAPI(openapiFile)
 	for _, v := range openapi.getChildren() {
 		p := v.(*PathItem)
-		parent := p.getParent()
+		parent := p.GetParent()
 		_, ok := parent.(*OpenAPI)
 		if !ok {
-			t.Errorf("PathItem.getParent() did not return an OpenAPI type")
+			t.Errorf("PathItem.GetParent() did not return an OpenAPI type")
 			t.Fail()
 		}
 	}

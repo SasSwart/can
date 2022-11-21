@@ -8,8 +8,8 @@ type Response struct {
 	Links       map[string]Link // can also be a $ref
 }
 
-func (r Response) GetName() string {
-	return r.parent.GetName() + r.name + "Response"
+func (r *Response) GetName() string {
+	return r.parent.GetName() + r.renderer.sanitiseName(r.name) + "Response"
 }
 
 func (r *Response) getRef() string {

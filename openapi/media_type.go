@@ -8,10 +8,6 @@ type MediaType struct {
 	Schema *Schema
 }
 
-func (m *MediaType) GetName() string {
-	return m.parent.GetName() + m.name
-}
-
 func (m *MediaType) getRef() string {
 	return ""
 }
