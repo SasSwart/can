@@ -11,6 +11,7 @@ type Traversable interface {
 	getRef() string
 	setRenderer(r Renderer)
 	getRenderer() Renderer
+	GetOutputFile() string
 }
 
 type TraversalFunc func(key string, parent, child Traversable) (Traversable, error)
@@ -43,6 +44,10 @@ func (n *node) setParent(parent Traversable) {
 
 func (n *node) getBasePath() string {
 	return n.parent.getBasePath()
+}
+
+func (n *node) GetOutputFile() string {
+	return n.getRenderer().getOutputFile(n)
 }
 
 func (n *node) getRef() string {

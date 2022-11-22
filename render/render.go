@@ -2,17 +2,20 @@ package render
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/sasswart/gin-in-a-can/config"
+	"github.com/sasswart/gin-in-a-can/openapi"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
 )
 
 // Render is the main parsing and rendering steps within the render library
-func Render(config config.Config, data any, templateFile string) ([]byte, error) {
+func Render(config config.Config, data openapi.Traversable, templateFile string) ([]byte, error) {
 	buff := bytes.NewBuffer([]byte{})
 
 	templater := template.New(templateFile)
@@ -41,6 +44,34 @@ func Render(config config.Config, data any, templateFile string) ([]byte, error)
 	}
 
 	err = parsedTemplate.Execute(buff, data)
+	if err != nil {
+		return nil, err
+	}
+
+	var absoluteOutputFile string
+	switch true {
+	case filepath.IsAbs(config.OutputPath):
+		absoluteOutputFile = config.OutputPath
+	case filepath.IsAbs(config.ConfigFilePath):
+		absoluteOutputFile = filepath.Join(
+			filepath.Dir(config.ConfigFilePath),
+			config.OutputPath,
+		)
+	default:
+		absoluteOutputFile = filepath.Join(
+			config.WorkingDirectory,
+			filepath.Dir(config.ConfigFilePath),
+			config.OutputPath,
+		)
+	}
+	absoluteOutputFile = filepath.Join(absoluteOutputFile, data.GetOutputFile())
+
+	outputDirectory := filepath.Dir(absoluteOutputFile)
+	if _, err := os.Stat(outputDirectory); errors.Is(err, os.ErrNotExist) {
+		os.MkdirAll(outputDirectory, 0755)
+	}
+
+	err = os.WriteFile(absoluteOutputFile, buff.Bytes(), 0644)
 	if err != nil {
 		return nil, err
 	}

@@ -90,6 +90,10 @@ func (o *OpenAPI) GetName() string {
 	return o.name
 }
 
+func (o *OpenAPI) GetOutputFile() string {
+	return filepath.Join(o.getRenderer().getOutputFile(o), o.GetName())
+}
+
 func (o *OpenAPI) getChildren() map[string]Traversable {
 	traversables := map[string]Traversable{}
 	for s := range o.Paths {
