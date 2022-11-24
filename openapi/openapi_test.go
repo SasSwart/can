@@ -1,25 +1,18 @@
 package openapi
 
 import (
-	"path"
 	"reflect"
 	"strings"
 	"testing"
 )
 
-var openapiFile = "fixtures/validation.yaml"
-var expectedPathInFile = "/endpoint"
-var expectedBasePath = path.Dir(openapiFile)
-
 func TestOpenAPI_LoadOpenAPI(t *testing.T) {
 	openapi, err := LoadOpenAPI(openapiFile)
 	if err != nil {
 		t.Errorf("could not load file %s:%s", openapiFile, err.Error())
-		t.Fail()
 	}
 	if openapi == nil {
 		t.Errorf("could not load file %s:%s", openapiFile, err.Error())
-		t.Fail()
 	}
 }
 
@@ -30,43 +23,39 @@ func TestOpenAPI_SetRenderer(t *testing.T) {
 	//Check *PathItem
 	paths := openapi.getChildren()
 	for key, path := range paths {
-		p := path.(*PathItem)
+		p := path
 		if p.getRenderer() == nil {
 			t.Errorf("Path %v is missing a renderer", key)
-			t.Fail()
 		}
 	}
 
 	//Check *Operation
-	operations := paths["/endpoint"].(*PathItem).getChildren()
+	operations := paths[testEndpoint].getChildren()
 	// TODO currently faiing
 	for key, operation := range operations {
 		if operation != nil {
-			o := operation.(*Operation)
+			o := operation
 			if o.getRenderer() == nil {
 				t.Errorf("Operation %v is missing a renderer", key)
-				t.Fail()
 			}
 		}
 	}
 
 	//Check *RequestBody
-	requestBodyAndResponses := operations["post"].(*Operation).getChildren()
+	requestBodyAndResponses := operations[testMethod].getChildren()
 	// TODO currently faiing
 	for key, mediaTypes := range requestBodyAndResponses {
 		if key == "RequestBody" {
-			r := mediaTypes.(*RequestBody)
+			r := mediaTypes
 			if r.getRenderer() == nil {
 				t.Errorf("%v is missing a renderer", key)
-				t.Fail()
 			}
 			continue
 		}
 		//Check *Response
-		r := mediaTypes.(*Response)
+		r := mediaTypes
 		if r.getRenderer() == nil {
 			t.Errorf("Response %v is missing a renderer", key)
-			t.Fail()
 		}
 	}
 
@@ -78,17 +67,15 @@ func TestOpenAPI_SetRenderer(t *testing.T) {
 	//	RequestBody
 	requestBodyMediaTypes := requestBodyAndResponses["RequestBody"].getChildren()
 	for mt, val := range requestBodyMediaTypes {
-		if mt == "application/json" {
+		if mt == testMediaType {
 			container, _ := val.(*MediaType)
 			schemae := container.getChildren()
-			schema, ok := schemae["Model"].(*Schema)
+			schema, ok := schemae[testSchema].(*Schema)
 			if !ok {
 				t.Errorf("Schema cast failed")
-				t.Fail()
 			}
 			if schema.getRenderer() == nil {
 				t.Errorf("RequestBody Schema of  %v is missing a renderer", mt)
-				t.Fail()
 			}
 			c := schema.getChildren()
 			for propKey, s := range c {
@@ -98,11 +85,9 @@ func TestOpenAPI_SetRenderer(t *testing.T) {
 				s, ok := s.(*Schema)
 				if !ok {
 					t.Errorf("Invalid schema nesting")
-					t.Fail()
 				}
 				if s.getRenderer() == nil {
 					t.Errorf("%v:%v property schema is missing a renderer", mt, propKey)
-					t.Fail()
 				}
 			}
 		}
@@ -112,14 +97,13 @@ func TestOpenAPI_SetRenderer(t *testing.T) {
 		if k == "RequestBody" {
 			continue
 		}
-		content := val.(*Response).getChildren()
+		content := val.getChildren()
 		if content == nil {
 			continue
 		}
 		for mt, val := range content {
-			container, _ := val.(*MediaType)
-			schemae := container.getChildren()
-			schema, ok := schemae["Model"].(*Schema)
+			schemae := val.getChildren()
+			schema, ok := schemae[testSchema].(*Schema)
 			if !ok {
 				t.Errorf("Schema cast failed")
 				t.Fail()
@@ -153,7 +137,6 @@ func TestOpenAPI_GetBasePath(t *testing.T) {
 	before, _, _ := strings.Cut(openapiFile, "/")
 	if openapi.basePath != before {
 		t.Errorf("could not get basePath %s, got %s", before, openapi.basePath)
-		t.Fail()
 	}
 }
 
@@ -162,7 +145,6 @@ func TestOpenAPI_GetParent(t *testing.T) {
 	p := openapi.GetParent()
 	if p != nil {
 		t.Errorf("the root openapi file found a parent: %v", p)
-		t.Fail()
 	}
 }
 
@@ -171,18 +153,15 @@ func TestGetOpenAPI_GetChildren(t *testing.T) {
 	paths := openapi.getChildren()
 	if len(paths) == 0 {
 		t.Errorf("error occured or test yaml file has no paths to get")
-		t.Fail()
 	}
 	for k, v := range paths {
-		if k == expectedPathInFile {
-			_, ok := v.(*PathItem) // test that it's a *PathItem
-			if ok {
-				return
+		if k == testEndpoint {
+			if _, ok := v.(*PathItem); ok {
+				return // test that it's a *PathItem
 			}
 		}
 	}
-	t.Errorf("could not find expected child in openapi file")
-	t.Fail()
+	t.Errorf("could not find a valid child in openapi file")
 }
 
 func TestOpenAPI_SetChild(t *testing.T) {
@@ -199,11 +178,9 @@ func TestOpenAPI_SetChild(t *testing.T) {
 			path, ok := v.(*PathItem) // test that it's a *PathItem
 			if !ok {
 				t.Errorf("Non-valid pathItem found")
-				t.Fail()
 			}
 			if !reflect.DeepEqual(*path, p) {
 				t.Errorf("path item set is not equivalent to path item retrieved")
-				t.Fail()
 			}
 		}
 	}

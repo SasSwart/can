@@ -62,7 +62,3 @@ func (o *Operation) GetName() string {
 	name := o.renderer.sanitiseName(o.name) + o.parent.GetName()
 	return name
 }
-
-func (o operationChildNode) getRenderer() Renderer {
-	return o.renderer
-}
