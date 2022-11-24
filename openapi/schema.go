@@ -6,13 +6,11 @@ import (
 
 // TODO see if this can be made spec-compliant while retaining original logical flow
 
-var _ refContainer = &Schema{}
+var _ Traversable = &Schema{}
 
 // Schema is a programmatic representation of the Schema object defined here: https://swagger.io/specification/#schema-object
 type Schema struct {
-	renderer             Renderer
-	parent               refContainer
-	name                 string
+	node
 	Description          string
 	Type                 string
 	Properties           map[string]*Schema
@@ -24,18 +22,6 @@ type Schema struct {
 	Pattern              string
 	Format               string
 	Required             []string
-}
-
-func (s *Schema) SetRenderer(r Renderer) {
-	s.renderer = r
-}
-
-func (s *Schema) getRenderer() Renderer {
-	return s.renderer
-}
-
-func (s *Schema) GetName() string {
-	return s.renderer.sanitiseName(s.parent.GetName() + s.name)
 }
 
 func (s *Schema) GetType() string {

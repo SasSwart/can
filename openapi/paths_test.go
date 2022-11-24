@@ -12,7 +12,7 @@ func TestPathItem_GetName(t *testing.T) {
 		p := v.(*PathItem)
 		if p.getRenderer() == nil {
 			t.Log("Renderer is nil, setting renderer manually")
-			p.SetRenderer(GinRenderer{})
+			p.setRenderer(GinRenderer{})
 		}
 		if p.GetName() != expected {
 			t.Errorf("got %v, expected %v", p.GetName(), expected)
@@ -47,7 +47,7 @@ func TestPathItem_SetRenderer(t *testing.T) {
 	openapi, _ := LoadOpenAPI(openapiFile)
 	for _, v := range openapi.getChildren() {
 		p := v.(*PathItem)
-		p.SetRenderer(GinRenderer{})
+		p.setRenderer(GinRenderer{})
 		GinRenderer := GinRenderer{}
 		if !reflect.DeepEqual(p.getRenderer(), GinRenderer) {
 			t.Errorf("SetRenderer(GinRenderer{}) was unsuccessful")
@@ -72,10 +72,10 @@ func TestPathItem_GetParent(t *testing.T) {
 	openapi, _ := LoadOpenAPI(openapiFile)
 	for _, v := range openapi.getChildren() {
 		p := v.(*PathItem)
-		parent := p.getParent()
+		parent := p.GetParent()
 		_, ok := parent.(*OpenAPI)
 		if !ok {
-			t.Errorf("PathItem.getParent() did not return an OpenAPI type")
+			t.Errorf("PathItem.GetParent() did not return an OpenAPI type")
 			t.Fail()
 		}
 	}

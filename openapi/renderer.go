@@ -3,12 +3,14 @@ package openapi
 import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"path/filepath"
 	"strings"
 )
 
 type Renderer interface {
 	sanitiseName(string) string
 	sanitiseType(*Schema) string
+	getOutputFile(Traversable) string
 }
 
 var _ Renderer = GinRenderer{}
@@ -57,6 +59,7 @@ func (g GinRenderer) sanitiseName(s string) string {
 			continue
 		}
 		if segment[0] == '{' {
+			nameSegments[i] = caser.String(segment[1 : len(segment)-1])
 			continue
 		}
 
@@ -64,4 +67,15 @@ func (g GinRenderer) sanitiseName(s string) string {
 	}
 
 	return strings.Join(nameSegments, "")
+}
+
+func (g GinRenderer) getOutputFile(t Traversable) string {
+	var dir string
+	switch t.(type) {
+	case *OpenAPI:
+		dir = ""
+	case *Schema:
+		dir = "models"
+	}
+	return filepath.Join(dir, t.GetName()+".go")
 }

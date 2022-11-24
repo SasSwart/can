@@ -2,6 +2,8 @@
 
 package main
 
+import "github.com/gin-gonic/gin"
+
 type Server interface {
 {{- range $name, $pathItem := .Paths }}
   {{ $pathItem.GetName }}

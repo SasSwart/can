@@ -1,3 +1,6 @@
+package api
+
+import "github.com/gin-gonic/gin"
 
 // GENERATED INTERFACE. DO NOT EDIT
 
@@ -5,20 +8,31 @@ type {{ .GetName }} interface {
 {{- range $name, $operation := .Operations }}
   {{ $operation.GetName }}(*gin.Context, *{{ $operation.GetName }}Parameters, *{{ $operation.RequestBody.GetName }}) {{ $operation.GetName }}Response
 {{- end }}
+	InvalidRequest(*gin.Context, error)
 }
 
 {{ $pathItemStructName := printf "Unimplemented%s" .GetName -}}
 type {{ $pathItemStructName }} struct {}
 
 {{- range $name, $operation := .Operations }}
-func (u {{ $pathItemStructName }}) {{ $operation.GetName }}(*gin.Context, *{{ $operation.GetName }}Parameters, *{{ $operation.RequestBody.GetName }}) {{ $operation.GetName }}Response {}
+func (u {{ $pathItemStructName }}) {{ $operation.GetName }}(*gin.Context, *{{ $operation.GetName }}Parameters, *{{ $operation.RequestBody.GetName }}) {{ $operation.GetName }}Response {
+	return {{ $operation.GetName }}405Response{}
+}
 {{- end }}
+func (u {{ $pathItemStructName }}) InvalidRequest(c *gin.Context, err error) {
+	c.JSON(400, err.Error())
+}
 
 func Register{{ .GetName }}Path(e *gin.Engine, srv {{ .GetName }}) {
 {{- range $name, $operation := .Operations }}
-  e.{{ $name }}("/path", func(c *gin.Context) {
+	{{ $parent := .GetParent }}
+  e.{{ $name | ToUpper }}("{{ $parent.GetPath }}", func(c *gin.Context) {
   	params := &{{ $operation.GetName }}Parameters{}
   	body := &{{ $operation.RequestBody.GetName }}{}
+		err := c.ShouldBindJSON(body)
+		if err != nil {
+			srv.InvalidRequest(c, err)
+		}
     response := srv.{{ $operation.GetName }}(c, params, body)
     c.JSON(response.GetStatus(), response)
   })
@@ -28,6 +42,22 @@ func Register{{ .GetName }}Path(e *gin.Engine, srv {{ .GetName }}) {
 {{- range $name, $operation := .Operations }}
 type {{ $operation.GetName }}Response interface {
 	GetStatus() int
+}
+
+{{- range $name, $response := .Responses }}
+{{ $statusCode := $name }}
+{{- range $name, $content := $response.Content }}
+type {{ $response.GetName }} struct {
+	{{ $content.Schema.GetName }}
+}
+func ({{ $response.GetName }}) GetStatus() int {
+	return {{ $statusCode }}
+}
+{{- end }}
+{{- end }}
+type {{ $operation.GetName }}405Response struct {}
+func ({{ $operation.GetName }}405Response) GetStatus() int {
+	return 405
 }
 
 type {{ $operation.GetName }}Parameters struct {}

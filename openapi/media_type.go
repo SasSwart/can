@@ -1,19 +1,15 @@
 package openapi
 
-var _ refContainer = &MediaType{}
+var _ Traversable = &MediaType{}
 
 type MediaType struct {
-	parent refContainer
+	node
 	name   string
 	Schema *Schema
 }
 
 func (m *MediaType) GetName() string {
 	return m.parent.GetName() + m.name
-}
-
-func (m *MediaType) getBasePath() string {
-	return m.parent.getBasePath()
 }
 
 func (m *MediaType) getRef() string {

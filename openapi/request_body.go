@@ -1,7 +1,7 @@
 package openapi
 
 type RequestBody struct {
-	operationChildNode
+	node
 	Description string
 	Content     map[string]*MediaType
 	Required    bool
@@ -11,7 +11,7 @@ func (r *RequestBody) getRef() string {
 	return ""
 }
 
-var _ refContainer = &RequestBody{}
+var _ Traversable = &RequestBody{}
 
 func (r *RequestBody) getChildren() map[string]Traversable {
 	children := map[string]Traversable{}

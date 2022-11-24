@@ -13,11 +13,15 @@ var (
 	}
 	item = &Schema{}
 	p    = &MediaType{ // PARENT
-		parent: nil, // RESPONSE USED
-		name:   "parentName",
+		node: node{
+			parent: nil, // RESPONSE USED
+		},
+		name: "parentName",
 		Schema: &Schema{
-			parent:      &MediaType{},
-			name:        "parentModel",
+			node: node{
+				parent: &MediaType{},
+				name:   "parentModel",
+			},
 			Description: "",
 			Type:        "string",
 		},
@@ -25,30 +29,29 @@ var (
 )
 
 func emptySchemaWith(childProperties, childItems, parent bool) *Schema {
+	mainNode := node{
+		renderer: nil,
+		parent:   p, // PARENT POINT
+		name:     "mainModel",
+	}
 	switch {
 	case parent && !childProperties && !childItems:
 		return &Schema{ // BASE SCHEMA
-			renderer:   nil,
-			parent:     p, // PARENT POINT
-			name:       "mainModel",
+			node:       mainNode,
 			Type:       "string",
 			Properties: nil, // CHILD POINT
 			Items:      nil, // CHILD POINT
 		}
 	case !parent && childProperties && !childItems:
 		return &Schema{ // BASE SCHEMA
-			renderer:   nil,
-			parent:     p, // PARENT POINT
-			name:       "mainModel",
+			node:       mainNode,
 			Type:       "string",
 			Properties: properties, // CHILD POINT
 			Items:      nil,        // CHILD POINT
 		}
 	case !parent && !childProperties && childItems:
 		return &Schema{ // BASE SCHEMA
-			renderer:   nil,
-			parent:     p, // PARENT POINT
-			name:       "mainModel",
+			node:       mainNode,
 			Type:       "string",
 			Properties: nil,  // CHILD POINT
 			Items:      item, // CHILD POINT
@@ -56,9 +59,7 @@ func emptySchemaWith(childProperties, childItems, parent bool) *Schema {
 	case !parent && childProperties && childItems:
 
 		return &Schema{ // BASE SCHEMA
-			renderer:   nil,
-			parent:     p, // PARENT POINT
-			name:       "mainModel",
+			node:       mainNode,
 			Type:       "string",
 			Properties: properties, // CHILD POINT
 			Items:      item,       // CHILD POINT
