@@ -1,6 +1,6 @@
 // GENERATED CODE. DO NOT EDIT
 
-package main
+package {{ index .GetMetadata "package" }}
 
 import "github.com/gin-gonic/gin"
 
@@ -20,4 +20,8 @@ type UnimplementedServer struct {
 {{- range $name, $pathItem := .Paths }}
   Unimplemented{{ $pathItem.GetName }}
 {{- end }}
+}
+
+func (u UnimplementedServer) InvalidRequest(c *gin.Context, err error) {
+	c.JSON(400, err.Error())
 }

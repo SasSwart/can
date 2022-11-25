@@ -13,7 +13,7 @@ type Operation struct {
 	Tags         []string
 	Summary      string
 	Description  string
-	Parameters   []Parameter
+	Parameters   []*Parameter
 	RequestBody  RequestBody `yaml:"requestBody"`
 	Responses    map[string]*Response
 	OperationId  string `yaml:"operationId"`
@@ -29,11 +29,10 @@ func (o *Operation) getChildren() map[string]Traversable {
 	if o == nil {
 		return children
 	}
-	// TODO: Figure out why parameters cause segfaults and then implement testing
-	//for i := range o.Parameters {
-	//	parameter := o.Parameters[i]
-	//	children[string(i)] = &parameter
-	//}
+	for i := range o.Parameters {
+		parameter := o.Parameters[i]
+		children[string(i)] = parameter
+	}
 	children["RequestBody"] = &o.RequestBody
 	for name := range o.Responses {
 		response := o.Responses[name]
@@ -48,7 +47,7 @@ func (o *Operation) setChild(i string, child Traversable) {
 		// TODO: Handle this error
 		j, _ := strconv.Atoi(i)
 		param, _ := child.(*Parameter)
-		o.Parameters[j] = *param
+		o.Parameters[j] = param
 	case *RequestBody:
 		requestBody, _ := child.(*RequestBody)
 		o.RequestBody = *requestBody

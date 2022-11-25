@@ -15,13 +15,12 @@ type Parameter struct {
 }
 
 func (p *Parameter) getRef() string {
-	//TODO implement me
-	panic("implement me")
+	return ""
 }
 
 func (p *Parameter) getChildren() map[string]Traversable {
 	return map[string]Traversable{
-		//"model": &p.Schema,
+		"model": &p.Schema,
 	}
 }
 

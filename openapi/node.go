@@ -1,10 +1,13 @@
 package openapi
 
 type Traversable interface {
+	// Tree Traversable
 	getChildren() map[string]Traversable
 	setChild(i string, t Traversable)
 	GetParent() Traversable
 	setParent(parent Traversable)
+
+	// Node Attributes
 	GetName() string
 	setName(name string)
 	getBasePath() string
@@ -12,6 +15,8 @@ type Traversable interface {
 	setRenderer(r Renderer)
 	getRenderer() Renderer
 	GetOutputFile() string
+	GetMetadata() map[string]string
+	SetMetadata(metadata map[string]string)
 }
 
 type TraversalFunc func(key string, parent, child Traversable) (Traversable, error)
@@ -24,7 +29,15 @@ type node struct {
 	ref      string
 }
 
+func (n *node) SetMetadata(metadata map[string]string) {
+	n.parent.SetMetadata(metadata)
+}
+
 var _ Traversable = &node{}
+
+func (n *node) GetMetadata() map[string]string {
+	return n.parent.GetMetadata()
+}
 
 func (n *node) getChildren() map[string]Traversable {
 	panic("not implemented by composed type")
