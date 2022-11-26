@@ -1,6 +1,7 @@
 package openapi
 
 import (
+	"fmt"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"path"
@@ -22,3 +23,4 @@ const testPattern = "^([a-zA-Z0-9])+([-_ @\\.]([a-zA-Z0-9])+)*$"
 
 var ginRenderedPathItemName = caser.String(strings.TrimLeft(testEndpoint, "/"))
 var testBasePath = path.Dir(openapiFile)
+var testReqBodyJSON = fmt.Sprintf("%s[%s]", testReqBody, testMediaType)

@@ -1,5 +1,7 @@
 package openapi
 
+import "fmt"
+
 var _ Traversable = &MediaType{}
 
 type MediaType struct {
@@ -9,10 +11,14 @@ type MediaType struct {
 }
 
 func (m *MediaType) GetName() string {
-	return m.parent.GetName() + m.name
+	return m.parent.GetName() + "[" + m.node.name + "]"
 }
 
 func (m *MediaType) getRef() string {
+	if m.Schema != nil {
+		return m.Schema.Ref
+	}
+	fmt.Println("borked in media type getref")
 	return ""
 }
 

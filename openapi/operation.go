@@ -1,7 +1,9 @@
 package openapi
 
 import (
+	"fmt"
 	"strconv"
+	"strings"
 )
 
 // communicate by sharing memory ;)
@@ -30,10 +32,11 @@ func (o *Operation) getChildren() map[string]Traversable {
 		return children
 	}
 	// TODO: Figure out why parameters cause segfaults and then implement testing
-	//for i := range o.Parameters {
-	//	parameter := o.Parameters[i]
-	//	children[string(i)] = &parameter
-	//}
+	for i := range o.Parameters {
+		parameter := o.Parameters[i]
+		paramKeyName := fmt.Sprintf("Param%s%s", strings.Title(parameter.In), strings.Title(parameter.Name))
+		children[paramKeyName] = &parameter
+	}
 	children["RequestBody"] = &o.RequestBody
 	for name := range o.Responses {
 		response := o.Responses[name]

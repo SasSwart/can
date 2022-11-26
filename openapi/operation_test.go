@@ -1,6 +1,9 @@
 package openapi
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func getOperation() map[string]Traversable {
 	openapi, _ := LoadOpenAPI(openapiFile)
@@ -48,21 +51,37 @@ func TestOperation_GetParent(t *testing.T) {
 
 func TestOperation_GetChildren(t *testing.T) {
 	openapi, _ := LoadOpenAPI(openapiFile)
-	ops := Dig(openapi, testEndpoint)
-	for _, traversable := range ops.getChildren() {
-		if operation, ok := traversable.(*Operation); ok {
+	paths := Dig(openapi, testEndpoint)
+	for _, transversable := range paths.getChildren() {
+		if operation, ok := transversable.(*Operation); ok {
 			for key, child := range operation.getChildren() {
 				if key == testReqBody {
+					if _, ok := child.(*RequestBody); !ok {
+						t.Errorf("%s did not contain an object of type *RequestBody", key)
+						continue
+					}
+					t.Logf("heres your %s", testReqBody)
 					continue
 				}
-				if _, ok := child.(*Response); !ok {
-					t.Errorf("invalid Response")
+				if strings.HasPrefix(key, "Param") {
+					p, ok := child.(*Parameter)
+					if !ok {
+						t.Errorf("%s did not contain a parameter type", key)
+						continue
+					}
+					t.Logf("Parameter %s, in %s", p.name, p.In)
+					continue
 				}
+
+				if _, ok := child.(*Response); !ok {
+					t.Errorf("%s did not contain an object of type *Response", key)
+					continue
+				}
+				t.Logf("Response")
+
 			}
-			// TODO implement testing for params
 		}
 	}
-
 }
 
 func TestOperation_SetChild(t *testing.T) {
