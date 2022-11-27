@@ -30,7 +30,7 @@ func (n *node) getChildren() map[string]Traversable {
 	panic("not implemented by composed type")
 }
 
-func (n *node) setChild(i string, t Traversable) {
+func (n *node) setChild(_ string, _ Traversable) {
 	panic("not implemented by composed type")
 }
 
@@ -42,6 +42,7 @@ func (n *node) setParent(parent Traversable) {
 	n.parent = parent
 }
 
+// Recurses up the parental ladder until it's overridden by the *OpenAPI method
 func (n *node) getBasePath() string {
 	return n.parent.getBasePath()
 }
@@ -85,6 +86,7 @@ func Traverse(node Traversable, f TraversalFunc) (Traversable, error) {
 				continue
 			}
 			// Update Child Node
+			// TODO should child node pass down modified base path for easy resolution?
 			newChild, err := f(i, node, child)
 			if err != nil {
 				return nil, err

@@ -11,10 +11,10 @@ func (r *RequestBody) GetName() string {
 	return r.name
 }
 
-func (r *RequestBody) getRef() string {
-	// FIXME multiple refs exist here. One per media type contained within the .Content.
-	return ""
-}
+//func (r *RequestBody) getRef() string {
+//	panic("(r *RequestBody) getRef() This should never be called") // Refs are in media type -> schemas
+//	return ""
+//}
 
 var _ Traversable = &RequestBody{}
 

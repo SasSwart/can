@@ -23,7 +23,8 @@ graph TD
     Operation --> Responses
     Operation --> RequestBody
     RequestBody --> MediaType
-    Responses --> MediaType --> S2[Schemas] --> S2
+    Responses[Responses Container] -->  Response[Response $ref]
+    Response --> RC[Content] --> MediaType --> S2[Schemas $ref] --> S2
 ```
 
 ## Process Representation

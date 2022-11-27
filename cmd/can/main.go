@@ -71,7 +71,7 @@ func loadConfig() (config.Config, error) {
 	args := flag.NewFlagSet("can", flag.ExitOnError)
 
 	var configFilePath = args.String("configFile", "", "Specify which config file to use")
-	args.Parse(os.Args[1:])
+	_ = args.Parse(os.Args[1:])
 
 	if configFilePath == nil {
 		fmt.Println("No config file specified.")
@@ -92,7 +92,7 @@ func loadConfig() (config.Config, error) {
 		ConfigFilePath:   viper.ConfigFileUsed(),
 	}
 
-	viper.Unmarshal(&config)
+	_ = viper.Unmarshal(&config)
 
 	return config, nil
 }

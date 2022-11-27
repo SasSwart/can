@@ -11,19 +11,21 @@ var _ Traversable = &Operation{}
 // Operation is a programmatic representation of the Operation object defined here: https://swagger.io/specification/#operation-object
 type Operation struct {
 	node
-	Tags         []string
-	Summary      string
-	Description  string
-	Parameters   []Parameter
-	RequestBody  RequestBody `yaml:"requestBody"`
-	Responses    map[string]*Response
+	Tags        []string
+	Summary     string
+	Description string
+	Parameters  []Parameter          // can be a $ref
+	RequestBody RequestBody          `yaml:"requestBody"` // can be a $ref
+	Responses   map[string]*Response // can be a $ref
+	//Callbacks 	map[string]*Callback // can be a $ref
 	OperationId  string `yaml:"operationId"`
 	ExternalDocs ExternalDocs
 }
 
-func (o *Operation) getRef() string {
-	return ""
-}
+//func (o *Operation) getRef() string {
+//	panic("(o *Operation) getRef() This should never be called") // Refs are in parameter, requestbody, callbacks
+//	return ""
+//}
 
 func (o *Operation) getChildren() map[string]Traversable {
 	children := map[string]Traversable{}

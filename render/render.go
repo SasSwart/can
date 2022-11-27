@@ -68,7 +68,7 @@ func Render(config config.Config, data openapi.Traversable, templateFile string)
 
 	outputDirectory := filepath.Dir(absoluteOutputFile)
 	if _, err := os.Stat(outputDirectory); errors.Is(err, os.ErrNotExist) {
-		os.MkdirAll(outputDirectory, 0755)
+		_ = os.MkdirAll(outputDirectory, 0755)
 	}
 
 	err = os.WriteFile(absoluteOutputFile, buff.Bytes(), 0644)

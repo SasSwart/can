@@ -23,9 +23,10 @@ func (p *PathItem) getChildren() map[string]Traversable {
 	return p.Operations()
 }
 
-func (p *PathItem) getRef() string {
-	return p.Ref
-}
+//func (p *PathItem) getRef() string {
+//	panic("(p *PathItem) getRef() This should never be called")
+//	return p.Ref
+//}
 
 func (p *PathItem) GetPath() string {
 	name := p.name

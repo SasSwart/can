@@ -14,9 +14,11 @@ type Parameter struct {
 	Schema          Schema // Acts as alternative description of param
 }
 
-func (p *Parameter) getRef() string {
-	return p.Schema.getRef()
-}
+//func (p *Parameter) getRef() string {
+//	panic("(p *Parameter) getRef() This should never be called")
+//	return ""
+//	//return p.Schema.getRef()
+//}
 
 func (p *Parameter) getChildren() map[string]Traversable {
 	return map[string]Traversable{
@@ -24,12 +26,8 @@ func (p *Parameter) getChildren() map[string]Traversable {
 	}
 }
 
-func (p *Parameter) setChild(i string, t Traversable) {
+func (p *Parameter) setChild(_ string, t Traversable) {
 	if schema, ok := t.(*Schema); ok {
 		p.Schema = *schema
 	}
-}
-
-func (p *Parameter) ResolveRefs(basePath string) error {
-	return nil
 }

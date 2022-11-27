@@ -13,9 +13,13 @@ type Config struct {
 
 func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	// skeleton
+	absPath, err := filepath.Abs(openAPIFile)
+	if err != nil {
+		return nil, err
+	}
 	api := OpenAPI{
 		node: node{
-			basePath: filepath.Dir(openAPIFile),
+			basePath: filepath.Dir(absPath),
 		},
 		Components: Components{
 			Schemas: map[string]Schema{},
@@ -28,7 +32,11 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to read file \"%s\": %w", openAPIFile, err)
 	}
-	yaml.Unmarshal(content, &api)
+
+	err = yaml.Unmarshal(content, &api)
+	if err != nil {
+		return nil, err
+	}
 
 	api.setName(api.Info.Title)
 
@@ -43,7 +51,7 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 }
 
 func SetRenderer(api *OpenAPI, renderer Renderer) {
-	Traverse(api, func(_ string, _, child Traversable) (Traversable, error) {
+	_, _ = Traverse(api, func(_ string, _, child Traversable) (Traversable, error) {
 		child.setRenderer(renderer)
 		parent := child.GetParent()
 		if parent != nil {
@@ -54,21 +62,20 @@ func SetRenderer(api *OpenAPI, renderer Renderer) {
 	})
 }
 
-// resolveRefs walks the tree and
-func resolveRefs(key string, parent, child Traversable) (Traversable, error) {
-	child.setParent(parent)
-	child.setName(key)
-	ref := child.getRef()
-	if ref != "" {
-		basePath := child.getBasePath()
-		ref := filepath.Base(child.getRef())
-		err := readRef(filepath.Join(basePath, ref), child)
+// resolveRefs calls readRef on references with the ref path modified appropriately for it's use
+func resolveRefs(key string, parent, node Traversable) (Traversable, error) {
+	node.setParent(parent)
+	node.setName(key)
+	nodeRef := node.getRef()
+	if nodeRef != "" {
+		openapiBasePath := node.getBasePath()
+		ref := filepath.Base(node.getRef())
+		err := readRef(filepath.Join(openapiBasePath, ref), node)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to read reference:\n%w", err)
 		}
 	}
-
-	return child, nil
+	return node, nil
 }
 
 // OpenAPI is a programmatic representation of the OpenApi Document object defined here: https://swagger.io/specification/#openapi-object

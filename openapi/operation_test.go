@@ -5,12 +5,6 @@ import (
 	"testing"
 )
 
-func getOperation() map[string]Traversable {
-	openapi, _ := LoadOpenAPI(openapiFile)
-	return openapi.getChildren()["/endpoint"].(*PathItem).getChildren()
-}
-
-// Test Operation{}
 func TestOperation_GetBasePath(t *testing.T) {
 	openapi, _ := LoadOpenAPI(openapiFile)
 	ops := Dig(openapi, testEndpoint)
@@ -43,7 +37,7 @@ func TestOperation_GetParent(t *testing.T) {
 	openapi, _ := LoadOpenAPI(openapiFile)
 	ops := Dig(openapi, testEndpoint)
 	for _, operation := range ops.getChildren() {
-		if operation.GetParent() != nil {
+		if operation.GetParent() == nil {
 			t.Errorf("operation %#v has a nil parent", operation)
 		}
 	}
@@ -123,5 +117,3 @@ func TestOperation_SetChild(t *testing.T) {
 		}
 	}
 }
-
-//Test operationChildNode{}

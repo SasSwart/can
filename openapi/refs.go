@@ -7,11 +7,11 @@ import (
 )
 
 // readRef takes a reference and attempts to unmarshal it's content into the struct being passed as `i`.
-func readRef(filename string, i interface{}) error {
-	fmt.Printf("Reading reference: %s\n", filename)
-	content, err := os.ReadFile(filename)
+func readRef(absFilename string, i interface{}) error {
+	fmt.Printf("Reading reference: %s\n", absFilename)
+	content, err := os.ReadFile(absFilename)
 	if err != nil {
-		return fmt.Errorf("unable to resolve PathItem Reference:\n%w", err)
+		return fmt.Errorf("unable to resolve Reference: %w", err)
 	}
 
 	// TODO Alex: schema.go passes in reference to base struct for unmarshalling. This should instead be the ref object within the struct.

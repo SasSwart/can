@@ -53,10 +53,14 @@ func (s *Schema) setChild(i string, t Traversable) {
 }
 
 func (s *Schema) getBasePath() string {
+	if s.parent == nil {
+		return ""
+	}
 	basePath := filepath.Join(s.parent.getBasePath(), filepath.Dir(s.Ref))
 	return basePath
 }
 
-func (s *Schema) getRef() string {
-	return s.Ref
-}
+//func (s *Schema) getRef() string {
+//	panic("(s *Schema) getRef() This should never be called")
+//	return s.Ref
+//}
