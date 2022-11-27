@@ -78,14 +78,50 @@ func TestOperation_GetChildren(t *testing.T) {
 					continue
 				}
 				t.Logf("Response")
-
 			}
 		}
 	}
 }
 
 func TestOperation_SetChild(t *testing.T) {
-	t.Errorf("Implement me")
+	openapi, _ := LoadOpenAPI(openapiFile)
+	transversable := Dig(openapi, testEndpoint)
+	operations := transversable.getChildren()
+
+	// Test Data
+	parameter := Parameter{node: node{name: "newParameter"}}
+	reqBody := RequestBody{node: node{name: "newReqBody"}}
+	response := Response{node: node{name: "newReqBody"}}
+	httpResponseCode := "499"
+
+	// Set children
+	for method, op := range operations {
+		t.Logf("Setting test children for %s method", method)
+		op.setChild("", &parameter)
+		op.setChild("", &reqBody)
+		op.setChild(httpResponseCode, &response)
+	}
+
+	// Verify set children
+	for method, op := range operations {
+		t.Logf("Getting test children for %s method", method)
+		children := op.getChildren()
+		if got, ok := children[httpResponseCode].(*Response); ok {
+			if got.node.name != response.node.name {
+				t.Errorf("child %s: %s was not set properly", method, httpResponseCode)
+			}
+		}
+		if got, ok := children[testReqBody].(*RequestBody); ok {
+			if got.node.name != reqBody.node.name {
+				t.Errorf("child %s: %s was not set properly", method, testReqBody)
+			}
+		}
+		if got, ok := children[testEmptyParamName].(*Parameter); ok {
+			if got.node.name != parameter.node.name {
+				t.Errorf("child %s: %s was not set properly", method, testEmptyParamName)
+			}
+		}
+	}
 }
 
 //Test operationChildNode{}

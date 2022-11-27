@@ -57,7 +57,10 @@ func (p *PathItem) Operations() map[string]Traversable {
 }
 
 func (p *PathItem) setChild(i string, child Traversable) {
-	// TODO: handle this error
-	operation, _ := child.(*Operation)
-	p.Operations()[i] = operation
+	if operation, ok := child.(*Operation); ok {
+		p.Operations()[i] = operation
+		return
+
+	}
+	panic("(p *PathItem) setChild borked")
 }

@@ -41,13 +41,15 @@ func (s *Schema) getChildren() map[string]Traversable {
 }
 
 func (s *Schema) setChild(i string, t Traversable) {
-	// TODO: handle this error
-	schema, _ := t.(*Schema)
-	if i == "item" {
-		s.Items = schema
-	} else {
-		s.Properties[i] = schema
+	if schema, ok := t.(*Schema); ok {
+		if i == "item" {
+			s.Items = schema
+		} else {
+			s.Properties[i] = schema
+		}
+		return
 	}
+	panic("(s *Schema) setChild borked")
 }
 
 func (s *Schema) getBasePath() string {

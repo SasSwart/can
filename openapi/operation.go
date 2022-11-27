@@ -2,7 +2,6 @@ package openapi
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -31,13 +30,19 @@ func (o *Operation) getChildren() map[string]Traversable {
 	if o == nil {
 		return children
 	}
-	// TODO: Figure out why parameters cause segfaults and then implement testing
+
+	// Parameters
 	for i := range o.Parameters {
 		parameter := o.Parameters[i]
 		paramKeyName := fmt.Sprintf("Param%s%s", strings.Title(parameter.In), strings.Title(parameter.Name))
+		// This key value pair is for convenience. Internally parameters are collected in a slice
 		children[paramKeyName] = &parameter
 	}
+
+	// RequestBody
 	children["RequestBody"] = &o.RequestBody
+
+	// Response
 	for name := range o.Responses {
 		response := o.Responses[name]
 		children[name] = response
@@ -48,16 +53,19 @@ func (o *Operation) getChildren() map[string]Traversable {
 func (o *Operation) setChild(i string, child Traversable) {
 	switch child.(type) {
 	case *Parameter:
-		// TODO: Handle this error
-		j, _ := strconv.Atoi(i)
 		param, _ := child.(*Parameter)
-		o.Parameters[j] = *param
+		o.Parameters = append(o.Parameters, *param)
+		return
 	case *RequestBody:
 		requestBody, _ := child.(*RequestBody)
 		o.RequestBody = *requestBody
+		return
 	case *Response:
 		response, _ := child.(*Response)
 		o.Responses[i] = response
+		return
+	default:
+		panic("(o *OpenAPI) setChild borked")
 	}
 }
 

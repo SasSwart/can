@@ -16,6 +16,7 @@ var caser = cases.Title(language.English)
 const testEndpoint = "/endpoint"
 const testMethod = "post"
 const testReqBody = "RequestBody"
+const testEmptyParamName = "Param"
 const testMediaType = "application/json"
 const openapiFile = "fixtures/validation.yaml"
 const testSchema = "Model" // the Dig() key used to access any schema held within a MediaType

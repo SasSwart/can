@@ -25,9 +25,9 @@ func (p *Parameter) getChildren() map[string]Traversable {
 }
 
 func (p *Parameter) setChild(i string, t Traversable) {
-	// TODO: Handle this error
-	schema, _ := t.(*Schema)
-	p.Schema = *schema
+	if schema, ok := t.(*Schema); ok {
+		p.Schema = *schema
+	}
 }
 
 func (p *Parameter) ResolveRefs(basePath string) error {

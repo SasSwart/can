@@ -28,10 +28,9 @@ func (r *RequestBody) getChildren() map[string]Traversable {
 }
 
 func (r *RequestBody) setChild(i string, t Traversable) {
-	// TODO: handle this error
-	content, ok := t.(*MediaType)
-	if !ok {
-		panic("reqbody setchild")
+	if content, ok := t.(*MediaType); ok {
+		r.Content[i] = content
+		return
 	}
-	r.Content[i] = content
+	panic("(r *RequestBody) setChild borked")
 }

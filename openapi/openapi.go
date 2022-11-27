@@ -104,8 +104,11 @@ func (o *OpenAPI) getChildren() map[string]Traversable {
 }
 
 func (o *OpenAPI) setChild(i string, child Traversable) {
-	c, _ := child.(*PathItem)
-	o.Paths[i] = c
+	if c, ok := child.(*PathItem); ok {
+		o.Paths[i] = c
+		return
+	}
+	panic("(o *OpenAPI) setChild borked")
 }
 
 // ExternalDocs is a programmatic representation of the External Docs object defined here: https://swagger.io/specification/#external-documentation-object

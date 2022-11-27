@@ -29,5 +29,9 @@ func (m *MediaType) getChildren() map[string]Traversable {
 }
 
 func (m *MediaType) setChild(i string, t Traversable) {
-	m.Schema = t.(*Schema)
+	if s, ok := t.(*Schema); ok {
+		m.Schema = s
+		return
+	}
+	panic("(m *MediaType) setChild borked")
 }
