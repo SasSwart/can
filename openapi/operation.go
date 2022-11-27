@@ -11,6 +11,7 @@ var _ Traversable = &Operation{}
 // Operation is a programmatic representation of the Operation object defined here: https://swagger.io/specification/#operation-object
 type Operation struct {
 	node
+<<<<<<< HEAD
 	Tags        []string
 	Summary     string
 	Description string
@@ -18,6 +19,14 @@ type Operation struct {
 	RequestBody RequestBody          `yaml:"requestBody"` // can be a $ref
 	Responses   map[string]*Response // can be a $ref
 	//Callbacks 	map[string]*Callback // can be a $ref
+=======
+	Tags         []string
+	Summary      string
+	Description  string
+	Parameters   []*Parameter
+	RequestBody  RequestBody `yaml:"requestBody"`
+	Responses    map[string]*Response
+>>>>>>> hackday-sas
 	OperationId  string `yaml:"operationId"`
 	ExternalDocs ExternalDocs
 }

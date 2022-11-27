@@ -87,6 +87,15 @@ type OpenAPI struct {
 	Servers    []Server // TODO fix bugs after this modification
 	Paths      map[string]*PathItem
 	Components Components
+	metadata   map[string]string
+}
+
+func (o *OpenAPI) SetMetadata(metadata map[string]string) {
+	o.metadata = metadata
+}
+
+func (o *OpenAPI) GetMetadata() map[string]string {
+	return o.metadata
 }
 
 func (o *OpenAPI) getBasePath() string {
