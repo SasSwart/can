@@ -66,7 +66,7 @@ func SetRenderer(api *OpenAPI, renderer Renderer) {
 func resolveRefs(key string, parent, node Traversable) (Traversable, error) {
 	node.setParent(parent)
 	if _, ok := node.(*OpenAPI); !ok {
-		node.setName(key)
+		node.setName(key) // Don't set the root name as that's already been done by this point
 	}
 	nodeRef := node.getRef()
 	if nodeRef != "" {
