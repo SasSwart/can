@@ -71,7 +71,8 @@ func (o *Operation) setChild(i string, child Traversable) {
 	}
 }
 
-func (o *Operation) GetName() string {
-	name := o.renderer.sanitiseName(o.name) + o.parent.GetName()
-	return name
-}
+//func (o *Operation) GetName() string {
+//	panic("(o *Operation) GetName() Overridden by composed `node` method")
+//	name := o.renderer.sanitiseName(o.name) + o.parent.GetName()
+//	return name
+//}

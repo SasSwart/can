@@ -5,17 +5,17 @@ import (
 	"testing"
 )
 
-func TestMediaType_GetName(t *testing.T) {
-	openapi, _ := LoadOpenAPI(openapiFile)
-	mt := Dig(openapi, testEndpoint, testMethod, testReqBody, testMediaType)
-	name := mt.GetName()
-	if name != testReqBodyJSON {
-		t.Errorf("expected %v, got %v", testReqBodyJSON, name)
-	}
-}
+//func TestMediaType_GetName(t *testing.T) {
+//	openapi, _ := LoadOpenAPI(absOpenAPI)
+//	mt := Dig(openapi, testEndpoint, testMethod, testReqBody, testMediaType)
+//	name := mt.GetName()
+//	if name != testReqBodyJSON {
+//		t.Errorf("expected %v, got %v", testReqBodyJSON, name)
+//	}
+//}
 
 func TestMediaType_GetChildren(t *testing.T) {
-	openapi, _ := LoadOpenAPI(openapiFile)
+	openapi, _ := LoadOpenAPI(absOpenAPI)
 	mt := Dig(openapi, testEndpoint, testMethod, testReqBody, testMediaType)
 	children := mt.getChildren()
 	for model, schema := range children {
@@ -32,7 +32,7 @@ func TestMediaType_GetChildren(t *testing.T) {
 }
 
 func TestMediaType_SetChild(t *testing.T) {
-	openapi, _ := LoadOpenAPI(openapiFile)
+	openapi, _ := LoadOpenAPI(absOpenAPI)
 	mt := Dig(openapi, testEndpoint, testMethod, testReqBody, testMediaType)
 	s, _ := Dig(mt, testSchema).(*Schema)
 	sOld := *s

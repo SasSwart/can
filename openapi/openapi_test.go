@@ -1,13 +1,13 @@
 package openapi
 
 import (
+	"path/filepath"
 	"reflect"
-	"strings"
 	"testing"
 )
 
 func TestOpenAPI_LoadOpenAPI(t *testing.T) {
-	openapi, err := LoadOpenAPI(openapiFile)
+	openapi, err := LoadOpenAPI(absOpenAPI)
 	if err != nil {
 		t.Errorf("could not load file %s:%s", openapiFile, err.Error())
 	}
@@ -17,7 +17,7 @@ func TestOpenAPI_LoadOpenAPI(t *testing.T) {
 }
 
 func TestOpenAPI_SetRenderer(t *testing.T) {
-	openapi, _ := LoadOpenAPI(openapiFile)
+	openapi, _ := LoadOpenAPI(absOpenAPI)
 	SetRenderer(openapi, GinRenderer{})
 
 	//Check *PathItem
@@ -130,15 +130,15 @@ func TestOpenAPI_SetRenderer(t *testing.T) {
 }
 
 func TestOpenAPI_GetBasePath(t *testing.T) {
-	openapi, _ := LoadOpenAPI(openapiFile)
-	before, _, _ := strings.Cut(openapiFile, "/")
-	if openapi.basePath != before {
-		t.Errorf("could not get basePath %s, got %s", before, openapi.basePath)
+	openapi, _ := LoadOpenAPI(absOpenAPI)
+	wanted := filepath.Dir(absOpenAPI)
+	if openapi.getBasePath() != wanted {
+		t.Errorf("could not get basePath %s, got %s", wanted, openapi.basePath)
 	}
 }
 
 func TestOpenAPI_GetParent(t *testing.T) {
-	openapi, _ := LoadOpenAPI(openapiFile)
+	openapi, _ := LoadOpenAPI(absOpenAPI)
 	p := openapi.GetParent()
 	if p != nil {
 		t.Errorf("the root openapi file found a parent: %v", p)
@@ -146,7 +146,7 @@ func TestOpenAPI_GetParent(t *testing.T) {
 }
 
 func TestGetOpenAPI_GetChildren(t *testing.T) {
-	openapi, _ := LoadOpenAPI(openapiFile)
+	openapi, _ := LoadOpenAPI(absOpenAPI)
 	paths := openapi.getChildren()
 	if len(paths) == 0 {
 		t.Errorf("error occured or test yaml file has no paths to get")
@@ -162,7 +162,7 @@ func TestGetOpenAPI_GetChildren(t *testing.T) {
 }
 
 func TestOpenAPI_SetChild(t *testing.T) {
-	openapi, _ := LoadOpenAPI(openapiFile)
+	openapi, _ := LoadOpenAPI(absOpenAPI)
 	pathKey := "new"
 	p := PathItem{
 		Description: "new path item",

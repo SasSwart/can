@@ -3,7 +3,7 @@ package openapi
 import "testing"
 
 func TestOpenAPI_LoadsRequestBodyValidation(t *testing.T) {
-	apiSpec, err := LoadOpenAPI(openapiFile)
+	apiSpec, err := LoadOpenAPI(absOpenAPI)
 	if err != nil {
 		t.Fail()
 	}

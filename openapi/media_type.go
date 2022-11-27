@@ -8,9 +8,11 @@ type MediaType struct {
 	Schema *Schema
 }
 
-func (m *MediaType) GetName() string {
-	return m.parent.GetName() + "[" + m.node.name + "]"
-}
+//func (m *MediaType) GetName() string {
+// TODO where is this used?
+//
+//	return m.parent.GetName() + "[" + m.node.name + "]"
+//}
 
 //func (m *MediaType) getRef() string {
 // FIXME node composable should override this

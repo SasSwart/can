@@ -90,7 +90,7 @@ type OpenAPI struct {
 }
 
 func (o *OpenAPI) getBasePath() string {
-	return o.basePath
+	return o.node.basePath
 }
 
 func (o *OpenAPI) GetName() string {

@@ -3,7 +3,7 @@ package openapi
 import "testing"
 
 func TestOpenAPI_Dig(t *testing.T) {
-	openapi, _ := LoadOpenAPI(openapiFile)
+	openapi, _ := LoadOpenAPI(absOpenAPI)
 	endpoint := Dig(openapi, testEndpoint)
 	if _, ok := endpoint.(*PathItem); !ok {
 		t.Errorf("%#v shoud have been a %T", endpoint, &PathItem{})

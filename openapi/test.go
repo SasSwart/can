@@ -5,6 +5,7 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -22,6 +23,7 @@ const openapiFile = "fixtures/validation.yaml"
 const testSchema = "Model" // the Dig() key used to access any schema held within a MediaType
 const testPattern = "^([a-zA-Z0-9])+([-_ @\\.]([a-zA-Z0-9])+)*$"
 
+var absOpenAPI, _ = filepath.Abs(openapiFile)
 var ginRenderedPathItemName = caser.String(strings.TrimLeft(testEndpoint, "/"))
-var testBasePath = path.Dir(openapiFile)
+var testBasePath = path.Dir(absOpenAPI)
 var testReqBodyJSON = fmt.Sprintf("%s[%s]", testReqBody, testMediaType)

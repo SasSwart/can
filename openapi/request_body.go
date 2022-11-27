@@ -7,9 +7,9 @@ type RequestBody struct {
 	Required    bool
 }
 
-func (r *RequestBody) GetName() string {
-	return r.name
-}
+//func (r *RequestBody) GetName() string {
+//	return r.name
+//}
 
 //func (r *RequestBody) getRef() string {
 //	panic("(r *RequestBody) getRef() This should never be called") // Refs are in media type -> schemas
