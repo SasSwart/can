@@ -1,3 +1,6 @@
+package {{ index .GetMetadata "package" }}
+
+import "github.com/gin-gonic/gin"
 
 // GENERATED INTERFACE. DO NOT EDIT
 
@@ -44,9 +47,8 @@ type {{ $operation.GetName }}Response interface {
 {{- range $name, $response := .Responses }}
 {{ $statusCode := $name }}
 {{- range $name, $content := $response.Content }}
-type {{ $response.GetName }} struct {
-	{{ $content.Schema.GetName }}
-}
+type {{ $response.GetName }} {{ $content.Schema.GetName }}
+
 func ({{ $response.GetName }}) GetStatus() int {
 	return {{ $statusCode }}
 }
@@ -56,14 +58,5 @@ type {{ $operation.GetName }}405Response struct {}
 func ({{ $operation.GetName }}405Response) GetStatus() int {
 	return 405
 }
-
-type {{ $operation.GetName }}Parameters struct {}
-
-{{- range $name, $requestBody := $operation.RequestBody.Content }}
-type {{ $operation.RequestBody.GetName }} {{ $requestBody.Schema.GetName }}
-{{- end }}
-{{- if not $operation.RequestBody.Content }}
-type {{ $operation.RequestBody.GetName }} struct {}
-{{- end }}
 
 {{- end }}

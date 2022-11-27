@@ -29,6 +29,9 @@ func main() {
 	}
 
 	openapi.SetRenderer(apiSpec, openapi.GinRenderer{})
+	apiSpec.SetMetadata(map[string]string{
+		"package": "api",
+	})
 
 	renderNode := buildRenderNode(config)
 	_, err = openapi.Traverse(apiSpec, renderNode)
@@ -47,8 +50,14 @@ func buildRenderNode(config config.Config) openapi.TraversalFunc {
 		case *openapi.PathItem:
 			templateFile = "path_item.tmpl"
 		case *openapi.Schema:
+			if child.(*openapi.Schema).Type != "object" {
+				return child, nil
+			}
 			templateFile = "schema.tmpl"
+		case *openapi.Operation:
+			templateFile = "operation.tmpl"
 		}
+
 		if templateFile == "" {
 			return child, nil
 		}
