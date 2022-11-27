@@ -183,6 +183,15 @@ func TestOpenAPI_SetChild(t *testing.T) {
 	}
 }
 
+func TestOpenAPI_GetName(t *testing.T) {
+	openapi, _ := LoadOpenAPI(absOpenAPI)
+	name := openapi.GetName()
+	wanted := "Validation Fixture"
+	if name != wanted {
+		t.Errorf("wanted %s, got %s", wanted, name)
+	}
+}
+
 func TestOpenAPI_ResolveRefs(t *testing.T) {
 	// TODO
 	//(key string, parent, child Traversable) (Traversable, error) {

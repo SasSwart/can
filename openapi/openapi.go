@@ -65,7 +65,9 @@ func SetRenderer(api *OpenAPI, renderer Renderer) {
 // resolveRefs calls readRef on references with the ref path modified appropriately for it's use
 func resolveRefs(key string, parent, node Traversable) (Traversable, error) {
 	node.setParent(parent)
-	node.setName(key)
+	if _, ok := node.(*OpenAPI); !ok {
+		node.setName(key)
+	}
 	nodeRef := node.getRef()
 	if nodeRef != "" {
 		openapiBasePath := node.getBasePath()
@@ -103,7 +105,8 @@ func (o *OpenAPI) getBasePath() string {
 }
 
 func (o *OpenAPI) GetName() string {
-	return o.name
+	name := o.node.name
+	return name
 }
 
 func (o *OpenAPI) GetOutputFile() string {
