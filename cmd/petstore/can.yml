@@ -5,4 +5,4 @@ generator:
   InvalidRequestStatus: 200
 openAPI:
   openAPIFile: ./docs/openapi.yml
-outputPath: .
+outputPath: ./api
