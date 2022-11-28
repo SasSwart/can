@@ -26,7 +26,6 @@ type node struct {
 	parent   Traversable
 	name     string
 	renderer Renderer
-	ref      string
 }
 
 func (n *node) SetMetadata(metadata map[string]string) {
@@ -65,7 +64,8 @@ func (n *node) GetOutputFile() string {
 }
 
 func (n *node) getRef() string {
-	return n.ref
+	panic("(n *node) getRef(): We don't call this one")
+	return ""
 }
 
 func (n *node) GetName() string {

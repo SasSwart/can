@@ -5,6 +5,7 @@ var _ Traversable = &Parameter{}
 // Parameter is a programmatic representation of the Parameter object defined here: https://swagger.io/specification/#parameter-object
 type Parameter struct {
 	node
+	Ref             string `yaml:"$ref"`
 	Name            string `yaml:"name"`
 	In              string `yaml:"in"`
 	Description     string `yaml:"description"`
@@ -14,11 +15,9 @@ type Parameter struct {
 	Schema          Schema // Acts as alternative description of param
 }
 
-//func (p *Parameter) getRef() string {
-//	panic("(p *Parameter) getRef() This should never be called")
-//	return ""
-//	//return p.Schema.getRef()
-//}
+func (p *Parameter) getRef() string {
+	return p.Ref
+}
 
 func (p *Parameter) getChildren() map[string]Traversable {
 	return map[string]Traversable{

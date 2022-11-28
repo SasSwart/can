@@ -11,11 +11,11 @@ var _ Traversable = &Schema{}
 // Schema is a programmatic representation of the Schema object defined here: https://swagger.io/specification/#schema-object
 type Schema struct {
 	node
+	Ref                  string `yaml:"$ref"`
 	Description          string
 	Type                 string
 	Properties           map[string]*Schema
 	Items                *Schema
-	Ref                  string `yaml:"$ref"`
 	AdditionalProperties bool
 	MinLength            int `yaml:"minLength"`
 	MaxLength            int `yaml:"maxLength"`
@@ -60,7 +60,6 @@ func (s *Schema) getBasePath() string {
 	return basePath
 }
 
-//func (s *Schema) getRef() string {
-//	panic("(s *Schema) getRef() This should never be called")
-//	return s.Ref
-//}
+func (s *Schema) getRef() string {
+	return s.Ref
+}

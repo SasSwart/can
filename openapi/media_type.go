@@ -2,6 +2,7 @@ package openapi
 
 var _ Traversable = &MediaType{}
 
+// MediaType is a programmatic representation of the MediaType object defined here: https://swagger.io/specification/#media-type-object
 type MediaType struct {
 	node
 	name   string
@@ -12,15 +13,6 @@ type MediaType struct {
 // TODO where is this used?
 //
 //	return m.parent.GetName() + "[" + m.node.name + "]"
-//}
-
-//func (m *MediaType) getRef() string {
-// FIXME node composable should override this
-//if m.Schema != nil {
-//	return m.Schema.Ref
-//}
-//fmt.Println("borked in media type getref")
-//return ""
 //}
 
 func (m *MediaType) getChildren() map[string]Traversable {

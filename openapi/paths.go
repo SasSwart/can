@@ -9,6 +9,7 @@ var _ Traversable = &PathItem{}
 // PathItem is a programmatic representation of the Path Item object defined here: https://swagger.io/specification/#path-item-object
 type PathItem struct {
 	node
+	Ref         string `yaml:"$ref"` // must be defined in the format of a PathItem object
 	Summary     string
 	Description string
 	Get         *Operation
@@ -16,17 +17,15 @@ type PathItem struct {
 	Patch       *Operation
 	Delete      *Operation
 	Parameters  []Parameter
-	Ref         string `yaml:"$ref"`
 }
 
 func (p *PathItem) getChildren() map[string]Traversable {
 	return p.Operations()
 }
 
-//func (p *PathItem) getRef() string {
-//	panic("(p *PathItem) getRef() This should never be called")
-//	return p.Ref
-//}
+func (p *PathItem) getRef() string {
+	return p.Ref
+}
 
 func (p *PathItem) GetPath() string {
 	name := p.name

@@ -2,8 +2,10 @@ package openapi
 
 import "strconv"
 
+// Response is a programmatic representation of the Response object defined here: https://swagger.io/specification/#response-object
 type Response struct {
 	node
+	Ref         string
 	Description string            `yaml:"description"`
 	Headers     map[string]Header // can also be a $ref
 	Content     map[string]MediaType
@@ -14,10 +16,9 @@ type Response struct {
 //	return r.parent.GetName() + r.renderer.sanitiseName(r.name) + "Response"
 //}
 
-//func (r *Response) getRef() string {
-//	panic("Composed type should override this")
-//	return ""
-//}
+func (r *Response) getRef() string {
+	return r.Ref
+}
 
 var _ Traversable = &Response{}
 
