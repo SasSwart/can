@@ -47,7 +47,7 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 
 	err = yaml.Unmarshal(content, &api)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("yaml unmarshalling error: %w", err)
 	}
 
 	api.setName(api.Info.Title)

@@ -26,7 +26,9 @@ func (p *Parameter) getChildren() map[string]Traversable {
 }
 
 func (p *Parameter) setChild(_ string, t Traversable) {
-	if schema, ok := t.(*Schema); ok {
-		p.Schema = *schema
+	schema, ok := t.(*Schema)
+	if !ok {
+		panic("(p *Parameter) setChild failed cast")
 	}
+	p.Schema = *schema
 }

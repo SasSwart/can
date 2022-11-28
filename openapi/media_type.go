@@ -9,11 +9,10 @@ type MediaType struct {
 	Schema *Schema
 }
 
-//func (m *MediaType) GetName() string {
-// TODO where is this used?
-//
-//	return m.parent.GetName() + "[" + m.node.name + "]"
-//}
+// GetName overrides the default node implementation to avoid
+func (m *MediaType) GetName() string {
+	return m.parent.GetName() + m.name
+}
 
 func (m *MediaType) getChildren() map[string]Traversable {
 	return map[string]Traversable{

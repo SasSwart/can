@@ -99,7 +99,6 @@ func Traverse(node Traversable, f TraversalFunc) (Traversable, error) {
 				continue
 			}
 			// Update Child Node
-			// TODO should child node pass down modified base path for easy resolution?
 			newChild, err := f(i, node, child)
 			if err != nil {
 				return nil, err
