@@ -9,6 +9,10 @@ type MediaType struct {
 	Schema *Schema
 }
 
+func (m *MediaType) getRef() string {
+	return ""
+}
+
 // GetName overrides the default node implementation to avoid
 func (m *MediaType) GetName() string {
 	return m.parent.GetName() + m.name

@@ -5,17 +5,18 @@ import (
 	"testing"
 )
 
-//func TestPathItem_GetName(t *testing.T) {
-//	openapi, _ := LoadOpenAPI(openapiFile)
-//	path := Dig(openapi, testEndpoint)
-//	if path.getRenderer() == nil {
-//		t.Log("Renderer is nil, setting renderer manually")
-//		path.setRenderer(GinRenderer{})
-//	}
-//	if path.GetName() != ginRenderedPathItemName {
-//		t.Errorf("got %v, expected %v", path.GetName(), ginRenderedPathItemName)
-//	}
-//}
+func TestPathItem_GetName(t *testing.T) {
+	openapi, _ := LoadOpenAPI(openapiFile)
+	SetRenderer(openapi, GinRenderer{})
+	path := Dig(openapi, testEndpoint)
+	if path.getRenderer() == nil {
+		t.Log("Renderer is nil, setting renderer manually")
+		path.setRenderer(GinRenderer{})
+	}
+	if path.GetName() != testGinRenderedPathItemName {
+		t.Errorf("got %v, expected %v", path.GetName(), testGinRenderedPathItemName)
+	}
+}
 
 func TestPathItem_Operations(t *testing.T) {
 	openapi, _ := LoadOpenAPI(absOpenAPI)

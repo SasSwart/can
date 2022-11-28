@@ -5,14 +5,15 @@ import (
 	"testing"
 )
 
-//func TestMediaType_GetName(t *testing.T) {
-//	openapi, _ := LoadOpenAPI(absOpenAPI)
-//	mt := Dig(openapi, testEndpoint, testMethod, testReqBody, testMediaType)
-//	name := mt.GetName()
-//	if name != testReqBodyJSON {
-//		t.Errorf("expected %v, got %v", testReqBodyJSON, name)
-//	}
-//}
+func TestMediaType_GetName(t *testing.T) {
+	openapi, _ := LoadOpenAPI(absOpenAPI)
+	SetRenderer(openapi, GinRenderer{})
+	mt := Dig(openapi, testEndpoint, testMethod, testReqBody, testMediaType)
+	name := mt.GetName()
+	if name != testGinRenderedMediaItemName {
+		t.Errorf("expected %v, got %v", testGinRenderedMediaItemName, name)
+	}
+}
 
 func TestMediaType_GetChildren(t *testing.T) {
 	openapi, _ := LoadOpenAPI(absOpenAPI)

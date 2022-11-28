@@ -22,7 +22,6 @@ type Operation struct {
 }
 
 func (o *Operation) getRef() string {
-	panic("(o *Operation) getRef() This should never be called") // Refs are in parameter, requestbody, callbacks
 	return ""
 }
 

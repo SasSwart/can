@@ -185,10 +185,10 @@ func TestOpenAPI_SetChild(t *testing.T) {
 
 func TestOpenAPI_GetName(t *testing.T) {
 	openapi, _ := LoadOpenAPI(absOpenAPI)
+	SetRenderer(openapi, GinRenderer{})
 	name := openapi.GetName()
-	wanted := "Validation Fixture"
-	if name != wanted {
-		t.Errorf("wanted %s, got %s", wanted, name)
+	if name != testGinRenderedOpenAPIName {
+		t.Errorf("wanted %s, got %s", testGinRenderedOpenAPIName, name)
 	}
 }
 

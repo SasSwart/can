@@ -64,3 +64,8 @@ func (p *PathItem) setChild(i string, child Traversable) {
 	}
 	panic("(p *PathItem) setChild borked")
 }
+
+func (p *PathItem) GetName() string {
+	name := p.renderer.sanitiseName(p.name) + p.parent.GetName()
+	return name
+}

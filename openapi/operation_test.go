@@ -1,7 +1,6 @@
 package openapi
 
 import (
-	"strings"
 	"testing"
 )
 
@@ -49,29 +48,21 @@ func TestOperation_GetChildren(t *testing.T) {
 	for _, transversable := range paths.getChildren() {
 		if operation, ok := transversable.(*Operation); ok {
 			for key, child := range operation.getChildren() {
-				if key == testReqBody {
-					if _, ok := child.(*RequestBody); !ok {
-						t.Errorf("%s did not contain an object of type *RequestBody", key)
-						continue
-					}
+				if _, ok := child.(*RequestBody); ok {
+					t.Logf("%s contained an object of type *RequestBody", key)
 					t.Logf("heres your %s", testReqBody)
 					continue
 				}
-				if strings.HasPrefix(key, "Param") {
-					p, ok := child.(*Parameter)
-					if !ok {
-						t.Errorf("%s did not contain a parameter type", key)
-						continue
-					}
+				if p, ok := child.(*Parameter); ok {
+					t.Logf("%s contained a *Parameter type", key)
 					t.Logf("Parameter %s, in %s", p.name, p.In)
 					continue
 				}
-
-				if _, ok := child.(*Response); !ok {
-					t.Errorf("%s did not contain an object of type *Response", key)
+				if _, ok := child.(*Response); ok {
+					t.Logf("%s contained a *Response type", key)
 					continue
 				}
-				t.Logf("Response")
+				t.Errorf("%s did not contain an object of type *Response, *Parameter, or *RequestBody", key)
 			}
 		}
 	}

@@ -82,12 +82,16 @@ func (o *OpenAPI) GetMetadata() map[string]string {
 	return o.metadata
 }
 
+func (o *OpenAPI) getRef() string {
+	return ""
+}
+
 func (o *OpenAPI) getBasePath() string {
 	return o.node.basePath
 }
 
 func (o *OpenAPI) GetName() string {
-	name := o.node.name
+	name := o.renderer.sanitiseName(o.name)
 	return name
 }
 
