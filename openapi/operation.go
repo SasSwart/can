@@ -1,8 +1,7 @@
 package openapi
 
 import (
-	"fmt"
-	"strings"
+	"strconv"
 )
 
 // communicate by sharing memory ;)
@@ -32,16 +31,14 @@ func (o *Operation) getChildren() map[string]Traversable {
 	if o == nil {
 		return children
 	}
-
 	// Parameters
 	for i := range o.Parameters {
 		parameter := o.Parameters[i]
-		paramKeyName := fmt.Sprintf("Param%s%s", strings.Title(parameter.In), strings.Title(parameter.Name))
-		// This key value pair is for convenience. Internally parameters are collected in a slice
-		children[paramKeyName] = &parameter
+		children[string(rune(i))] = parameter
 	}
 
-	// RequestBody
+	// Request Body
+
 	children["RequestBody"] = &o.RequestBody
 
 	// Response
@@ -55,8 +52,9 @@ func (o *Operation) getChildren() map[string]Traversable {
 func (o *Operation) setChild(i string, child Traversable) {
 	switch child.(type) {
 	case *Parameter:
+		j, _ := strconv.Atoi(i)
 		param, _ := child.(*Parameter)
-		o.Parameters = append(o.Parameters, *param)
+		o.Parameters[j] = *param
 		return
 	case *RequestBody:
 		requestBody, _ := child.(*RequestBody)
