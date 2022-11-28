@@ -1,12 +1,10 @@
 package openapi
 
 import (
-	"fmt"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"path"
 	"path/filepath"
-	"strings"
 )
 
 var caser = cases.Title(language.English)
@@ -24,6 +22,18 @@ const testSchema = "Model" // the Dig() key used to access any schema held withi
 const testPattern = "^([a-zA-Z0-9])+([-_ @\\.]([a-zA-Z0-9])+)*$"
 
 var absOpenAPI, _ = filepath.Abs(openapiFile)
-var ginRenderedPathItemName = caser.String(strings.TrimLeft(testEndpoint, "/"))
+
+// var ginRenderedPathItemName = caser.String(strings.TrimLeft(testEndpoint, "/"))
 var testBasePath = path.Dir(absOpenAPI)
-var testReqBodyJSON = fmt.Sprintf("%s[%s]", testReqBody, testMediaType)
+
+//var testReqBodyJSON = fmt.Sprintf("%s[%s]", testReqBody, testMediaType)
+
+// These functions are used purely for testing purposes.
+//If a function finds use outside of testing it should be moved out of this file.
+
+func Dig(node Traversable, key ...string) Traversable {
+	if len(key) == 0 {
+		return node
+	}
+	return Dig(node.getChildren()[key[0]], key[1:]...)
+}

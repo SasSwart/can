@@ -124,10 +124,3 @@ func Traverse(node Traversable, f TraversalFunc) (Traversable, error) {
 
 	return recurse(node, f)
 }
-
-func Dig(node Traversable, key ...string) Traversable {
-	if len(key) == 0 {
-		return node
-	}
-	return Dig(node.getChildren()[key[0]], key[1:]...)
-}

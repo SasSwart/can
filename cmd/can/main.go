@@ -13,15 +13,15 @@ import (
 )
 
 func main() {
-	config, err := loadConfig()
+	configData, err := loadConfig()
 	if err != nil {
 		fmt.Println(fmt.Errorf("loadConfig error: %w", err))
 		os.Exit(1)
 	}
 
-	fmt.Printf("Reading API specification from \"%s\"\n", absoluteOpenAPIFile(config))
+	fmt.Printf("Reading API specification from \"%s\"\n", absoluteOpenAPIFile(configData))
 	apiSpec, err := openapi.LoadOpenAPI(
-		absoluteOpenAPIFile(config),
+		absoluteOpenAPIFile(configData),
 	)
 	if err != nil {
 		fmt.Println(fmt.Errorf("openapi.LoadOpenAPI error: %w", err))
@@ -33,7 +33,7 @@ func main() {
 		"package": "api",
 	})
 
-	renderNode := buildRenderNode(config)
+	renderNode := buildRenderNode(configData)
 	_, err = openapi.Traverse(apiSpec, renderNode)
 	if err != nil {
 		fmt.Println(fmt.Errorf("openapi.Traverse(apiSpec, renderNode) error: %w", err))
@@ -96,14 +96,14 @@ func loadConfig() (config.Config, error) {
 		return config.Config{}, fmt.Errorf("could not read config file: %w\n", err)
 	}
 
-	config := config.Config{
+	configData := config.Config{
 		WorkingDirectory: wd,
 		ConfigFilePath:   viper.ConfigFileUsed(),
 	}
 
-	_ = viper.Unmarshal(&config)
+	_ = viper.Unmarshal(&configData)
 
-	return config, nil
+	return configData, nil
 }
 
 // absoluteOpenAPIFile uses the current working directory, resolved config file and the openAPI file that was specified

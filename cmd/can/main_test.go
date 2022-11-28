@@ -35,14 +35,14 @@ func TestLoadConfig(t *testing.T) {
 		if test.configFile != "" {
 			os.Args = append(os.Args, "--configFile", test.configFile)
 		}
-		config, err := loadConfig()
+		configData, err := loadConfig()
 
 		if !test.expectedErr && err != nil {
 			t.Log("Test Case: ", i)
 			t.Log("Unexpected error occurred while loading config file:", err)
 			t.Fail()
 		}
-		if !reflect.DeepEqual(config, test.expectedConfig) {
+		if !reflect.DeepEqual(configData, test.expectedConfig) {
 			t.Log("Test Case: ", i)
 			t.Log("Loaded Config did not match expected config")
 			t.Fail()
