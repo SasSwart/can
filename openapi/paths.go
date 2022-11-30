@@ -62,7 +62,7 @@ func (p *PathItem) setChild(i string, child Traversable) {
 		return
 
 	}
-	panic("(p *PathItem) setChild borked")
+	panic("(p *PathItem) setChild(): " + errCastFail)
 }
 
 func (p *PathItem) GetName() string {

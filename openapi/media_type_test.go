@@ -23,6 +23,7 @@ func TestMediaType_GetChildren(t *testing.T) {
 		if model == testSchema {
 			s, ok := schema.(*Schema)
 			if !ok {
+				// TODO These tests would be more valuable if we asserted against the content of the schema object we expect to make sure we get the right one.
 				t.Errorf("MediaType.getChildren() didn't return a *Schema")
 			}
 			if s == nil {

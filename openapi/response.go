@@ -36,10 +36,12 @@ func (r *Response) getChildren() map[string]Traversable {
 
 func (r *Response) setChild(i string, t Traversable) {
 	if _, err := strconv.Atoi(i); err != nil || i == "default" {
-		if mediaType, ok := t.(*MediaType); ok {
-			r.Content[i] = *mediaType
-			return
+		mediaType, ok := t.(*MediaType)
+		if !ok {
+			panic("(r *Response) setChild(): " + errCastFail)
 		}
+		r.Content[i] = *mediaType
+		return
 	}
-	panic("Response spec broken")
+	panic("(r *Response) setChild(): Response spec broken. Key should either be int as string or `default`")
 }

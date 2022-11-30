@@ -14,10 +14,9 @@ type Config struct {
 // OpenAPI is a programmatic representation of the OpenApi Document object defined here: https://swagger.io/specification/#openapi-object
 type OpenAPI struct {
 	node
-	OpenAPI string `yaml:"openapi"`
-	Info    Info
-	//Servers Servers
-	Servers    []Server // TODO fix bugs after this modification
+	OpenAPI    string `yaml:"openapi"`
+	Info       Info
+	Servers    []Server
 	Paths      map[string]*PathItem
 	Components Components
 	metadata   map[string]string
@@ -53,13 +52,13 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	api.setName(api.Info.Title)
 
 	// Resolve references
-	newapi, err := Traverse(&api, resolveRefs)
+	newApi, err := Traverse(&api, resolveRefs)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return newapi.(*OpenAPI), err
+	return newApi.(*OpenAPI), err
 }
 
 func SetRenderer(api *OpenAPI, renderer Renderer) {
@@ -113,7 +112,7 @@ func (o *OpenAPI) setChild(i string, child Traversable) {
 		o.Paths[i] = c
 		return
 	}
-	panic("(o *OpenAPI) setChild borked")
+	panic("(o *OpenAPI) setChild:" + errCastFail)
 }
 
 // resolveRefs calls readRef on references with the ref path modified appropriately for it's use

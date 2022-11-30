@@ -13,7 +13,6 @@ func (m *MediaType) getRef() string {
 	return ""
 }
 
-// GetName overrides the default node implementation to avoid
 func (m *MediaType) GetName() string {
 	return m.parent.GetName() + m.name
 }
@@ -29,5 +28,5 @@ func (m *MediaType) setChild(_ string, t Traversable) {
 		m.Schema = s
 		return
 	}
-	panic("(m *MediaType) setChild borked")
+	panic("(m *MediaType) setChild(): " + errCastFail)
 }

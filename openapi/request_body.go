@@ -9,9 +9,9 @@ type RequestBody struct {
 	Required    bool
 }
 
-//func (r *RequestBody) GetName() string {
-//	return r.name
-//}
+func (r *RequestBody) GetName() string {
+	return r.name
+}
 
 func (r *RequestBody) getRef() string {
 	return r.Ref
@@ -33,5 +33,5 @@ func (r *RequestBody) setChild(i string, t Traversable) {
 		r.Content[i] = content
 		return
 	}
-	panic("(r *RequestBody) setChild borked")
+	panic("(r *RequestBody) setChild(): " + errCastFail)
 }

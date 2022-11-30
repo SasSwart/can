@@ -33,7 +33,8 @@ func (o *Operation) getChildren() map[string]Traversable {
 	// Parameters
 	for i := range o.Parameters {
 		parameter := o.Parameters[i]
-		children[string(rune(i))] = &parameter
+		paramIndex := strconv.Itoa(i)
+		children[paramIndex] = &parameter
 	}
 
 	// Request Body
@@ -64,7 +65,7 @@ func (o *Operation) setChild(i string, child Traversable) {
 		o.Responses[i] = response
 		return
 	default:
-		panic("(o *OpenAPI) setChild borked")
+		panic("(o *OpenAPI) setChild(): " + errCastFail)
 	}
 }
 

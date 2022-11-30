@@ -49,7 +49,7 @@ func (s *Schema) setChild(i string, t Traversable) {
 		}
 		return
 	}
-	panic("(s *Schema) setChild borked")
+	panic("(s *Schema) setChild(): " + errCastFail)
 }
 
 func (s *Schema) getBasePath() string {
