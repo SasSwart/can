@@ -16,3 +16,27 @@ Run the can command as follows:
 
 ## Design
 See [design.md](design.md)
+
+## Roadmap
+
+### TODOs
+* Look into yaml.Readpath
+* Look into unmarshalling composed types
+* Implement e2e testing of generated code (1.0)
+* (Alex) test resolveRefs against nested refs and debug - use hackday branch for reference
+* Finish unit testing
+* Spec Compliant Templating
+  * go-client
+  * go-gin
+    +* Pipeline
+  * Linting (https://github.com/uber-go/guide/blob/master/.golangci.yml)
+  * Automated PR-blocking testing for unit and e2e testing
+  * Automated PR-blocking building of binary
+  * Release pipeline revision for main
+
+### Long Term Goals
+ * Unmarshal refs into node container
+ * Full Open Api spec 3.x coverage
+ * Make full use of Architechtural Decision Records - keep in main branch
+ * Robust CI pipeline
+ * Implement style guide for development - possible adapted from pre-existing industry-used guides

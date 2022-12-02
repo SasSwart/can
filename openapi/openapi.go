@@ -11,11 +11,26 @@ type Config struct {
 	OpenAPIFile string
 }
 
+// OpenAPI is a programmatic representation of the OpenApi Document object defined here: https://swagger.io/specification/#openapi-object
+type OpenAPI struct {
+	node
+	OpenAPI    string `yaml:"openapi"`
+	Info       Info
+	Servers    []Server
+	Paths      map[string]*PathItem
+	Components Components
+	metadata   map[string]string
+}
+
 func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	// skeleton
+	absPath, err := filepath.Abs(openAPIFile)
+	if err != nil {
+		return nil, err
+	}
 	api := OpenAPI{
 		node: node{
-			basePath: filepath.Dir(openAPIFile),
+			basePath: filepath.Dir(absPath),
 		},
 		Components: Components{
 			Schemas: map[string]Schema{},
@@ -28,22 +43,26 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to read file \"%s\": %w", openAPIFile, err)
 	}
-	yaml.Unmarshal(content, &api)
+
+	err = yaml.Unmarshal(content, &api)
+	if err != nil {
+		return nil, fmt.Errorf("yaml unmarshalling error: %w", err)
+	}
 
 	api.setName(api.Info.Title)
 
 	// Resolve references
-	newapi, err := Traverse(&api, resolveRefs)
+	newApi, err := Traverse(&api, resolveRefs)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return newapi.(*OpenAPI), err
+	return newApi.(*OpenAPI), err
 }
 
 func SetRenderer(api *OpenAPI, renderer Renderer) {
-	Traverse(api, func(_ string, _, child Traversable) (Traversable, error) {
+	_, _ = Traverse(api, func(_ string, _, child Traversable) (Traversable, error) {
 		child.setRenderer(renderer)
 		parent := child.GetParent()
 		if parent != nil {
@@ -54,35 +73,6 @@ func SetRenderer(api *OpenAPI, renderer Renderer) {
 	})
 }
 
-// resolveRefs walks the tree and
-func resolveRefs(key string, parent, child Traversable) (Traversable, error) {
-	child.setParent(parent)
-	child.setName(key)
-	ref := child.getRef()
-	if ref != "" {
-		basePath := child.getBasePath()
-		ref := filepath.Base(child.getRef())
-		err := readRef(filepath.Join(basePath, ref), child)
-		if err != nil {
-			return nil, fmt.Errorf("Unable to read reference:\n%w", err)
-		}
-	}
-
-	return child, nil
-}
-
-// OpenAPI is a programmatic representation of the OpenApi Document object defined here: https://swagger.io/specification/#openapi-object
-type OpenAPI struct {
-	node
-	OpenAPI string `yaml:"openapi"`
-	Info    Info
-	//Servers Servers
-	Servers    []Server // TODO fix bugs after this modification
-	Paths      map[string]*PathItem
-	Components Components
-	metadata   map[string]string
-}
-
 func (o *OpenAPI) SetMetadata(metadata map[string]string) {
 	o.metadata = metadata
 }
@@ -91,12 +81,17 @@ func (o *OpenAPI) GetMetadata() map[string]string {
 	return o.metadata
 }
 
+func (o *OpenAPI) getRef() string {
+	return ""
+}
+
 func (o *OpenAPI) getBasePath() string {
-	return o.basePath
+	return o.node.basePath
 }
 
 func (o *OpenAPI) GetName() string {
-	return o.name
+	name := o.renderer.sanitiseName(o.name)
+	return name
 }
 
 func (o *OpenAPI) GetOutputFile() string {
@@ -113,8 +108,29 @@ func (o *OpenAPI) getChildren() map[string]Traversable {
 }
 
 func (o *OpenAPI) setChild(i string, child Traversable) {
-	c, _ := child.(*PathItem)
-	o.Paths[i] = c
+	if c, ok := child.(*PathItem); ok {
+		o.Paths[i] = c
+		return
+	}
+	panic("(o *OpenAPI) setChild:" + errCastFail)
+}
+
+// resolveRefs calls readRef on references with the ref path modified appropriately for it's use
+func resolveRefs(key string, parent, node Traversable) (Traversable, error) {
+	node.setParent(parent)
+	if _, ok := node.(*OpenAPI); !ok {
+		node.setName(key) // Don't set the root name as that's already been done by this point
+	}
+	nodeRef := node.getRef()
+	if nodeRef != "" {
+		openapiBasePath := node.getBasePath()
+		ref := filepath.Base(node.getRef())
+		err := readRef(filepath.Join(openapiBasePath, ref), node)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to read reference:\n%w", err)
+		}
+	}
+	return node, nil
 }
 
 // ExternalDocs is a programmatic representation of the External Docs object defined here: https://swagger.io/specification/#external-documentation-object

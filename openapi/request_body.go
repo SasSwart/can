@@ -1,14 +1,20 @@
 package openapi
 
+// RequestBody is a programmatic representation of the RequestBody object defined here: https://swagger.io/specification/#request-body-object
 type RequestBody struct {
 	node
+	Ref         string
 	Description string
 	Content     map[string]*MediaType
 	Required    bool
 }
 
+func (r *RequestBody) GetName() string {
+	return r.name
+}
+
 func (r *RequestBody) getRef() string {
-	return ""
+	return r.Ref
 }
 
 var _ Traversable = &RequestBody{}
@@ -23,7 +29,9 @@ func (r *RequestBody) getChildren() map[string]Traversable {
 }
 
 func (r *RequestBody) setChild(i string, t Traversable) {
-	// TODO: handle this error
-	content, _ := t.(*MediaType)
-	r.Content[i] = content
+	if content, ok := t.(*MediaType); ok {
+		r.Content[i] = content
+		return
+	}
+	panic("(r *RequestBody) setChild(): " + errCastFail)
 }

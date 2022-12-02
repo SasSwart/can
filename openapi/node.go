@@ -26,8 +26,12 @@ type node struct {
 	parent   Traversable
 	name     string
 	renderer Renderer
-	ref      string
 }
+
+const (
+	errNotImplemented = " not implemented by composed type"
+	errCastFail       = " cast failed"
+)
 
 func (n *node) SetMetadata(metadata map[string]string) {
 	n.parent.SetMetadata(metadata)
@@ -40,11 +44,11 @@ func (n *node) GetMetadata() map[string]string {
 }
 
 func (n *node) getChildren() map[string]Traversable {
-	panic("not implemented by composed type")
+	panic("(n *node) getChildren():" + errNotImplemented)
 }
 
-func (n *node) setChild(i string, t Traversable) {
-	panic("not implemented by composed type")
+func (n *node) setChild(_ string, _ Traversable) {
+	panic("(n *node) setChild():" + errNotImplemented)
 }
 
 func (n *node) GetParent() Traversable {
@@ -55,6 +59,7 @@ func (n *node) setParent(parent Traversable) {
 	n.parent = parent
 }
 
+// getBasePath recurses up the parental ladder until it's overridden by the *OpenAPI method
 func (n *node) getBasePath() string {
 	return n.parent.getBasePath()
 }
@@ -64,7 +69,8 @@ func (n *node) GetOutputFile() string {
 }
 
 func (n *node) getRef() string {
-	return n.ref
+	panic("(n *node) getRef():" + errNotImplemented)
+	return ""
 }
 
 func (n *node) GetName() string {
@@ -121,11 +127,4 @@ func Traverse(node Traversable, f TraversalFunc) (Traversable, error) {
 	}
 
 	return recurse(node, f)
-}
-
-func Dig(node Traversable, key ...string) Traversable {
-	if len(key) == 0 {
-		return node
-	}
-	return Dig(node.getChildren()[key[0]], key[1:]...)
 }

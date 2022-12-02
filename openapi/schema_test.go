@@ -1,60 +1,51 @@
 package openapi
 
 import (
-	"path/filepath"
 	"reflect"
 	"testing"
 )
 
 var (
 	properties = map[string]*Schema{
-		"renderable":        &Schema{},
-		"anotherRenderable": &Schema{},
+		"renderable":        {},
+		"anotherRenderable": {},
 	}
 	item = &Schema{}
 	p    = &MediaType{ // PARENT
-		node: node{
-			parent: nil, // RESPONSE USED
-		},
+		node: node{},
 		name: "parentName",
 		Schema: &Schema{
 			node: node{
 				parent: &MediaType{},
 				name:   "parentModel",
 			},
-			Description: "",
-			Type:        "string",
+			Type: "string",
 		},
 	}
 )
 
 func emptySchemaWith(childProperties, childItems, parent bool) *Schema {
 	mainNode := node{
-		renderer: nil,
-		parent:   p, // PARENT POINT
-		name:     "mainModel",
+		parent: p, // PARENT POINT
+		name:   "mainModel",
 	}
 	switch {
 	case parent && !childProperties && !childItems:
 		return &Schema{ // BASE SCHEMA
-			node:       mainNode,
-			Type:       "string",
-			Properties: nil, // CHILD POINT
-			Items:      nil, // CHILD POINT
+			node: mainNode,
+			Type: "string",
 		}
 	case !parent && childProperties && !childItems:
 		return &Schema{ // BASE SCHEMA
 			node:       mainNode,
 			Type:       "string",
 			Properties: properties, // CHILD POINT
-			Items:      nil,        // CHILD POINT
 		}
 	case !parent && !childProperties && childItems:
 		return &Schema{ // BASE SCHEMA
-			node:       mainNode,
-			Type:       "string",
-			Properties: nil,  // CHILD POINT
-			Items:      item, // CHILD POINT
+			node:  mainNode,
+			Type:  "string",
+			Items: item, // CHILD POINT
 		}
 	case !parent && childProperties && childItems:
 
@@ -75,52 +66,32 @@ func TestGetChildren(t *testing.T) {
 	s := &Schema{}
 	if !reflect.DeepEqual(shouldBeEmpty, s.getChildren()) {
 		t.Error("shouldBeEmpty is not empty")
-		t.Fail()
 	}
 	schemaWithChildren = emptySchemaWith(true, true, false)
 	shouldBePropAndItemChildren := schemaWithChildren.getChildren()
 	if shouldBePropAndItemChildren == nil {
 		t.Error("shouldBePropAndItemChildren is nil")
-		t.Fail()
 	}
 	schemaWithChildren = emptySchemaWith(false, true, false)
 	shouldBeItemChildren := schemaWithChildren.getChildren()
 	if shouldBeItemChildren == nil {
 		t.Error("shouldBeItemChildren is nil")
-		t.Fail()
 	}
 	schemaWithChildren = emptySchemaWith(true, false, false)
 	shouldBePropChildren := schemaWithChildren.getChildren()
 	if shouldBePropChildren == nil {
 		t.Error("shouldBePropChildren is nil")
-		t.Fail()
 	}
 }
 
 func TestSchema_ResolveRefs(t *testing.T) {
-	basePath := "../"
-
-	ref := "openapi/fixtures/test_schema.yaml"
-	absoluteRef, _ := filepath.Abs(filepath.Join(basePath, ref))
-
-	subRef := "openapi/fixtures/sub_schema.yml"
-	absoluteSubRef, _ := filepath.Abs(filepath.Join(basePath, subRef))
-
-	schema := Schema{
-		Ref: ref,
+	openapi, err := LoadOpenAPI(absOpenAPI)
+	if err != nil {
+		t.Errorf(err.Error())
 	}
-
-	t.Errorf("Fix me")
-	t.FailNow() // Panic on next line
-	newSchema, _ := Traverse(&schema, resolveRefs)
-
-	if newSchema.(*Schema).Ref != absoluteRef {
-		t.Log("Schema reference was not correctly resolved to an absolute path")
-		t.Fail()
+	if openapi == nil {
+		t.Errorf("openapi is nil")
 	}
-
-	if newSchema.(*Schema).Items.Ref != absoluteSubRef {
-		t.Log("Recursive Schema reference was not correctly resolved to an absolute path")
-		t.Fail()
-	}
+	// TODO
+	t.Error("TODO load refs through the use of the composed `node` struct and test against that")
 }

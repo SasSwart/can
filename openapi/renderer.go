@@ -51,6 +51,14 @@ func (g GinRenderer) sanitiseName(s string) string {
 	}
 	s = strings.Join(nameSegments, "_")
 
+	// Replace " " with _ (" " is not allowed in go func names)
+	pathSegments = strings.Split(s, " ")
+	nameSegments = make([]string, len(pathSegments))
+	for i, segment := range pathSegments {
+		nameSegments[i] = caser.String(segment)
+	}
+	s = strings.Join(nameSegments, "")
+
 	// Convert from '/' delimited path to Camelcase func names
 	pathSegments = strings.Split(s, "/")
 	nameSegments = make([]string, len(pathSegments))
@@ -63,7 +71,7 @@ func (g GinRenderer) sanitiseName(s string) string {
 			continue
 		}
 
-		nameSegments[i] = caser.String(segment)
+		nameSegments[i] = segment
 	}
 
 	return strings.Join(nameSegments, "")

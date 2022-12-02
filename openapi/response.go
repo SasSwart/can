@@ -1,7 +1,11 @@
 package openapi
 
+import "strconv"
+
+// Response is a programmatic representation of the Response object defined here: https://swagger.io/specification/#response-object
 type Response struct {
 	node
+	Ref         string
 	Description string            `yaml:"description"`
 	Headers     map[string]Header // can also be a $ref
 	Content     map[string]MediaType
@@ -13,20 +17,31 @@ func (r *Response) GetName() string {
 }
 
 func (r *Response) getRef() string {
-	return ""
+	return r.Ref
 }
 
 var _ Traversable = &Response{}
 
 func (r *Response) getChildren() map[string]Traversable {
-	children := map[string]Traversable{}
+	responses := map[string]Traversable{} // Where string is either `default` or an HTTP status code
 	for name, mediaType := range r.Content {
-		children[name] = &mediaType
+		if _, err := strconv.Atoi(name); err != nil || name == "default" {
+			responses[name] = &mediaType
+		} else {
+			panic("Response spec broken")
+		}
 	}
-	return children
+	return responses
 }
 
 func (r *Response) setChild(i string, t Traversable) {
-	mediaType, _ := t.(*MediaType)
-	r.Content[i] = *mediaType
+	if _, err := strconv.Atoi(i); err != nil || i == "default" {
+		mediaType, ok := t.(*MediaType)
+		if !ok {
+			panic("(r *Response) setChild(): " + errCastFail)
+		}
+		r.Content[i] = *mediaType
+		return
+	}
+	panic("(r *Response) setChild(): Response spec broken. Key should either be int as string or `default`")
 }

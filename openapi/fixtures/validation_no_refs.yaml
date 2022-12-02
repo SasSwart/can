@@ -11,7 +11,8 @@ paths:
           description: endpoint UUID
           required: true
           schema:
-            $ref: ./testRefs/test_ref_generic.yaml
+            type: string
+            format: uuid
       responses:
         204:
           description: Project deleted successfully
@@ -22,7 +23,8 @@ paths:
           description: endpoint UUID
           required: true
           schema:
-            $ref: ./testRefs/test_ref_generic.yaml
+            type: string
+            format: uuid
       responses:
         204:
           description: Project changed successfully
@@ -33,14 +35,29 @@ paths:
           description: endpoint UUID
           required: true
           schema:
-            $ref: ./testRefs/test_ref_generic.yaml
+            type: string
+            format: uuid
       responses:
         200:
           description: Project retrieved successfully
           content:
            application/json:
              schema:
-               $ref: "./testRefs/nested_ref.yml"
+               type: array
+               maxItems: 100
+               items:
+                 type: object
+                 required:
+                   - id
+                   - name
+                 properties:
+                   id:
+                     type: integer
+                     format: int64
+                   name:
+                     type: string
+                   tag:
+                     type: string
     post:
       parameters:
         - name: id
@@ -57,4 +74,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: ./testRefs/test_ref_post.yaml
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 64
+                  pattern: ^([a-zA-Z0-9])+([-_ @\.]([a-zA-Z0-9])+)*$
+                description:
+                  type: string
+                id:
+                  type: string
+                  format: uuid
+              required:
+                - name
