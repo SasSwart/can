@@ -1,36 +1,32 @@
 package openapi
 
-import (
-	"fmt"
-	"path"
-)
+var _ Traversable = &MediaType{}
 
+// MediaType is a programmatic representation of the MediaType object defined here: https://swagger.io/specification/#media-type-object
 type MediaType struct {
-	Schema Schema
+	node
+	name   string
+	Schema *Schema
 }
 
-func (m *MediaType) ResolveRefs(basePath string, components *Components) error {
-	if m.Schema.Ref == "" {
-		return nil
+func (m *MediaType) getRef() string {
+	return ""
+}
+
+func (m *MediaType) GetName() string {
+	return m.parent.GetName() + m.name
+}
+
+func (m *MediaType) getChildren() map[string]Traversable {
+	return map[string]Traversable{
+		"Model": m.Schema,
 	}
+}
 
-	ref := m.Schema.Ref
-
-	fullRefPath := path.Join(basePath, m.Schema.Ref)
-	var newSchema Schema
-	err := readRef(fullRefPath, &newSchema)
-	if err != nil {
-		return fmt.Errorf("Unable to read schema reference:\n%w", err)
+func (m *MediaType) setChild(_ string, t Traversable) {
+	if s, ok := t.(*Schema); ok {
+		m.Schema = s
+		return
 	}
-	newSchema.Name = refToName(fullRefPath)
-	m.Schema = newSchema
-	components.Schemas[newSchema.Name] = newSchema
-
-	refBasePath := path.Dir(ref)
-	err = newSchema.ResolveRefs(path.Join(basePath, refBasePath), components)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	panic("(m *MediaType) setChild(): " + errCastFail)
 }

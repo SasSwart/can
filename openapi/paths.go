@@ -1,35 +1,15 @@
 package openapi
 
 import (
-	"fmt"
-	"path"
+	"path/filepath"
 )
 
-type Paths map[string]PathItem
+var _ Traversable = &PathItem{}
 
-func (p *Paths) ResolveRefs(basePath string, components *Components) error {
-	for key, pathItem := range *p {
-		if pathItem.Ref == "" {
-			continue
-		}
-
-		var newPathItem PathItem
-		err := readRef(path.Join(basePath, pathItem.Ref), &newPathItem)
-		if err != nil {
-			return fmt.Errorf("Unable to read reference:\n%w", err)
-		}
-		(*p)[key] = newPathItem
-
-		refBasePath := path.Dir(pathItem.Ref)
-		err = newPathItem.ResolveRefs(path.Join(basePath, refBasePath), components)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
+// PathItem is a programmatic representation of the Path Item object defined here: https://swagger.io/specification/#path-item-object
 type PathItem struct {
+	node
+	Ref         string `yaml:"$ref"` // must be defined in the format of a PathItem object
 	Summary     string
 	Description string
 	Get         *Operation
@@ -37,28 +17,55 @@ type PathItem struct {
 	Patch       *Operation
 	Delete      *Operation
 	Parameters  []Parameter
-	Ref         string `yaml:"$ref"`
 }
 
-func (p *PathItem) ResolveRefs(basePath string, components *Components) error {
-	for _, operation := range p.Operations() {
-		if operation == nil {
-			continue
-		}
-		err := operation.ResolveRefs(basePath, components)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+func (p *PathItem) getChildren() map[string]Traversable {
+	return p.Operations()
 }
 
-func (p *PathItem) Operations() map[string]*Operation {
-	return map[string]*Operation{
-		"delete": p.Delete,
-		"get":    p.Get,
-		"patch":  p.Patch,
-		"post":   p.Post,
+func (p *PathItem) getRef() string {
+	return p.Ref
+}
+
+func (p *PathItem) GetPath() string {
+	name := p.name
+	return name
+}
+
+func (p *PathItem) getBasePath() string {
+	// TODO: Deal with absolute paths for both of these parameters
+	// For now both of these params are assumed relative
+	basePath := filepath.Join(p.parent.getBasePath(), filepath.Dir(p.Ref))
+	return basePath
+}
+
+func (p *PathItem) Operations() map[string]Traversable {
+	operations := map[string]Traversable{}
+	if p.Get != nil {
+		operations["get"] = p.Get
 	}
+	if p.Post != nil {
+		operations["post"] = p.Post
+	}
+	if p.Patch != nil {
+		operations["patch"] = p.Patch
+	}
+	if p.Delete != nil {
+		operations["delete"] = p.Delete
+	}
+	return operations
+}
+
+func (p *PathItem) setChild(i string, child Traversable) {
+	if operation, ok := child.(*Operation); ok {
+		p.Operations()[i] = operation
+		return
+
+	}
+	panic("(p *PathItem) setChild(): " + errCastFail)
+}
+
+func (p *PathItem) GetName() string {
+	name := p.getRenderer().sanitiseName(p.name) + p.parent.GetName()
+	return name
 }

@@ -1,18 +1,47 @@
 package openapi
 
+import "strconv"
+
+// Response is a programmatic representation of the Response object defined here: https://swagger.io/specification/#response-object
 type Response struct {
-	Description string
+	node
+	Ref         string
+	Description string            `yaml:"description"`
+	Headers     map[string]Header // can also be a $ref
 	Content     map[string]MediaType
+	Links       map[string]Link // can also be a $ref
 }
 
-func (r *Response) ResolveRefs(basePath string, components *Components) error {
-	for key, mediaType := range r.Content {
-		err := mediaType.ResolveRefs(basePath, components)
-		if err != nil {
-			return err
-		}
-		r.Content[key] = mediaType
-	}
+func (r *Response) GetName() string {
+	return r.parent.GetName() + r.getRenderer().sanitiseName(r.name) + "Response"
+}
 
-	return nil
+func (r *Response) getRef() string {
+	return r.Ref
+}
+
+var _ Traversable = &Response{}
+
+func (r *Response) getChildren() map[string]Traversable {
+	responses := map[string]Traversable{} // Where string is either `default` or an HTTP status code
+	for name, mediaType := range r.Content {
+		if _, err := strconv.Atoi(name); err != nil || name == "default" {
+			responses[name] = &mediaType
+		} else {
+			panic("Response spec broken")
+		}
+	}
+	return responses
+}
+
+func (r *Response) setChild(i string, t Traversable) {
+	if _, err := strconv.Atoi(i); err != nil || i == "default" {
+		mediaType, ok := t.(*MediaType)
+		if !ok {
+			panic("(r *Response) setChild(): " + errCastFail)
+		}
+		r.Content[i] = *mediaType
+		return
+	}
+	panic("(r *Response) setChild(): Response spec broken. Key should either be int as string or `default`")
 }

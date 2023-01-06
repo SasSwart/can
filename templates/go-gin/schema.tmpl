@@ -1,0 +1,18 @@
+package {{ index .GetMetadata "package" }}
+
+// GENERATED MODEL. DO NOT EDIT
+{{ if ne .Description "" }}
+// {{ .GetName }} description:
+// {{ .Description }}
+{{- end }}
+type {{ .GetName }} {{ .GetType }}
+{{- if eq "object" .Type }} {
+{{- range $name, $schema := .Properties }}
+	{{ if eq $schema.GetType "struct" -}}
+	{{ $name | ToTitle }} {{ $schema.GetName }}
+	{{- else -}}
+	{{ $name | ToTitle }} {{ $schema.GetType }}
+	{{- end }}
+{{- end }}
+}
+{{- end }}

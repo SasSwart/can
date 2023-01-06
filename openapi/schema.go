@@ -1,20 +1,20 @@
 package openapi
 
 import (
-	"fmt"
-	"github.com/spf13/viper"
 	"path/filepath"
-	"strings"
 )
 
+var _ Traversable = &Schema{}
+
+// Schema is a programmatic representation of the Schema object defined here: https://swagger.io/specification/#schema-object
 type Schema struct {
+	node
+	Ref                  string `yaml:"$ref"`
 	Description          string
 	Type                 string
-	Properties           map[string]Schema
+	Properties           map[string]*Schema
 	Items                *Schema
-	Ref                  string `yaml:"$ref"`
 	AdditionalProperties bool
-	Name                 string
 	MinLength            int `yaml:"minLength"`
 	MaxLength            int `yaml:"maxLength"`
 	Pattern              string
@@ -22,43 +22,44 @@ type Schema struct {
 	Required             []string
 }
 
-func (s *Schema) ResolveRefs(basePath string, components *Components) error {
-	if s.Items != nil && s.Items.Ref != "" {
-		ref := filepath.Join(basePath, s.Items.Ref)
-		var newSchema Schema
-		err := readRef(ref, &newSchema)
-		if err != nil {
-			return fmt.Errorf("Unable to read schema reference:\n%w", err)
-		}
-
-		newSchema.Name = refToName(ref)
-		s.Items = &newSchema
-
-		components.Schemas[newSchema.Name] = newSchema
-
-		err = s.Items.ResolveRefs(basePath, components)
-		if err != nil {
-			return err
-		}
-	}
-
-	if s.Properties != nil {
-		for key, schema := range s.Properties {
-			ref := schema.Ref
-			err := schema.ResolveRefs(basePath, components)
-			if err != nil {
-				return err
-			}
-			schema.Name = refToName(ref)
-			s.Properties[key] = schema
-		}
-	}
-	return nil
+func (s *Schema) GetType() string {
+	renderer := s.getRenderer()
+	sanitisedType := renderer.sanitiseType(s)
+	return sanitisedType
 }
 
-func refToName(ref string) string {
-	docsRoot := filepath.Dir(viper.GetString("openAPIFile"))
-	name := strings.ReplaceAll(ref, docsRoot, "")
-	name = strings.ReplaceAll(name, filepath.Ext(name), "")
-	return name
+func (s *Schema) getChildren() map[string]Traversable {
+	children := map[string]Traversable{}
+	for name := range s.Properties {
+		property := s.Properties[name]
+		children[name] = property
+	}
+	if s.Items != nil {
+		children["item"] = s.Items
+	}
+	return children
+}
+
+func (s *Schema) setChild(i string, t Traversable) {
+	if schema, ok := t.(*Schema); ok {
+		if i == "item" {
+			s.Items = schema
+		} else {
+			s.Properties[i] = schema
+		}
+		return
+	}
+	panic("(s *Schema) setChild(): " + errCastFail)
+}
+
+func (s *Schema) getBasePath() string {
+	if s.parent == nil {
+		return ""
+	}
+	basePath := filepath.Join(s.parent.getBasePath(), filepath.Dir(s.Ref))
+	return basePath
+}
+
+func (s *Schema) getRef() string {
+	return s.Ref
 }
