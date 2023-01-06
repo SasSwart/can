@@ -68,8 +68,3 @@ func (o *Operation) setChild(i string, child Traversable) {
 		panic("(o *OpenAPI) setChild(): " + errCastFail)
 	}
 }
-
-func (o *Operation) GetName() string {
-	name := o.getRenderer().sanitiseName(o.name) + o.parent.GetName()
-	return name
-}
