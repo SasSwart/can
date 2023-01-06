@@ -92,6 +92,8 @@ func (n *node) getRenderer() Renderer {
 	return n.parent.getRenderer()
 }
 
+// TraverseRecursor is an auxiliary function to Traverse that initiates a recursive loop over a tree of Traversable
+// structs, applying a given function at every step.
 func TraverseRecursor[T Traversable](node T, f TraversalFunc) (T, error) {
 	children := node.getChildren()
 	for i := range children {
@@ -118,7 +120,8 @@ func TraverseRecursor[T Traversable](node T, f TraversalFunc) (T, error) {
 	return node, nil
 }
 
-// Traverse takes a Traversable node and applies some function to the node within the tree. It recursively calls itself and fails early when an error is thrown
+// Traverse takes a Traversable node and enters into a recursive loop (TraverseRecursor) that applies a given function
+// to the node.
 func Traverse[T Traversable](node T, f TraversalFunc) (T, error) {
 	if f == nil {
 		return node, nil
