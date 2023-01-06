@@ -10,7 +10,7 @@ type Server interface {
 {{- end }}
 }
 
-func RegisterServer(e *gin.Engine, srv Server) {
+func RegisterServer(e gin.IRouter, srv Server) {
 {{- range $name, $pathItem := .Paths }}
   Register{{ $pathItem.GetName }}Path(e, srv)
 {{- end }}

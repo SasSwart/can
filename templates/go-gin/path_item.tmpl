@@ -23,7 +23,7 @@ func (u {{ $pathItemStructName }}) InvalidRequest(c *gin.Context, err error) {
 	c.JSON(400, err.Error())
 }
 
-func Register{{ .GetName }}Path(e *gin.Engine, srv {{ .GetName }}) {
+func Register{{ .GetName }}Path(e gin.IRouter, srv {{ .GetName }}) {
 {{- range $name, $operation := .Operations }}
 	{{ $parent := .GetParent }}
   e.{{ $name | ToUpper }}("{{ $parent.GetPath }}", func(c *gin.Context) {

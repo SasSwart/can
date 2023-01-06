@@ -16,12 +16,6 @@ import (
 
 // Render is the main parsing and rendering steps within the render library
 func Render(config config.Config, data openapi.Traversable, templateFile string) ([]byte, error) {
-	buff := bytes.NewBuffer([]byte{})
-
-	templater := template.New(templateFile)
-
-	templater.Funcs(templateFuncMap)
-
 	var absoluteTemplateDirectory string
 	switch true {
 	case filepath.IsAbs(config.Generator.TemplateDirectory):
@@ -37,15 +31,6 @@ func Render(config config.Config, data openapi.Traversable, templateFile string)
 			filepath.Dir(config.ConfigFilePath),
 			config.Generator.TemplateDirectory,
 		)
-	}
-	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", absoluteTemplateDirectory))
-	if err != nil {
-		return nil, err
-	}
-
-	err = parsedTemplate.Execute(buff, data)
-	if err != nil {
-		return nil, err
 	}
 
 	var absoluteOutputFile string
@@ -66,6 +51,22 @@ func Render(config config.Config, data openapi.Traversable, templateFile string)
 	}
 	absoluteOutputFile = filepath.Join(absoluteOutputFile, data.GetOutputFile())
 	
+	buff := bytes.NewBuffer([]byte{})
+
+	templater := template.New(templateFile)
+
+	templater.Funcs(templateFuncMap)
+
+	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", absoluteTemplateDirectory))
+	if err != nil {
+		return nil, err
+	}
+
+	err = parsedTemplate.Execute(buff, data)
+	if err != nil {
+		return nil, err
+	}
+
 	fmt.Printf("Rendering %s using %s\n", data.GetOutputFile(), templateFile)
 
 	outputDirectory := filepath.Dir(absoluteOutputFile)
