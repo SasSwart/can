@@ -10,7 +10,7 @@ type RequestBody struct {
 }
 
 func (r *RequestBody) GetName() string {
-	return r.name
+	return r.parent.GetName() + r.name
 }
 
 func (r *RequestBody) getRef() string {

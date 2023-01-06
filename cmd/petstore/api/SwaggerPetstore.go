@@ -5,18 +5,18 @@ package api
 import "github.com/gin-gonic/gin"
 
 type Server interface {
-  PetsSwaggerPetstore
-  PetsPetidSwaggerPetstore
+  SwaggerPetstorePets
+  SwaggerPetstorePetsPetid
 }
 
 func RegisterServer(e *gin.Engine, srv Server) {
-  RegisterPetsSwaggerPetstorePath(e, srv)
-  RegisterPetsPetidSwaggerPetstorePath(e, srv)
+  RegisterSwaggerPetstorePetsPath(e, srv)
+  RegisterSwaggerPetstorePetsPetidPath(e, srv)
 }
 
 type UnimplementedServer struct {
-  UnimplementedPetsSwaggerPetstore
-  UnimplementedPetsPetidSwaggerPetstore
+  UnimplementedSwaggerPetstorePets
+  UnimplementedSwaggerPetstorePetsPetid
 }
 
 func (u UnimplementedServer) InvalidRequest(c *gin.Context, err error) {

@@ -4,77 +4,77 @@ import "github.com/gin-gonic/gin"
 
 // GENERATED INTERFACE. DO NOT EDIT
 
-type PetsSwaggerPetstore interface {
-  GetPetsSwaggerPetstore(*gin.Context, *GetPetsSwaggerPetstoreParameters, *RequestBody) GetPetsSwaggerPetstoreResponse
-  PostPetsSwaggerPetstore(*gin.Context, *PostPetsSwaggerPetstoreParameters, *RequestBody) PostPetsSwaggerPetstoreResponse
+type SwaggerPetstorePets interface {
+  SwaggerPetstorePetsGet(*gin.Context, *SwaggerPetstorePetsGetParameters, *SwaggerPetstorePetsGetRequestBody) SwaggerPetstorePetsGetResponse
+  SwaggerPetstorePetsPost(*gin.Context, *SwaggerPetstorePetsPostParameters, *SwaggerPetstorePetsPostRequestBody) SwaggerPetstorePetsPostResponse
 	InvalidRequest(*gin.Context, error)
 }
 
-type UnimplementedPetsSwaggerPetstore struct {}
-func (u UnimplementedPetsSwaggerPetstore) GetPetsSwaggerPetstore(*gin.Context, *GetPetsSwaggerPetstoreParameters, *RequestBody) GetPetsSwaggerPetstoreResponse {
-	return GetPetsSwaggerPetstore405Response{}
+type UnimplementedSwaggerPetstorePets struct {}
+func (u UnimplementedSwaggerPetstorePets) SwaggerPetstorePetsGet(*gin.Context, *SwaggerPetstorePetsGetParameters, *SwaggerPetstorePetsGetRequestBody) SwaggerPetstorePetsGetResponse {
+	return SwaggerPetstorePetsGet405Response{}
 }
-func (u UnimplementedPetsSwaggerPetstore) PostPetsSwaggerPetstore(*gin.Context, *PostPetsSwaggerPetstoreParameters, *RequestBody) PostPetsSwaggerPetstoreResponse {
-	return PostPetsSwaggerPetstore405Response{}
+func (u UnimplementedSwaggerPetstorePets) SwaggerPetstorePetsPost(*gin.Context, *SwaggerPetstorePetsPostParameters, *SwaggerPetstorePetsPostRequestBody) SwaggerPetstorePetsPostResponse {
+	return SwaggerPetstorePetsPost405Response{}
 }
-func (u UnimplementedPetsSwaggerPetstore) InvalidRequest(c *gin.Context, err error) {
+func (u UnimplementedSwaggerPetstorePets) InvalidRequest(c *gin.Context, err error) {
 	c.JSON(400, err.Error())
 }
 
-func RegisterPetsSwaggerPetstorePath(e *gin.Engine, srv PetsSwaggerPetstore) {
+func RegisterSwaggerPetstorePetsPath(e *gin.Engine, srv SwaggerPetstorePets) {
 	
   e.GET("/pets", func(c *gin.Context) {
-  	params := &GetPetsSwaggerPetstoreParameters{}
-  	body := &RequestBody{}
+  	params := &SwaggerPetstorePetsGetParameters{}
+  	body := &SwaggerPetstorePetsGetRequestBody{}
 		err := c.ShouldBindJSON(body)
 		if err != nil {
 			srv.InvalidRequest(c, err)
 		}
-    response := srv.GetPetsSwaggerPetstore(c, params, body)
+    response := srv.SwaggerPetstorePetsGet(c, params, body)
     c.JSON(response.GetStatus(), response)
   })
 	
   e.POST("/pets", func(c *gin.Context) {
-  	params := &PostPetsSwaggerPetstoreParameters{}
-  	body := &RequestBody{}
+  	params := &SwaggerPetstorePetsPostParameters{}
+  	body := &SwaggerPetstorePetsPostRequestBody{}
 		err := c.ShouldBindJSON(body)
 		if err != nil {
 			srv.InvalidRequest(c, err)
 		}
-    response := srv.PostPetsSwaggerPetstore(c, params, body)
+    response := srv.SwaggerPetstorePetsPost(c, params, body)
     c.JSON(response.GetStatus(), response)
   })
 }
-type GetPetsSwaggerPetstoreResponse interface {
+type SwaggerPetstorePetsGetResponse interface {
 	GetStatus() int
 }
 
-type GetPetsSwaggerPetstore200Response GetPetsSwaggerPetstore200ResponseModel
+type SwaggerPetstorePetsGet200Response SwaggerPetstorePetsGet200ResponseModel
 
-func (GetPetsSwaggerPetstore200Response) GetStatus() int {
+func (SwaggerPetstorePetsGet200Response) GetStatus() int {
 	return 200
 }
 
-type GetPetsSwaggerPetstoreDefaultResponse GetPetsSwaggerPetstoreDefaultResponseModel
+type SwaggerPetstorePetsGet500Response SwaggerPetstorePetsGet500ResponseModel
 
-func (GetPetsSwaggerPetstoreDefaultResponse) GetStatus() int {
-	return default
+func (SwaggerPetstorePetsGet500Response) GetStatus() int {
+	return 500
 }
-type GetPetsSwaggerPetstore405Response struct {}
-func (GetPetsSwaggerPetstore405Response) GetStatus() int {
+type SwaggerPetstorePetsGet405Response struct {}
+func (SwaggerPetstorePetsGet405Response) GetStatus() int {
 	return 405
 }
-type PostPetsSwaggerPetstoreResponse interface {
+type SwaggerPetstorePetsPostResponse interface {
 	GetStatus() int
 }
 
 
-type PostPetsSwaggerPetstoreDefaultResponse PostPetsSwaggerPetstoreDefaultResponseModel
+type SwaggerPetstorePetsPost500Response SwaggerPetstorePetsPost500ResponseModel
 
-func (PostPetsSwaggerPetstoreDefaultResponse) GetStatus() int {
-	return default
+func (SwaggerPetstorePetsPost500Response) GetStatus() int {
+	return 500
 }
-type PostPetsSwaggerPetstore405Response struct {}
-func (PostPetsSwaggerPetstore405Response) GetStatus() int {
+type SwaggerPetstorePetsPost405Response struct {}
+func (SwaggerPetstorePetsPost405Response) GetStatus() int {
 	return 405
 }

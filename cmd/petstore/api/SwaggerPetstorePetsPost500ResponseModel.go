@@ -2,7 +2,7 @@ package api
 
 // GENERATED MODEL. DO NOT EDIT
 
-type GetPetsPetidSwaggerPetstoreDefaultResponseModel struct {
+type SwaggerPetstorePetsPost500ResponseModel struct {
 	Code int
 	Message string
 }

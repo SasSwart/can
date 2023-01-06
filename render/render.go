@@ -65,6 +65,8 @@ func Render(config config.Config, data openapi.Traversable, templateFile string)
 		)
 	}
 	absoluteOutputFile = filepath.Join(absoluteOutputFile, data.GetOutputFile())
+	
+	fmt.Printf("Rendering %s using %s\n", data.GetOutputFile(), templateFile)
 
 	outputDirectory := filepath.Dir(absoluteOutputFile)
 	if _, err := os.Stat(outputDirectory); errors.Is(err, os.ErrNotExist) {
