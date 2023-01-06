@@ -8,8 +8,8 @@ func TestOpenAPI_LoadsRequestBodyValidation(t *testing.T) {
 		t.Fail()
 	}
 
-	transversable := Dig(apiSpec, testEndpoint, testMethod, testReqBody, testMediaType, testSchema)
-	name := transversable.(*Schema)
+	traversable := Dig(apiSpec, testEndpoint, testMethod, testReqBody, testMediaType, testSchema)
+	name := traversable.(*Schema)
 	if name.MinLength != 1 {
 		t.Errorf("got minLength %v, wanted %v", name.MinLength, 1)
 	}

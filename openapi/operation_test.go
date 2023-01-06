@@ -45,8 +45,8 @@ func TestOperation_GetParent(t *testing.T) {
 func TestOperation_GetChildren(t *testing.T) {
 	openapi, _ := LoadOpenAPI(absOpenAPI)
 	paths := Dig(openapi, testEndpoint)
-	for _, transversable := range paths.getChildren() {
-		if operation, ok := transversable.(*Operation); ok {
+	for _, traversable := range paths.getChildren() {
+		if operation, ok := traversable.(*Operation); ok {
 			for key, child := range operation.getChildren() {
 				if _, ok := child.(*RequestBody); ok {
 					t.Logf("%s contained an object of type *RequestBody", key)
@@ -70,8 +70,8 @@ func TestOperation_GetChildren(t *testing.T) {
 
 func TestOperation_SetChild(t *testing.T) {
 	openapi, _ := LoadOpenAPI(absOpenAPI)
-	transversable := Dig(openapi, testEndpoint)
-	operations := transversable.getChildren()
+	traversable := Dig(openapi, testEndpoint)
+	operations := traversable.getChildren()
 
 	// Test Data
 	parameter := Parameter{node: node{name: "newParameter"}}

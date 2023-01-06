@@ -61,8 +61,8 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	return newApi.(*OpenAPI), err
 }
 
-func SetRenderer(api *OpenAPI, renderer Renderer) {
-	_, _ = Traverse(api, func(_ string, _, child Traversable) (Traversable, error) {
+func SetRenderer(api *OpenAPI, renderer Renderer) error {
+	_, err := Traverse(api, func(_ string, _, child Traversable) (Traversable, error) {
 		child.setRenderer(renderer)
 		parent := child.GetParent()
 		if parent != nil {
@@ -71,6 +71,11 @@ func SetRenderer(api *OpenAPI, renderer Renderer) {
 
 		return child, nil
 	})
+	return err
+}
+
+func (o *OpenAPI) getRenderer() Renderer {
+	return o.renderer
 }
 
 func (o *OpenAPI) SetMetadata(metadata map[string]string) {
@@ -95,7 +100,8 @@ func (o *OpenAPI) GetName() string {
 }
 
 func (o *OpenAPI) GetOutputFile() string {
-	return filepath.Join(o.getRenderer().getOutputFile(o), o.GetName())
+	fileName := o.getRenderer().getOutputFile(o)
+	return fileName
 }
 
 func (o *OpenAPI) getChildren() map[string]Traversable {

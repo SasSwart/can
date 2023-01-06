@@ -28,7 +28,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	openapi.SetRenderer(apiSpec, openapi.GinRenderer{})
+	err = openapi.SetRenderer(apiSpec, openapi.GinRenderer{})
+	if err != nil {
+		fmt.Println(fmt.Errorf("openapi.SetRenderer error: %w", err))
+		os.Exit(1)
+	}
+
 	apiSpec.SetMetadata(map[string]string{
 		"package": "api",
 	})

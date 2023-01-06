@@ -74,7 +74,7 @@ func (n *node) getRef() string {
 }
 
 func (n *node) GetName() string {
-	name := n.parent.GetName() + n.renderer.sanitiseName(n.name)
+	name := n.parent.GetName() + n.getRenderer().sanitiseName(n.name)
 	return name
 }
 
@@ -87,7 +87,7 @@ func (n *node) setRenderer(r Renderer) {
 }
 
 func (n *node) getRenderer() Renderer {
-	return n.renderer
+	return n.parent.getRenderer()
 }
 
 // Traverse takes a Traversable node and applies some function to the node within the tree. It recursively calls itself and fails early when an error is thrown
