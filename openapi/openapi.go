@@ -58,7 +58,7 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 		return nil, err
 	}
 
-	return newApi.(*OpenAPI), err
+	return newApi, err
 }
 
 func SetRenderer(api *OpenAPI, renderer Renderer) error {

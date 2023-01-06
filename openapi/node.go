@@ -1,5 +1,7 @@
 package openapi
 
+import "fmt"
+
 type Traversable interface {
 	// Tree Traversable
 	getChildren() map[string]Traversable
@@ -90,41 +92,47 @@ func (n *node) getRenderer() Renderer {
 	return n.parent.getRenderer()
 }
 
-// Traverse takes a Traversable node and applies some function to the node within the tree. It recursively calls itself and fails early when an error is thrown
-func Traverse(node Traversable, f TraversalFunc) (Traversable, error) {
-	if node == nil || f == nil {
-		return node, nil
-	}
-	var recurse func(node Traversable, f TraversalFunc) (Traversable, error)
-	recurse = func(node Traversable, f TraversalFunc) (Traversable, error) {
-		children := node.getChildren()
-		for i := range children {
-			child := children[i]
-			if child == nil {
-				continue
-			}
-			// Update Child Node
-			newChild, err := f(i, node, child)
-			if err != nil {
-				return nil, err
-			}
-			node.setChild(i, newChild)
-
-			if newChild == nil {
-				continue
-			}
-			_, err = recurse(newChild, f)
-			if err != nil {
-				return nil, err
-			}
+func TraverseRecursor[T Traversable](node T, f TraversalFunc) (T, error) {
+	children := node.getChildren()
+	for i := range children {
+		child := children[i]
+		if child == nil {
+			continue
 		}
+		// Update Child Node
+		newChild, err := f(i, node, child)
+		if err != nil {
+			return node, err
+		}
+		node.setChild(i, newChild)
 
+		if newChild == nil {
+			continue
+		}
+		_, err = TraverseRecursor(newChild, f)
+		if err != nil {
+			return node, err
+		}
+	}
+
+	return node, nil
+}
+
+// Traverse takes a Traversable node and applies some function to the node within the tree. It recursively calls itself and fails early when an error is thrown
+func Traverse[T Traversable](node T, f TraversalFunc) (T, error) {
+	if f == nil {
 		return node, nil
 	}
-	node, err := f("", nil, node)
+
+	result, err := f("", nil, node)
 	if err != nil {
-		return nil, err
+		return node, err
 	}
 
-	return recurse(node, f)
+	node, ok := result.(T)
+	if !ok {
+		return node, fmt.Errorf("function parameter f should return the same type that is was given")
+	}
+
+	return TraverseRecursor(node, f)
 }
