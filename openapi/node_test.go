@@ -3,7 +3,7 @@ package openapi
 import "testing"
 
 func TestOpenAPI_Dig(t *testing.T) {
-	openapi, _ := LoadOpenAPI(absOpenAPI)
+	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	endpoint := Dig(openapi, testEndpoint)
 	// TODO check for identity, not just type
 	if _, ok := endpoint.(*PathItem); !ok {

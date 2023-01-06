@@ -5,7 +5,7 @@ import (
 )
 
 func TestOperation_GetBasePath(t *testing.T) {
-	openapi, _ := LoadOpenAPI(absOpenAPI)
+	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	ops := Dig(openapi, testEndpoint)
 
 	var basePaths []string
@@ -21,7 +21,7 @@ func TestOperation_GetBasePath(t *testing.T) {
 }
 
 func TestOperation_GetRef(t *testing.T) {
-	openapi, _ := LoadOpenAPI(absOpenAPI)
+	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	ops := Dig(openapi, testEndpoint)
 	for _, operation := range ops.getChildren() {
 		if op, ok := operation.(*Operation); ok {
@@ -33,7 +33,7 @@ func TestOperation_GetRef(t *testing.T) {
 }
 
 func TestOperation_GetParent(t *testing.T) {
-	openapi, _ := LoadOpenAPI(absOpenAPI)
+	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	ops := Dig(openapi, testEndpoint)
 	for _, operation := range ops.getChildren() {
 		if operation.GetParent() == nil {
@@ -43,7 +43,7 @@ func TestOperation_GetParent(t *testing.T) {
 }
 
 func TestOperation_GetChildren(t *testing.T) {
-	openapi, _ := LoadOpenAPI(absOpenAPI)
+	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	paths := Dig(openapi, testEndpoint)
 	for _, traversable := range paths.getChildren() {
 		if operation, ok := traversable.(*Operation); ok {
@@ -69,7 +69,7 @@ func TestOperation_GetChildren(t *testing.T) {
 }
 
 func TestOperation_SetChild(t *testing.T) {
-	openapi, _ := LoadOpenAPI(absOpenAPI)
+	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	traversable := Dig(openapi, testEndpoint)
 	operations := traversable.getChildren()
 

@@ -6,7 +6,7 @@ import (
 )
 
 func TestMediaType_GetName(t *testing.T) {
-	openapi, _ := LoadOpenAPI(absOpenAPI)
+	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	SetRenderer(openapi, GinRenderer{})
 	mt := Dig(openapi, testEndpoint, testMethod, testReqBody, testMediaType)
 	name := mt.GetName()
@@ -16,7 +16,7 @@ func TestMediaType_GetName(t *testing.T) {
 }
 
 func TestMediaType_GetChildren(t *testing.T) {
-	openapi, _ := LoadOpenAPI(absOpenAPI)
+	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	mt := Dig(openapi, testEndpoint, testMethod, testReqBody, testMediaType)
 	children := mt.getChildren()
 	for model, schema := range children {
@@ -34,7 +34,7 @@ func TestMediaType_GetChildren(t *testing.T) {
 }
 
 func TestMediaType_SetChild(t *testing.T) {
-	openapi, _ := LoadOpenAPI(absOpenAPI)
+	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	mt := Dig(openapi, testEndpoint, testMethod, testReqBody, testMediaType)
 	s, _ := Dig(mt, testSchema).(*Schema)
 	sOld := *s

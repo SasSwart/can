@@ -3,7 +3,7 @@ package openapi
 import "testing"
 
 func TestOpenAPILoadsParameterValidation(t *testing.T) {
-	apiSpec, _ := LoadOpenAPI(absOpenAPI)
+	apiSpec, _ := LoadOpenAPI(testAbsOpenAPI)
 
 	IDParam := apiSpec.Paths["/endpoint"].Post.Parameters[0]
 	if IDParam.Required != true {

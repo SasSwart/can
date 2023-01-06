@@ -85,7 +85,7 @@ func TestGetChildren(t *testing.T) {
 }
 
 func TestSchema_ResolveRefs(t *testing.T) {
-	openapi, err := LoadOpenAPI(absOpenAPI)
+	openapi, err := LoadOpenAPI(testAbsOpenAPI)
 	if err != nil {
 		t.Errorf(err.Error())
 	}

@@ -7,17 +7,17 @@ import (
 )
 
 func TestOpenAPI_LoadOpenAPI(t *testing.T) {
-	openapi, err := LoadOpenAPI(absOpenAPI)
+	openapi, err := LoadOpenAPI(testAbsOpenAPI)
 	if err != nil {
-		t.Errorf("could not load file %s:%s", openapiFile, err.Error())
+		t.Errorf("could not load file %s:%s", testOpenapiFile, err.Error())
 	}
 	if openapi == nil {
-		t.Errorf("could not load file %s:%s", openapiFile, err.Error())
+		t.Errorf("could not load file %s:%s", testOpenapiFile, err.Error())
 	}
 }
 
 func TestOpenAPI_SetRenderer(t *testing.T) {
-	openapi, _ := LoadOpenAPI(absOpenAPI)
+	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	SetRenderer(openapi, GinRenderer{})
 
 	//Check *PathItem
@@ -130,15 +130,15 @@ func TestOpenAPI_SetRenderer(t *testing.T) {
 }
 
 func TestOpenAPI_GetBasePath(t *testing.T) {
-	openapi, _ := LoadOpenAPI(absOpenAPI)
-	wanted := filepath.Dir(absOpenAPI)
+	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
+	wanted := filepath.Dir(testAbsOpenAPI)
 	if openapi.getBasePath() != wanted {
 		t.Errorf("could not get basePath %s, got %s", wanted, openapi.basePath)
 	}
 }
 
 func TestOpenAPI_GetParent(t *testing.T) {
-	openapi, _ := LoadOpenAPI(absOpenAPI)
+	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	p := openapi.GetParent()
 	if p != nil {
 		t.Errorf("the root openapi file found a parent: %v", p)
@@ -146,7 +146,7 @@ func TestOpenAPI_GetParent(t *testing.T) {
 }
 
 func TestGetOpenAPI_GetChildren(t *testing.T) {
-	openapi, _ := LoadOpenAPI(absOpenAPI)
+	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	paths := openapi.getChildren()
 	if len(paths) == 0 {
 		t.Errorf("error occured or test yaml file has no paths to get")
@@ -162,7 +162,7 @@ func TestGetOpenAPI_GetChildren(t *testing.T) {
 }
 
 func TestOpenAPI_SetChild(t *testing.T) {
-	openapi, _ := LoadOpenAPI(absOpenAPI)
+	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	pathKey := "new"
 	p := PathItem{
 		Description: "new path item",
@@ -184,7 +184,7 @@ func TestOpenAPI_SetChild(t *testing.T) {
 }
 
 func TestOpenAPI_GetName(t *testing.T) {
-	openapi, _ := LoadOpenAPI(absOpenAPI)
+	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	SetRenderer(openapi, GinRenderer{})
 	name := openapi.GetName()
 	if name != testGinRenderedOpenAPIName {

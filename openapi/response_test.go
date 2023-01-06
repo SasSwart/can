@@ -3,7 +3,7 @@ package openapi
 import "testing"
 
 func TestResponse_GetName(t *testing.T) {
-	openapi, _ := LoadOpenAPI(absOpenAPI)
+	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	SetRenderer(openapi, GinRenderer{})
 	post201 := "201"
 	response := Dig(openapi, testEndpoint, testMethod, post201)
