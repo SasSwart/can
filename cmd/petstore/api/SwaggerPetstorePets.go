@@ -5,16 +5,16 @@ import "github.com/gin-gonic/gin"
 // GENERATED INTERFACE. DO NOT EDIT
 
 type PetsSwaggerPetstore interface {
-  GetPetsSwaggerPetstore(*gin.Context, *GetPetsSwaggerPetstoreParameters, *RequestBody) GetPetsSwaggerPetstoreResponse
-  PostPetsSwaggerPetstore(*gin.Context, *PostPetsSwaggerPetstoreParameters, *RequestBody) PostPetsSwaggerPetstoreResponse
+  GetPetsSwaggerPetstore(*gin.Context, *GetPetsSwaggerPetstoreParameters, *GetPetsSwaggerPetstoreRequestBody) GetPetsSwaggerPetstoreResponse
+  PostPetsSwaggerPetstore(*gin.Context, *PostPetsSwaggerPetstoreParameters, *PostPetsSwaggerPetstoreRequestBody) PostPetsSwaggerPetstoreResponse
 	InvalidRequest(*gin.Context, error)
 }
 
 type UnimplementedPetsSwaggerPetstore struct {}
-func (u UnimplementedPetsSwaggerPetstore) GetPetsSwaggerPetstore(*gin.Context, *GetPetsSwaggerPetstoreParameters, *RequestBody) GetPetsSwaggerPetstoreResponse {
+func (u UnimplementedPetsSwaggerPetstore) GetPetsSwaggerPetstore(*gin.Context, *GetPetsSwaggerPetstoreParameters, *GetPetsSwaggerPetstoreRequestBody) GetPetsSwaggerPetstoreResponse {
 	return GetPetsSwaggerPetstore405Response{}
 }
-func (u UnimplementedPetsSwaggerPetstore) PostPetsSwaggerPetstore(*gin.Context, *PostPetsSwaggerPetstoreParameters, *RequestBody) PostPetsSwaggerPetstoreResponse {
+func (u UnimplementedPetsSwaggerPetstore) PostPetsSwaggerPetstore(*gin.Context, *PostPetsSwaggerPetstoreParameters, *PostPetsSwaggerPetstoreRequestBody) PostPetsSwaggerPetstoreResponse {
 	return PostPetsSwaggerPetstore405Response{}
 }
 func (u UnimplementedPetsSwaggerPetstore) InvalidRequest(c *gin.Context, err error) {
@@ -25,7 +25,7 @@ func RegisterPetsSwaggerPetstorePath(e *gin.Engine, srv PetsSwaggerPetstore) {
 	
   e.GET("/pets", func(c *gin.Context) {
   	params := &GetPetsSwaggerPetstoreParameters{}
-  	body := &RequestBody{}
+  	body := &GetPetsSwaggerPetstoreRequestBody{}
 		err := c.ShouldBindJSON(body)
 		if err != nil {
 			srv.InvalidRequest(c, err)
@@ -36,7 +36,7 @@ func RegisterPetsSwaggerPetstorePath(e *gin.Engine, srv PetsSwaggerPetstore) {
 	
   e.POST("/pets", func(c *gin.Context) {
   	params := &PostPetsSwaggerPetstoreParameters{}
-  	body := &RequestBody{}
+  	body := &PostPetsSwaggerPetstoreRequestBody{}
 		err := c.ShouldBindJSON(body)
 		if err != nil {
 			srv.InvalidRequest(c, err)
@@ -55,10 +55,10 @@ func (GetPetsSwaggerPetstore200Response) GetStatus() int {
 	return 200
 }
 
-type GetPetsSwaggerPetstoreDefaultResponse GetPetsSwaggerPetstoreDefaultResponseModel
+type GetPetsSwaggerPetstore500Response GetPetsSwaggerPetstore500ResponseModel
 
-func (GetPetsSwaggerPetstoreDefaultResponse) GetStatus() int {
-	return default
+func (GetPetsSwaggerPetstore500Response) GetStatus() int {
+	return 500
 }
 type GetPetsSwaggerPetstore405Response struct {}
 func (GetPetsSwaggerPetstore405Response) GetStatus() int {
@@ -69,10 +69,10 @@ type PostPetsSwaggerPetstoreResponse interface {
 }
 
 
-type PostPetsSwaggerPetstoreDefaultResponse PostPetsSwaggerPetstoreDefaultResponseModel
+type PostPetsSwaggerPetstore500Response PostPetsSwaggerPetstore500ResponseModel
 
-func (PostPetsSwaggerPetstoreDefaultResponse) GetStatus() int {
-	return default
+func (PostPetsSwaggerPetstore500Response) GetStatus() int {
+	return 500
 }
 type PostPetsSwaggerPetstore405Response struct {}
 func (PostPetsSwaggerPetstore405Response) GetStatus() int {

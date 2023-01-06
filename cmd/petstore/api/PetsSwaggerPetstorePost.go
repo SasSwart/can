@@ -1,5 +1,7 @@
+// GENERATED CODE. DO NOT EDIT
+
 package api
 
 type PostPetsSwaggerPetstoreParameters struct {
 }
-type RequestBody struct {}
+type PostPetsSwaggerPetstoreRequestBody struct {}
