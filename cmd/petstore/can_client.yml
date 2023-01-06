@@ -1,8 +1,0 @@
-generator:
-templateDirectory: ../../templates/go-gin
-moduleName: github.com/sasswart/gin-in-a-can/cmd/petstore
-basePackageName: api
-InvalidRequestStatus: 200
-openAPI:
-openAPIFile: ./docs/openapi.yml
-outputPath: ./api

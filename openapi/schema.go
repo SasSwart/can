@@ -4,8 +4,6 @@ import (
 	"path/filepath"
 )
 
-// TODO see if this can be made spec-compliant while retaining original logical flow
-
 var _ Traversable = &Schema{}
 
 // Schema is a programmatic representation of the Schema object defined here: https://swagger.io/specification/#schema-object
@@ -25,7 +23,9 @@ type Schema struct {
 }
 
 func (s *Schema) GetType() string {
-	return s.renderer.sanitiseType(s)
+	renderer := s.getRenderer()
+	sanitisedType := renderer.sanitiseType(s)
+	return sanitisedType
 }
 
 func (s *Schema) getChildren() map[string]Traversable {
