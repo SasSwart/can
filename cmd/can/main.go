@@ -35,7 +35,7 @@ func main() {
 	}
 
 	apiSpec.SetMetadata(map[string]string{
-		"package": "api",
+		"package": configData.Generator.BasePackageName,
 	})
 
 	renderNode := buildRenderNode(configData)
@@ -66,11 +66,10 @@ func buildRenderNode(config config.Config) openapi.TraversalFunc {
 		if templateFile == "" {
 			return child, nil
 		}
-		bytes, err := render.Render(config, child, templateFile)
+		_, err := render.Render(config, child, templateFile)
 		if err != nil {
 			return child, err
 		}
-		fmt.Println(string(bytes))
 
 		return child, nil
 	}
