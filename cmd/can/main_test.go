@@ -18,9 +18,8 @@ func TestLoadConfig(t *testing.T) {
 		{configFile: "", expectedConfig: config.Config{}, expectedErr: true},
 		{configFile: "test_fixtures/example.yaml", expectedConfig: config.Config{
 			Generator: config.GeneratorConfig{
-				ModuleName:           "github.com/sasswart/gin-in-a-can",
-				BasePackageName:      "api",
-				InvalidRequestStatus: "400",
+				ModuleName:      "github.com/sasswart/gin-in-a-can",
+				BasePackageName: "api",
 			},
 			OpenAPI: openapi.Config{
 				OpenAPIFile: "./docs/openapi.yml",

@@ -1,7 +1,6 @@
 generator:
   moduleName: github.com/sasswart/gin-in-a-can
   basePackageName: api
-  InvalidRequestStatus: 400
 openapi:
   openAPIFile: ./docs/openapi.yml
 outputPath: .

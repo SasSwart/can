@@ -11,8 +11,7 @@ type Config struct {
 }
 
 type GeneratorConfig struct {
-	ModuleName           string
-	BasePackageName      string
-	InvalidRequestStatus string
-	TemplateDirectory    string
+	ModuleName        string
+	BasePackageName   string
+	TemplateDirectory string
 }
