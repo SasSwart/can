@@ -95,7 +95,7 @@ func (o *OpenAPI) getBasePath() string {
 }
 
 func (o *OpenAPI) GetName() string {
-	name := o.renderer.sanitiseName(o.name)
+	name := o.getRenderer().sanitiseName(o.name)
 	return name
 }
 

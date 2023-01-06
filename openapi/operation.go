@@ -70,6 +70,6 @@ func (o *Operation) setChild(i string, child Traversable) {
 }
 
 func (o *Operation) GetName() string {
-	name := o.renderer.sanitiseName(o.name) + o.parent.GetName()
+	name := o.getRenderer().sanitiseName(o.name) + o.parent.GetName()
 	return name
 }
