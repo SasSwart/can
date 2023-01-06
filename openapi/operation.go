@@ -4,7 +4,6 @@ import (
 	"strconv"
 )
 
-// communicate by sharing memory ;)
 var _ Traversable = &Operation{}
 
 // Operation is a programmatic representation of the Operation object defined here: https://swagger.io/specification/#operation-object
@@ -70,6 +69,6 @@ func (o *Operation) setChild(i string, child Traversable) {
 }
 
 func (o *Operation) GetName() string {
-	name := o.getRenderer().sanitiseName(o.name) + o.parent.GetName()
+	name := o.getRenderer().SanitiseName(o.name) + o.parent.GetName()
 	return name
 }

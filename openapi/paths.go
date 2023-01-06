@@ -66,6 +66,6 @@ func (p *PathItem) setChild(i string, child Traversable) {
 }
 
 func (p *PathItem) GetName() string {
-	name := p.getRenderer().sanitiseName(p.name) + p.parent.GetName()
+	name := p.getRenderer().SanitiseName(p.name) + p.parent.GetName()
 	return name
 }

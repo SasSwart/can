@@ -26,7 +26,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = render.SetRenderer(apiSpec, render.GinRenderer{})
+	err = openapi.SetRenderer(apiSpec, render.GinRenderer{})
 	if err != nil {
 		fmt.Println(fmt.Errorf("openapi.SetRenderer error: %w", err))
 		os.Exit(1)

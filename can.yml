@@ -4,4 +4,4 @@ generator:
   basePackageName: api
 openAPI:
   openAPIFile: ./openapi/fixtures/validation_no_refs.yaml
-outputPath: .
+outputPath: ./test/output

@@ -2,7 +2,6 @@ package openapi
 
 import (
 	"fmt"
-	"github.com/sasswart/gin-in-a-can/render"
 )
 
 type Traversable interface {
@@ -17,8 +16,8 @@ type Traversable interface {
 	setName(name string)
 	getBasePath() string
 	getRef() string
-	setRenderer(r render.Renderer)
-	getRenderer() render.Renderer
+	setRenderer(r Renderer)
+	getRenderer() Renderer
 	GetOutputFile() string
 	GetMetadata() map[string]string
 	SetMetadata(metadata map[string]string)
@@ -30,7 +29,7 @@ type node struct {
 	basePath string
 	parent   Traversable
 	name     string
-	renderer render.Renderer
+	renderer Renderer
 }
 
 const (
@@ -70,7 +69,7 @@ func (n *node) getBasePath() string {
 }
 
 func (n *node) GetOutputFile() string {
-	return n.getRenderer().getOutputFile(n)
+	return n.getRenderer().GetOutputFile(n)
 }
 
 func (n *node) getRef() string {
@@ -79,7 +78,7 @@ func (n *node) getRef() string {
 }
 
 func (n *node) GetName() string {
-	name := n.parent.GetName() + n.getRenderer().sanitiseName(n.name)
+	name := n.parent.GetName() + n.getRenderer().SanitiseName(n.name)
 	return name
 }
 
@@ -87,11 +86,11 @@ func (n *node) setName(name string) {
 	n.name = name
 }
 
-func (n *node) setRenderer(r render.Renderer) {
+func (n *node) setRenderer(r Renderer) {
 	n.renderer = r
 }
 
-func (n *node) getRenderer() render.Renderer {
+func (n *node) getRenderer() Renderer {
 	return n.parent.getRenderer()
 }
 

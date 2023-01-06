@@ -2,12 +2,16 @@ package openapi
 
 import (
 	"fmt"
-	"github.com/sasswart/gin-in-a-can/render"
 	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
 )
 
+type Renderer interface {
+	SanitiseName(string) string
+	SanitiseType(*Schema) string
+	GetOutputFile(Traversable) string
+}
 type Config struct {
 	OpenAPIFile string
 }
@@ -62,7 +66,7 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	return newApi, err
 }
 
-func SetRenderer(api *OpenAPI, renderer render.Renderer) error {
+func SetRenderer(api *OpenAPI, renderer Renderer) error {
 	_, err := Traverse(api, func(_ string, _, child Traversable) (Traversable, error) {
 		child.setRenderer(renderer)
 		parent := child.GetParent()
@@ -75,7 +79,7 @@ func SetRenderer(api *OpenAPI, renderer render.Renderer) error {
 	return err
 }
 
-func (o *OpenAPI) getRenderer() render.Renderer {
+func (o *OpenAPI) getRenderer() Renderer {
 	return o.renderer
 }
 
@@ -96,12 +100,12 @@ func (o *OpenAPI) getBasePath() string {
 }
 
 func (o *OpenAPI) GetName() string {
-	name := o.getRenderer().sanitiseName(o.name)
+	name := o.getRenderer().SanitiseName(o.name)
 	return name
 }
 
 func (o *OpenAPI) GetOutputFile() string {
-	fileName := o.getRenderer().getOutputFile(o)
+	fileName := o.getRenderer().GetOutputFile(o)
 	return fileName
 }
 

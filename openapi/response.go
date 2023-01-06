@@ -13,7 +13,7 @@ type Response struct {
 }
 
 func (r *Response) GetName() string {
-	return r.parent.GetName() + r.getRenderer().sanitiseName(r.name) + "Response"
+	return r.parent.GetName() + r.getRenderer().SanitiseName(r.name) + "Response"
 }
 
 func (r *Response) getRef() string {

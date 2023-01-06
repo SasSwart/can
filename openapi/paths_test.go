@@ -9,7 +9,7 @@ import (
 
 func TestPathItem_GetName(t *testing.T) {
 	openapi, _ := LoadOpenAPI(test.OpenAPIFile)
-	render.SetRenderer(openapi, render.GinRenderer{})
+	SetRenderer(openapi, render.GinRenderer{})
 	path := Dig(openapi, test.Endpoint)
 	if path.getRenderer() == nil {
 		t.Log("Renderer is nil, setting render manually")

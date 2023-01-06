@@ -24,7 +24,7 @@ type Schema struct {
 
 func (s *Schema) GetType() string {
 	renderer := s.getRenderer()
-	sanitisedType := renderer.sanitiseType(s)
+	sanitisedType := renderer.SanitiseType(s)
 	return sanitisedType
 }
 

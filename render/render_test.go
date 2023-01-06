@@ -3,14 +3,13 @@ package render
 import (
 	"github.com/sasswart/gin-in-a-can/openapi"
 	"github.com/sasswart/gin-in-a-can/test"
-	"reflect"
 	"testing"
 )
 
 func TestRender_Render(t *testing.T) {
 	var (
 		got      []byte
-		expected []byte
+		expected = "package \n\n// GENERATED MODEL. DO NOT EDIT\n\ntype RequestBodyModel struct {\n\tDescription string\n\tEnabled bool\n\tId string\n\tName string\n}\n"
 		err      error
 
 		schema           openapi.Traversable
@@ -26,7 +25,7 @@ func TestRender_Render(t *testing.T) {
 	if err != nil {
 		t.Errorf("Test error: %s\n", err.Error())
 	}
-	if !reflect.DeepEqual(got, expected) {
+	if string(got) != expected {
 		t.Errorf("got %s, expected %s\n", got, expected)
 	}
 }

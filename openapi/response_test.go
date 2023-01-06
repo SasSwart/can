@@ -8,7 +8,7 @@ import (
 
 func TestResponse_GetName(t *testing.T) {
 	openapi, _ := LoadOpenAPI(test.AbsOpenAPI)
-	render.SetRenderer(openapi, render.GinRenderer{})
+	SetRenderer(openapi, render.GinRenderer{})
 	post201 := "201"
 	response := Dig(openapi, test.Endpoint, test.Method, post201)
 	if response.GetName() != test.GinRenderedResponseName {
