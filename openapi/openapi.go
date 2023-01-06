@@ -2,6 +2,7 @@ package openapi
 
 import (
 	"fmt"
+	"github.com/sasswart/gin-in-a-can/render"
 	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
@@ -61,7 +62,7 @@ func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
 	return newApi, err
 }
 
-func SetRenderer(api *OpenAPI, renderer Renderer) error {
+func SetRenderer(api *OpenAPI, renderer render.Renderer) error {
 	_, err := Traverse(api, func(_ string, _, child Traversable) (Traversable, error) {
 		child.setRenderer(renderer)
 		parent := child.GetParent()
@@ -74,7 +75,7 @@ func SetRenderer(api *OpenAPI, renderer Renderer) error {
 	return err
 }
 
-func (o *OpenAPI) getRenderer() Renderer {
+func (o *OpenAPI) getRenderer() render.Renderer {
 	return o.renderer
 }
 
@@ -143,4 +144,11 @@ func resolveRefs(key string, parent, node Traversable) (Traversable, error) {
 type ExternalDocs struct {
 	Description string `yaml:"description"`
 	Url         string `yaml:"url"`
+}
+
+func Dig(node Traversable, key ...string) Traversable {
+	if len(key) == 0 {
+		return node
+	}
+	return Dig(node.getChildren()[key[0]], key[1:]...)
 }

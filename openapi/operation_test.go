@@ -1,12 +1,13 @@
 package openapi
 
 import (
+	"github.com/sasswart/gin-in-a-can/test"
 	"testing"
 )
 
 func TestOperation_GetBasePath(t *testing.T) {
-	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
-	ops := Dig(openapi, testEndpoint)
+	openapi, _ := LoadOpenAPI(test.AbsOpenAPI)
+	ops := Dig(openapi, test.Endpoint)
 
 	var basePaths []string
 	for method, operation := range ops.getChildren() {
@@ -14,15 +15,15 @@ func TestOperation_GetBasePath(t *testing.T) {
 		basePaths = append(basePaths, operation.getBasePath())
 	}
 	for _, path := range basePaths {
-		if path != testBasePath {
-			t.Errorf("%v found, expected: %v", path, testBasePath)
+		if path != test.BasePath {
+			t.Errorf("%v found, expected: %v", path, test.BasePath)
 		}
 	}
 }
 
 func TestOperation_GetRef(t *testing.T) {
-	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
-	ops := Dig(openapi, testEndpoint)
+	openapi, _ := LoadOpenAPI(test.AbsOpenAPI)
+	ops := Dig(openapi, test.Endpoint)
 	for _, operation := range ops.getChildren() {
 		if op, ok := operation.(*Operation); ok {
 			if op.getRef() != "" {
@@ -33,8 +34,8 @@ func TestOperation_GetRef(t *testing.T) {
 }
 
 func TestOperation_GetParent(t *testing.T) {
-	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
-	ops := Dig(openapi, testEndpoint)
+	openapi, _ := LoadOpenAPI(test.AbsOpenAPI)
+	ops := Dig(openapi, test.Endpoint)
 	for _, operation := range ops.getChildren() {
 		if operation.GetParent() == nil {
 			t.Errorf("operation %#v has a nil parent", operation)
@@ -43,14 +44,14 @@ func TestOperation_GetParent(t *testing.T) {
 }
 
 func TestOperation_GetChildren(t *testing.T) {
-	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
-	paths := Dig(openapi, testEndpoint)
+	openapi, _ := LoadOpenAPI(test.AbsOpenAPI)
+	paths := Dig(openapi, test.Endpoint)
 	for _, traversable := range paths.getChildren() {
 		if operation, ok := traversable.(*Operation); ok {
 			for key, child := range operation.getChildren() {
 				if _, ok := child.(*RequestBody); ok {
 					t.Logf("%s contained an object of type *RequestBody", key)
-					t.Logf("heres your %s", testReqBody)
+					t.Logf("heres your %s", test.ReqBody)
 					continue
 				}
 				if p, ok := child.(*Parameter); ok {
@@ -69,8 +70,8 @@ func TestOperation_GetChildren(t *testing.T) {
 }
 
 func TestOperation_SetChild(t *testing.T) {
-	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
-	traversable := Dig(openapi, testEndpoint)
+	openapi, _ := LoadOpenAPI(test.AbsOpenAPI)
+	traversable := Dig(openapi, test.Endpoint)
 	operations := traversable.getChildren()
 
 	// Test Data
@@ -96,14 +97,14 @@ func TestOperation_SetChild(t *testing.T) {
 				t.Errorf("child %s: %s was not set properly", method, httpResponseCode)
 			}
 		}
-		if got, ok := children[testReqBody].(*RequestBody); ok {
+		if got, ok := children[test.ReqBody].(*RequestBody); ok {
 			if got.node.name != reqBody.node.name {
-				t.Errorf("child %s: %s was not set properly", method, testReqBody)
+				t.Errorf("child %s: %s was not set properly", method, test.ReqBody)
 			}
 		}
-		if got, ok := children[testEmptyParamName].(*Parameter); ok {
+		if got, ok := children[test.EmptyParamName].(*Parameter); ok {
 			if got.node.name != parameter.node.name {
-				t.Errorf("child %s: %s was not set properly", method, testEmptyParamName)
+				t.Errorf("child %s: %s was not set properly", method, test.EmptyParamName)
 			}
 		}
 	}

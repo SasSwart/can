@@ -1,9 +1,12 @@
 package openapi
 
-import "testing"
+import (
+	"github.com/sasswart/gin-in-a-can/test"
+	"testing"
+)
 
 func TestOpenAPILoadsParameterValidation(t *testing.T) {
-	apiSpec, _ := LoadOpenAPI(testAbsOpenAPI)
+	apiSpec, _ := LoadOpenAPI(test.AbsOpenAPI)
 
 	IDParam := apiSpec.Paths["/endpoint"].Post.Parameters[0]
 	if IDParam.Required != true {

@@ -1,26 +1,28 @@
 package openapi
 
 import (
+	"github.com/sasswart/gin-in-a-can/render"
+	"github.com/sasswart/gin-in-a-can/test"
 	"reflect"
 	"testing"
 )
 
 func TestMediaType_GetName(t *testing.T) {
-	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
-	SetRenderer(openapi, GinRenderer{})
-	mt := Dig(openapi, testEndpoint, testMethod, testReqBody, testMediaType)
+	openAPI, _ := LoadOpenAPI(test.AbsOpenAPI)
+	SetRenderer(openAPI, render.GinRenderer{})
+	mt := Dig(openAPI, test.Endpoint, test.Method, test.ReqBody, test.MediaType)
 	name := mt.GetName()
-	if name != testGinRenderedMediaItemName {
-		t.Errorf("expected %v, got %v", testGinRenderedMediaItemName, name)
+	if name != test.GinRenderedMediaItemName {
+		t.Errorf("expected %v, got %v", test.GinRenderedMediaItemName, name)
 	}
 }
 
 func TestMediaType_GetChildren(t *testing.T) {
-	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
-	mt := Dig(openapi, testEndpoint, testMethod, testReqBody, testMediaType)
+	openapi, _ := LoadOpenAPI(test.AbsOpenAPI)
+	mt := Dig(openapi, test.Endpoint, test.Method, test.ReqBody, test.MediaType)
 	children := mt.getChildren()
 	for model, schema := range children {
-		if model == testSchema {
+		if model == test.Schema {
 			s, ok := schema.(*Schema)
 			if !ok {
 				// TODO These tests would be more valuable if we asserted against the content of the schema object we expect to make sure we get the right one.
@@ -34,18 +36,18 @@ func TestMediaType_GetChildren(t *testing.T) {
 }
 
 func TestMediaType_SetChild(t *testing.T) {
-	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
-	mt := Dig(openapi, testEndpoint, testMethod, testReqBody, testMediaType)
-	s, _ := Dig(mt, testSchema).(*Schema)
+	openapi, _ := LoadOpenAPI(test.AbsOpenAPI)
+	mt := Dig(openapi, test.Endpoint, test.Method, test.ReqBody, test.MediaType)
+	s, _ := Dig(mt, test.Schema).(*Schema)
 	sOld := *s
 	t.Logf("Original schema name: %v", s.name)
 	newSchemaName := "NewSchema"
-	mt.setChild(testSchema, &Schema{
+	mt.setChild(test.Schema, &Schema{
 		node: node{
 			name: newSchemaName,
 		},
 	})
-	sNew, _ := mt.getChildren()[testSchema].(*Schema)
+	sNew, _ := mt.getChildren()[test.Schema].(*Schema)
 	if reflect.DeepEqual(s, sNew) || (&sOld).name == sNew.name {
 		t.Errorf("Child schema not set successfully")
 	}

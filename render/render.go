@@ -14,11 +14,17 @@ import (
 	"text/template"
 )
 
+type Renderer interface {
+	SanitiseName(string) string
+	SanitiseType(*openapi.Schema) string
+	GetOutputFile(openapi.Traversable) string
+}
+
 // Render is the main parsing and rendering steps within the render library
-func Render(config config.Config, data openapi.Traversable, templateFile string) ([]byte, error) {
+func Render(config config.Config, data openapi.Traversable, templateFileName string) ([]byte, error) {
 	buff := bytes.NewBuffer([]byte{})
 
-	templater := template.New(templateFile)
+	templater := template.New(templateFileName)
 
 	templater.Funcs(templateFuncMap)
 

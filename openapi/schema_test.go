@@ -1,6 +1,7 @@
 package openapi
 
 import (
+	"github.com/sasswart/gin-in-a-can/test"
 	"reflect"
 	"testing"
 )
@@ -85,7 +86,7 @@ func TestGetChildren(t *testing.T) {
 }
 
 func TestSchema_ResolveRefs(t *testing.T) {
-	openapi, err := LoadOpenAPI(testAbsOpenAPI)
+	openapi, err := LoadOpenAPI(test.AbsOpenAPI)
 	if err != nil {
 		t.Errorf(err.Error())
 	}

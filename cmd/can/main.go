@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"github.com/sasswart/gin-in-a-can/config"
 	"github.com/sasswart/gin-in-a-can/render"
@@ -9,11 +8,10 @@ import (
 	"path/filepath"
 
 	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/spf13/viper"
 )
 
 func main() {
-	configData, err := loadConfig()
+	configData, err := config.LoadConfig()
 	if err != nil {
 		fmt.Println(fmt.Errorf("loadConfig error: %w", err))
 		os.Exit(1)
@@ -28,7 +26,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = openapi.SetRenderer(apiSpec, openapi.GinRenderer{})
+	err = render.SetRenderer(apiSpec, render.GinRenderer{})
 	if err != nil {
 		fmt.Println(fmt.Errorf("openapi.SetRenderer error: %w", err))
 		os.Exit(1)
@@ -48,66 +46,31 @@ func main() {
 
 func buildRenderNode(config config.Config) openapi.TraversalFunc {
 	return func(key string, parent, child openapi.Traversable) (openapi.Traversable, error) {
-		var templateFile string
+		var templateFileName string
 		switch child.(type) {
 		case *openapi.OpenAPI:
-			templateFile = "openapi.tmpl"
+			templateFileName = "openapi.tmpl"
 		case *openapi.PathItem:
-			templateFile = "path_item.tmpl"
+			templateFileName = "path_item.tmpl"
 		case *openapi.Schema:
 			if child.(*openapi.Schema).Type != "object" {
 				return child, nil
 			}
-			templateFile = "schema.tmpl"
+			templateFileName = "schema.tmpl"
 		case *openapi.Operation:
-			templateFile = "operation.tmpl"
+			templateFileName = "operation.tmpl"
 		}
 
-		if templateFile == "" {
+		if templateFileName == "" {
 			return child, nil
 		}
-		_, err := render.Render(config, child, templateFile)
+		_, err := render.Render(config, child, templateFileName)
 		if err != nil {
 			return child, err
 		}
 
 		return child, nil
 	}
-}
-
-func loadConfig() (config.Config, error) {
-	wd, err := os.Getwd()
-	if err != nil {
-		return config.Config{}, fmt.Errorf("could not determine working directory: %w\n", err)
-	}
-
-	args := flag.NewFlagSet("can", flag.ExitOnError)
-
-	var configFilePath = args.String("configFile", "", "Specify which config file to use")
-	_ = args.Parse(os.Args[1:])
-
-	if configFilePath == nil {
-		fmt.Println("No config file specified.")
-		viper.SetConfigName("config")
-		viper.AddConfigPath(".")
-	} else {
-		fmt.Printf("Using config file \"%s\" as specified.\n", *configFilePath)
-		viper.SetConfigFile(*configFilePath)
-	}
-
-	err = viper.ReadInConfig()
-	if err != nil {
-		return config.Config{}, fmt.Errorf("could not read config file: %w\n", err)
-	}
-
-	configData := config.Config{
-		WorkingDirectory: wd,
-		ConfigFilePath:   viper.ConfigFileUsed(),
-	}
-
-	_ = viper.Unmarshal(&configData)
-
-	return configData, nil
 }
 
 // absoluteOpenAPIFile uses the current working directory, resolved config file and the openAPI file that was specified
