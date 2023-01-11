@@ -9,7 +9,7 @@ type {{ .GetName }}Parameters struct {
 }
 
 {{- range $name, $requestBody := .RequestBody.Content }}
-type {{ .RequestBody.GetName }} {{ $requestBody.Schema.GetName }}
+type {{ .GetName }} {{ $requestBody.Schema.GetName }}
 {{- end }}
 {{- if not .RequestBody.Content }}
 type {{ .RequestBody.GetName }} struct {}

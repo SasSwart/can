@@ -4,13 +4,13 @@ package {{ index .GetMetadata "package" }}
 
 import "github.com/gin-gonic/gin"
 
-type Server interface {
+type API interface {
 {{- range $name, $pathItem := .Paths }}
   {{ $pathItem.GetName }}
 {{- end }}
 }
 
-func RegisterServer(e *gin.Engine, srv Server) {
+func RegisterAPI(e gin.IRouter, srv API) {
 {{- range $name, $pathItem := .Paths }}
   Register{{ $pathItem.GetName }}Path(e, srv)
 {{- end }}
