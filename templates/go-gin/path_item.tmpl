@@ -28,11 +28,14 @@ func Register{{ .GetName }}Path(e gin.IRouter, srv {{ .GetName }}) {
 	{{ $parent := .GetParent }}
   e.{{ $name | ToUpper }}("{{ $parent.GetPath }}", func(c *gin.Context) {
   	params := &{{ $operation.GetName }}Parameters{}
-  	body := &{{ $operation.RequestBody.GetName }}{}
+  	var body *{{ $operation.RequestBody.GetName }}
+  	{{- if ne (index $operation.RequestBody.Content "application/json") nil}}
+		body = &{{ $operation.RequestBody.GetName }}{}
 		err := c.ShouldBindJSON(body)
 		if err != nil {
 			srv.InvalidRequest(c, err)
 		}
+		{{- end }}
     response := srv.{{ $operation.GetName }}(c, params, body)
     c.JSON(response.GetStatus(), response)
   })
