@@ -19,17 +19,22 @@ func Render(config config.Config, data openapi.Traversable, templateFile string)
 	var absoluteTemplateDirectory string
 	switch true {
 	case filepath.IsAbs(config.Generator.TemplateDirectory):
-		absoluteTemplateDirectory = config.Generator.TemplateDirectory
+		absoluteTemplateDirectory = filepath.Join(
+			config.Generator.TemplateDirectory,
+			config.Generator.TemplateName,
+		)
 	case filepath.IsAbs(config.ConfigFilePath):
 		absoluteTemplateDirectory = filepath.Join(
 			filepath.Dir(config.ConfigFilePath),
 			config.Generator.TemplateDirectory,
+			config.Generator.TemplateName,
 		)
 	default:
 		absoluteTemplateDirectory = filepath.Join(
 			config.WorkingDirectory,
 			filepath.Dir(config.ConfigFilePath),
 			config.Generator.TemplateDirectory,
+			config.Generator.TemplateName,
 		)
 	}
 
@@ -50,7 +55,7 @@ func Render(config config.Config, data openapi.Traversable, templateFile string)
 		)
 	}
 	absoluteOutputFile = filepath.Join(absoluteOutputFile, data.GetOutputFile())
-	
+
 	buff := bytes.NewBuffer([]byte{})
 
 	templater := template.New(templateFile)

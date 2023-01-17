@@ -77,6 +77,11 @@ func buildRenderNode(config config.Config) openapi.TraversalFunc {
 }
 
 func loadConfig() (config.Config, error) {
+	exe, err := os.Readlink("/proc/self/exe")
+	if err != nil {
+		return config.Config{}, fmt.Errorf("could not read /proc/self/exe: %w\n", err)
+	}
+
 	wd, err := os.Getwd()
 	if err != nil {
 		return config.Config{}, fmt.Errorf("could not determine working directory: %w\n", err)
@@ -104,6 +109,9 @@ func loadConfig() (config.Config, error) {
 	configData := config.Config{
 		WorkingDirectory: wd,
 		ConfigFilePath:   viper.ConfigFileUsed(),
+		Generator: config.GeneratorConfig{
+			TemplateDirectory: filepath.Join(filepath.Dir(exe), "templates"),
+		},
 	}
 
 	_ = viper.Unmarshal(&configData)
