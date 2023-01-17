@@ -21,6 +21,7 @@ func (u {{ $pathItemStructName }}) {{ $operation.GetName }}(*gin.Context, *{{ $o
 {{- end }}
 func (u {{ $pathItemStructName }}) InvalidRequest(c *gin.Context, err error) {
 	c.JSON(400, err.Error())
+	c.Abort()
 }
 
 func Register{{ .GetName }}Path(e gin.IRouter, srv {{ .GetName }}) {

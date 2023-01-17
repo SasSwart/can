@@ -11,7 +11,7 @@ type {{ .GetName }} {{ .GetType }}
 	{{ if eq $schema.GetType "struct" -}}
 	{{ $name | ToTitle }} {{ $schema.GetName }}
 	{{- else -}}
-	{{ $name | ToTitle }} {{ $schema.GetType }}
+	{{ $name | ToTitle }} {{ $schema.GetType }} `json:"{{ $name }}"`
 	{{- end }}
 	{{- end }}
 }
