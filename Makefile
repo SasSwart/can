@@ -1,6 +1,6 @@
 APP_GO_FILES := $(shell find . -name '*.go')
 
-all: linux_amd64
+all: linux_amd64.zip
 
 linux_amd64.zip: build/linux_amd64 LICENSE
 	zip -r linux_amd64 build/linux_amd64 LICENSE config.yaml
