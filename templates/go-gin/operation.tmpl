@@ -14,3 +14,35 @@ type {{ .GetName }} {{ $requestBody.Schema.GetName }}
 {{- if not .RequestBody.Content }}
 type {{ .RequestBody.GetName }} struct {}
 {{- end }}
+
+
+
+func ({{ .GetName }}Parameters) IsValid() error {
+	{{- range $i, $parameter := .Parameters }}
+		{{- if $parameter.Schema.Required }}
+		{{ else }}
+		A REQUIRED PARAMETER
+			{{- if ne $parameter.Schema.MinLength 0 }}
+				if len({{ .GetName }} {{ .GetType }}.{{ $parameter.Name | ToTitle }}) < {{ $parameter.Schema.MinLength }} {
+				return fmt.Errorf("model.{{ $parameter.Name | ToTitle }} too short")
+				}
+			{{- end }}
+
+			{{- if ne $parameter.Schema.MaxLength 0 }}
+				if len({{ .GetName }} {{ .GetType }}.{{ $parameter.Name | ToTitle }}) > {{ $parameter.Schema.MaxLength }} {
+				return fmt.Errorf("model.{{ $parameter.Name | ToTitle }} too long")
+				}
+			{{- end }}
+
+			{{- if ne $parameter.Schema.Pattern "" }}
+				// Regular expressions are checked for compilation during code generation
+				// No need to check them here.
+				r{{ $parameter.Name | ToTitle }}, _ := regexp.Compile("{{ $parameter.Schema.Pattern }}")
+				if !r{{ $parameter.Name | ToTitle }}.MatchString({{ .GetName }} {{ .GetType }}.{{ $parameter.Name | ToTitle }}) {
+					return fmt.Errorf("model.{{ $parameter.Name | ToTitle }} did not pass validation pattern")
+				}
+			{{- end }}
+		{{- end }}
+	{{- end }}
+	return nil
+}

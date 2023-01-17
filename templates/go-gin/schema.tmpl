@@ -8,11 +8,11 @@ package {{ index .GetMetadata "package" }}
 type {{ .GetName }} {{ .GetType }}
 {{- if eq "object" .Type }} {
 	{{- range $name, $schema := .Properties }}
-	{{ if eq $schema.GetType "struct" -}}
-	{{ $name | ToTitle }} {{ $schema.GetName }}
-	{{- else -}}
-	{{ $name | ToTitle }} {{ $schema.GetType }} `json:"{{ $name }}"`
-	{{- end }}
+        {{ if eq $schema.GetType "struct" -}}
+            {{ $name | ToTitle }} {{ $schema.GetName }}
+        {{- else -}}
+            {{ $name | ToTitle }} {{ $schema.GetType }} `json:"{{ $name }}"`
+        {{- end }}
 	{{- end }}
 }
 {{- end }}
