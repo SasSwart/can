@@ -24,4 +24,5 @@ type UnimplementedServer struct {
 
 func (u UnimplementedServer) InvalidRequest(c *gin.Context, err error) {
 	c.JSON(400, err.Error())
+	c.Abort()
 }
