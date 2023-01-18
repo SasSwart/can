@@ -14,4 +14,5 @@ type GeneratorConfig struct {
 	ModuleName        string
 	BasePackageName   string
 	TemplateDirectory string
+	TemplateName      string
 }

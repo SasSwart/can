@@ -16,7 +16,7 @@ jobs:
       - name: Setup Go environment
         uses: actions/setup-go@v2.2.0
         with:
-          go-version: '1.18'
+          go-version: '1.19'
       - name: Show go version
         run: go version
       - name: Generate build files
