@@ -1,0 +1,31 @@
+// GENERATED CODE. DO NOT EDIT
+
+package {{ index .GetMetadata "package" }}
+
+func (model {{ .GetName }}Parameters) IsValid() error {
+    {{- if .Schema.Required }}
+    {{ else }} // This is currently always resolving to false
+    A REQUIRED PARAMETER
+    {{- if ne .Schema.MinLength 0 }}
+    if len({{ .GetName }} {{ .GetType }}.{{ .Name | ToTitle }}) < {{ .Schema.MinLength }} {
+    return fmt.Errorf("model.{{.Name | ToTitle }} too short")
+    }
+    {{- end }}
+
+    {{- if ne .Schema.MaxLength 0 }}
+    if len({{ .GetName }} {{ .GetType }}.{{ .Name | ToTitle }}) > {{ .Schema.MaxLength }} {
+    return fmt.Errorf("model.{{ .Name | ToTitle }} too long")
+    }
+    {{- end }}
+
+    {{- if ne .Schema.Pattern "" }}
+    // Regular expressions are checked for compilation during code generation
+    // No need to check them here.
+    r{{ .Name | ToTitle }}, _ := regexp.Compile("{{ .Schema.Pattern }}")
+    if !r{{ .Name | ToTitle }}.MatchString({{ .GetName }} {{ .GetType }}.{{ .Name | ToTitle }}) {
+        return fmt.Errorf("model.{{ .Name | ToTitle }} did not pass validation pattern")
+    }
+    {{- end }}
+    {{- end }}
+    return nil
+}
