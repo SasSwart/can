@@ -37,6 +37,12 @@ func Register{{ .GetName }}Path(e gin.IRouter, srv {{ .GetName }}) {
 			{{- if eq $param.In "path" }} c.Param("{{ $param.Name }}") {{- end -}}
 			{{- if eq $param.In "query" }} c.Query("{{ $param.Name }}") {{- end }}
   	{{- end }}
+
+		if ok, err := params.IsValid(); ok {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
+
   	var body *{{ $operation.RequestBody.GetName }}
   	{{- if ne (index $operation.RequestBody.Content "application/json") nil}}
 		body = &{{ $operation.RequestBody.GetName }}{}
