@@ -85,5 +85,6 @@ func (g GinRenderer) getOutputFile(t Traversable) string {
 	case *Schema:
 		dir = "models"
 	}
-	return filepath.Join(dir, t.GetName()+".go")
+	name := t.GetName()
+	return filepath.Join(dir, name+".go")
 }

@@ -1,6 +1,9 @@
 package {{ index .GetMetadata "package" }}
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
 
 // GENERATED INTERFACE. DO NOT EDIT
 
@@ -43,7 +46,7 @@ func Register{{ .GetName }}Path(e gin.IRouter, srv {{ .GetName }}) {
 		}
 	{{- end }}
 
-    if err := request.IsValid(); err != nil {
+    if ok, err := body.IsValid(); ok {
         c.JSON(http.StatusBadRequest, err)
         return
     }

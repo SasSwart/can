@@ -25,6 +25,15 @@ func (p *Parameter) getChildren() map[string]Traversable {
 	}
 }
 
+func (p *Parameter) GetOutputFile() string {
+	return p.getRenderer().getOutputFile(p)
+}
+
+func (p *Parameter) GetName() string {
+	name := p.parent.GetName() + p.getRenderer().sanitiseName(p.Name) + "Parameter"
+	return name
+}
+
 func (p *Parameter) setChild(_ string, t Traversable) {
 	schema, ok := t.(*Schema)
 	if !ok {
