@@ -5,8 +5,8 @@ package {{ index .GetMetadata "package" }}
 {{- $needs_regexp := false }}
 
 {{- range $name, $property := .Properties }}
-{{- if ne $property.MinLength 0 }}{{ $needs_fmt = true}}{{- end }}
-{{- if ne $property.MaxLength 0 }}{{ $needs_fmt = true}}{{- end }}
+{{- if ne $property.MinLength 0 }}{{ $needs_fmt = true }}{{- end }}
+{{- if ne $property.MaxLength 0 }}{{ $needs_fmt = true }}{{- end }}
 {{- if ne $property.Pattern "" }}{{ $needs_regexp = true }}{{- end }}
 {{- end }}
 
@@ -31,10 +31,9 @@ type {{ .GetName }} {{ .GetType }}
 
 func (p *{{ .GetName }}) IsValid() (bool, error) {
 	{{- range $name, $property := .Properties }}
-	// {{ $name }}
 	{{- if ne $property.MinLength 0 }}
 	if len(p.{{ $name | ToTitle }}) < {{ $property.MinLength }} {
-	return false, fmt.Errorf("p.{{$name | ToTitle }} too short")
+	return false, fmt.Errorf("p.{{ $name | ToTitle }} too short")
 	}
 	{{- end }}
 

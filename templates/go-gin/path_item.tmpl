@@ -2,7 +2,6 @@ package {{ index .GetMetadata "package" }}
 
 import (
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 // GENERATED INTERFACE. DO NOT EDIT
@@ -38,8 +37,8 @@ func Register{{ .GetName }}Path(e gin.IRouter, srv {{ .GetName }}) {
 			{{- if eq $param.In "query" }} c.Query("{{ $param.Name }}") {{- end }}
   	{{- end }}
 
-		if ok, err := params.IsValid(); ok {
-			c.JSON(http.StatusBadRequest, err)
+		if valid, err := params.IsValid(); !valid {
+			srv.InvalidRequest(c, err)
 			return
 		}
 
@@ -49,12 +48,13 @@ func Register{{ .GetName }}Path(e gin.IRouter, srv {{ .GetName }}) {
 		err := c.ShouldBindJSON(body)
 		if err != nil {
 			srv.InvalidRequest(c, err)
+			return
 		}
 	{{- end }}
 
-    if ok, err := body.IsValid(); ok {
-        c.JSON(http.StatusBadRequest, err)
-        return
+    if valid, err := body.IsValid(); !valid {
+			srv.InvalidRequest(c, err)
+			return
     }
     response := srv.{{ $operation.GetName }}(c, params, body)
     c.JSON(response.GetStatus(), response)
