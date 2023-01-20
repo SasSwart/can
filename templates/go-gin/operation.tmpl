@@ -28,7 +28,7 @@ type {{ .GetName }}Parameters struct {
 {{- end }}
 }
 
-func (p {{ .GetName }}Parameters) IsValid() (bool, error) {
+func (p *{{ .GetName }}Parameters) IsValid() (bool, error) {
 	{{- range $i, $parameter := .Parameters }}
     {{- if $parameter.Required }}
     {{- if ne $parameter.Schema.MinLength 0 }}
@@ -90,7 +90,7 @@ func (p *{{ .GetName }}) IsValid() (bool, error) {
 {{- if not .RequestBody.Content }}
 type {{ .RequestBody.GetName }} struct {}
 
-func ({{ .RequestBody.GetName }}) IsValid() (bool, error) {
+func (*{{ .RequestBody.GetName }}) IsValid() (bool, error) {
 	return true, nil
 }
 {{- end }}
