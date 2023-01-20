@@ -114,7 +114,10 @@ func loadConfig() (config.Config, error) {
 		},
 	}
 
-	_ = viper.Unmarshal(&configData)
+	err = viper.Unmarshal(&configData)
+	if err != nil {
+		return config.Config{}, fmt.Errorf("could not parse config file: %w\n", err)
+	}
 
 	return configData, nil
 }

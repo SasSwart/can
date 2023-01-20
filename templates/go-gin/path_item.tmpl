@@ -1,6 +1,9 @@
 package {{ index .GetMetadata "package" }}
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
 
 // GENERATED INTERFACE. DO NOT EDIT
 
@@ -30,10 +33,16 @@ func Register{{ .GetName }}Path(e gin.IRouter, srv {{ .GetName }}) {
   e.{{ $name | ToUpper }}("{{ $parent.GetPath }}", func(c *gin.Context) {
   	params := &{{ $operation.GetName }}Parameters{}
     {{- range $param := $operation.Parameters }}
-    params.{{ $param.Name | ToTitle }} =
-        {{- if eq $param.In "path" }} c.Param("{{ $param.Name }}") {{- end -}}
-        {{- if eq $param.In "query" }} c.Query("{{ $param.Name }}") {{- end }}
+		params.{{ $param.Name | ToTitle }} =
+			{{- if eq $param.In "path" }} c.Param("{{ $param.Name }}") {{- end -}}
+			{{- if eq $param.In "query" }} c.Query("{{ $param.Name }}") {{- end }}
   	{{- end }}
+
+		if ok, err := params.IsValid(); ok {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
+
   	var body *{{ $operation.RequestBody.GetName }}
   	{{- if ne (index $operation.RequestBody.Content "application/json") nil}}
 		body = &{{ $operation.RequestBody.GetName }}{}
@@ -41,7 +50,12 @@ func Register{{ .GetName }}Path(e gin.IRouter, srv {{ .GetName }}) {
 		if err != nil {
 			srv.InvalidRequest(c, err)
 		}
-		{{- end }}
+	{{- end }}
+
+    if ok, err := body.IsValid(); ok {
+        c.JSON(http.StatusBadRequest, err)
+        return
+    }
     response := srv.{{ $operation.GetName }}(c, params, body)
     c.JSON(response.GetStatus(), response)
   })
