@@ -26,10 +26,12 @@ func (p *Parameter) getChildren() map[string]Traversable {
 }
 
 func (p *Parameter) GetOutputFile() string {
+	// TODO this override can be removed and this logic dealt with by the node{} composable
 	return p.getRenderer().getOutputFile(p)
 }
 
 func (p *Parameter) GetName() string {
+	// TODO can this be done through switch node.parent.(Type)?
 	name := p.parent.GetName() + p.getRenderer().sanitiseName(p.Name) + "Parameter"
 	return name
 }

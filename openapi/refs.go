@@ -8,6 +8,7 @@ import (
 
 // readRef takes a reference and attempts to unmarshal it's content into the struct being passed as `i`.
 // As it happens, this ref is contained within the struct that is being unmarshalled into.
+// TODO can `i` become a non-empty interface? perhaps [Node | Traversable]?
 func readRef(absFilename string, i interface{}) error {
 	if Debug { // this can be a particularly noisy Printf call
 		fmt.Printf("Reading reference: %s\n", absFilename)

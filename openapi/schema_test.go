@@ -5,13 +5,13 @@ import (
 	"testing"
 )
 
-var (
-	properties = map[string]*Schema{
+func emptySchemaWith(childProperties, childItems, parent bool) *Schema {
+	properties := map[string]*Schema{
 		"renderable":        {},
 		"anotherRenderable": {},
 	}
-	item = &Schema{}
-	p    = &MediaType{ // PARENT
+	item := &Schema{}
+	p := &MediaType{ // PARENT
 		node: node{},
 		name: "parentName",
 		Schema: &Schema{
@@ -22,9 +22,6 @@ var (
 			Type: "string",
 		},
 	}
-)
-
-func emptySchemaWith(childProperties, childItems, parent bool) *Schema {
 	mainNode := node{
 		parent: p, // PARENT POINT
 		name:   "mainModel",
@@ -59,7 +56,7 @@ func emptySchemaWith(childProperties, childItems, parent bool) *Schema {
 	return &Schema{}
 }
 
-func TestGetChildren(t *testing.T) {
+func TestOpenAPI_Schema_getChildren(t *testing.T) {
 	// Sanity Check
 	schemaWithChildren := emptySchemaWith(false, false, false)
 	shouldBeEmpty := schemaWithChildren.getChildren()
@@ -84,7 +81,7 @@ func TestGetChildren(t *testing.T) {
 	}
 }
 
-func TestOpenAPI_IsRequired(t *testing.T) {
+func TestOpenAPI_Schema_IsRequired(t *testing.T) {
 	nilSchema := &Schema{
 		Required: nil,
 	}

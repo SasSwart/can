@@ -80,6 +80,7 @@ func (n *node) getBasePath() string {
 	return n.parent.GetParent().getBasePath()
 }
 
+// TODO this function can do without it's overrides
 func (n *node) GetOutputFile() string {
 	return n.getRenderer().getOutputFile(n)
 }

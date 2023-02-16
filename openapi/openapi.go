@@ -74,10 +74,6 @@ func SetRenderer(api *OpenAPI, renderer Renderer) error {
 	return err
 }
 
-func (o *OpenAPI) GetMetadata() map[string]string {
-	return o.metadata
-}
-
 func (o *OpenAPI) getRef() string {
 	return ""
 }
@@ -88,6 +84,8 @@ func (o *OpenAPI) GetName() string {
 }
 
 func (o *OpenAPI) GetOutputFile() string {
+	// TODO passing in yourself seems like a smell
+	// TODO this override could be removed and handed by the node{} composable
 	fileName := o.getRenderer().getOutputFile(o)
 	return fileName
 }

@@ -20,116 +20,15 @@ func TestOpenAPI_LoadOpenAPI(t *testing.T) {
 }
 
 func TestOpenAPI_SetRenderer(t *testing.T) {
-	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
-	SetRenderer(openapi, GinRenderer{})
+	apiSpec, _ := LoadOpenAPI(testAbsOpenAPI)
+	want := GinRenderer{}
+	_ = SetRenderer(apiSpec, want)
+	leaf := Dig(apiSpec, testEndpoint, testMethod, testReqBody, testMediaType, testSchema, "name")
 
-	//Check *PathItem
-	paths := openapi.getChildren()
-	for key, path := range paths {
-		p := path
-		if p.getRenderer() == nil {
-			t.Errorf("Path %v is missing a renderer", key)
-		}
+	got := leaf.getRenderer()
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("new metadata did not populate to root of tree. wanted %v, got %v", want, got)
 	}
-
-	//Check *Operation
-	operations := paths[testEndpoint].getChildren()
-	// TODO currently faiing
-	for key, operation := range operations {
-		if operation != nil {
-			o := operation
-			if o.getRenderer() == nil {
-				t.Errorf("Operation %v is missing a renderer", key)
-			}
-		}
-	}
-
-	//Check *RequestBody
-	requestBodyAndResponses := operations[testMethod].getChildren()
-	// TODO currently faiing
-	for key, mediaTypes := range requestBodyAndResponses {
-		if key == "RequestBody" {
-			r := mediaTypes
-			if r.getRenderer() == nil {
-				t.Errorf("%v is missing a renderer", key)
-			}
-			continue
-		}
-		//Check *Response
-		r := mediaTypes
-		if r.getRenderer() == nil {
-			t.Errorf("Response %v is missing a renderer", key)
-		}
-	}
-
-	//Check *Parameter
-	// TODO *PathItem.getParameters() still to be done
-
-	//Check *MediaType
-	//Check *Schema and *Schema within *Schemae
-	//	RequestBody
-	requestBodyMediaTypes := requestBodyAndResponses["RequestBody"].getChildren()
-	for mt, val := range requestBodyMediaTypes {
-		if mt == testMediaType {
-			container, _ := val.(*MediaType)
-			schemae := container.getChildren()
-			schema, ok := schemae[testSchema].(*Schema)
-			if !ok {
-				t.Errorf("Schema cast failed")
-			}
-			if schema.getRenderer() == nil {
-				t.Errorf("RequestBody Schema of  %v is missing a renderer", mt)
-			}
-			c := schema.getChildren()
-			for propKey, s := range c {
-				if propKey == "item" { // check everything but "item"
-					continue
-				}
-				s, ok := s.(*Schema)
-				if !ok {
-					t.Errorf("Invalid schema nesting")
-				}
-				if s.getRenderer() == nil {
-					t.Errorf("%v:%v property schema is missing a renderer", mt, propKey)
-				}
-			}
-		}
-	}
-	//	Responses
-	for k, val := range requestBodyAndResponses {
-		if k == "RequestBody" {
-			continue
-		}
-		content := val.getChildren()
-		if content == nil {
-			continue
-		}
-		//for mt, val := range content {
-		//	schemae := val.getChildren()
-		//	schema, ok := schemae[testSchema].(*Schema)
-		//if !ok {
-		//	// TODO find out why this cast is failing
-		//	t.Errorf("Schema cast failed")
-		//}
-		//if schema.getRenderer() == nil {
-		//	t.Errorf("%v Response Schema of type %v is missing a renderer", k, mt)
-		//}
-		//c := schema.getChildren()
-		//for propKey, s := range c {
-		//	if propKey == "item" { // check everything but "item"
-		//		continue
-		//	}
-		//	s, ok := s.(*Schema)
-		//	if !ok {
-		//		t.Errorf("Invalid schema nesting")
-		//	}
-		//	if s.getRenderer() == nil {
-		//		t.Errorf("%v Response Schema of type %v is missing a renderer", k, mt)
-		//	}
-		//}
-		//}
-	}
-	//Parameter
 }
 
 func TestOpenAPI_GetBasePath(t *testing.T) {

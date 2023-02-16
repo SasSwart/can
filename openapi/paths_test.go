@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestPathItem_GetName(t *testing.T) {
+func TestOpenAPI_PathItem_GetName(t *testing.T) {
 	openapi, _ := LoadOpenAPI(testOpenapiFile)
 	_ = SetRenderer(openapi, GinRenderer{})
 	path := Dig(openapi, testEndpoint)
@@ -14,7 +14,7 @@ func TestPathItem_GetName(t *testing.T) {
 	}
 }
 
-func TestPathItem_Operations(t *testing.T) {
+func TestOpenAPI_PathItem_Operations(t *testing.T) {
 	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	for _, v := range openapi.getChildren() {
 		p := v.(*PathItem)
@@ -35,7 +35,7 @@ func TestPathItem_Operations(t *testing.T) {
 
 }
 
-func TestPathItem_SetRenderer(t *testing.T) {
+func TestOpenAPI_PathItem_SetRenderer(t *testing.T) {
 	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	for _, path := range openapi.getChildren() {
 		path.setRenderer(GinRenderer{})
@@ -47,7 +47,7 @@ func TestPathItem_SetRenderer(t *testing.T) {
 	}
 }
 
-func TestPathItem_GetBasePath(t *testing.T) {
+func TestOpenAPI_PathItem_GetBasePath(t *testing.T) {
 	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	for _, path := range openapi.getChildren() {
 		if path.getBasePath() != testBasePath {
@@ -56,7 +56,7 @@ func TestPathItem_GetBasePath(t *testing.T) {
 	}
 }
 
-func TestPathItem_GetParent(t *testing.T) {
+func TestOpenAPI_PathItem_GetParent(t *testing.T) {
 	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	for _, path := range openapi.getChildren() {
 		parent := path.GetParent()

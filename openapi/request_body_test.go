@@ -23,3 +23,13 @@ func TestOpenAPI_LoadsRequestBodyValidation(t *testing.T) {
 		t.Errorf("found required field %v at index [0], wanted %v", name.IsRequired("name"), "name")
 	}
 }
+
+func TestOpenAPI_RequestBody_setChild(t *testing.T) {
+	t.Errorf("TODO")
+}
+func TestOpenAPI_RequestBody_getChildren(t *testing.T) {
+	t.Errorf("TODO")
+}
+func TestOpenAPI_RequestBody_getName(t *testing.T) {
+	t.Errorf("TODO")
+}
