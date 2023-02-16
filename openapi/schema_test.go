@@ -84,18 +84,6 @@ func TestGetChildren(t *testing.T) {
 	}
 }
 
-func TestSchema_ResolveRefs(t *testing.T) {
-	openapi, err := LoadOpenAPI(testAbsOpenAPI)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	if openapi == nil {
-		t.Errorf("openapi is nil")
-	}
-	// TODO
-	t.Error("TODO load refs through the use of the composed `node` struct and test against that")
-}
-
 func TestOpenAPI_IsRequired(t *testing.T) {
 	nilSchema := &Schema{
 		Required: nil,

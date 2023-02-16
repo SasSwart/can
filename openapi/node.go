@@ -36,16 +36,23 @@ const (
 )
 
 func (n *node) SetMetadata(metadata map[string]string) {
-	if _, ok := n.GetParent().(*OpenAPI); ok {
-		n.parent.SetMetadata(metadata)
-		return
+	if n.parent.GetParent() == nil {
+		root, ok := n.GetParent().(*OpenAPI)
+		if ok {
+			root.metadata = metadata
+			return
+		}
+		panic("we should never get here as *OpenAPI should always be at the top of the tree")
 	}
-	n.parent.GetParent().SetMetadata(metadata)
+	n.parent.SetMetadata(metadata)
 }
 
 var _ Traversable = &node{}
 
 func (n *node) GetMetadata() map[string]string {
+	if root, ok := n.parent.(*OpenAPI); ok {
+		return root.metadata
+	}
 	return n.parent.GetMetadata()
 }
 
@@ -67,7 +74,7 @@ func (n *node) setParent(parent Traversable) {
 
 // getBasePath recurses up the parental ladder until it's overridden by the *OpenAPI method
 func (n *node) getBasePath() string {
-	if n.GetParent() == nil {
+	if n.parent == nil {
 		return n.basePath
 	}
 	return n.parent.GetParent().getBasePath()
@@ -140,12 +147,12 @@ func TraverseRecursor[T Traversable](node T, f TraversalFunc) (T, error) {
 // to the node.
 func Traverse[T Traversable](node T, f TraversalFunc) (T, error) {
 	if f == nil {
-		return node, nil
+		return node, fmt.Errorf("no traversal function supplied")
 	}
 
 	result, err := f("", nil, node)
 	if err != nil {
-		return node, err
+		return node, fmt.Errorf("traversal function[%#v] error: %w", f, err)
 	}
 
 	node, ok := result.(T)

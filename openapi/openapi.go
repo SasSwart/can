@@ -74,10 +74,6 @@ func SetRenderer(api *OpenAPI, renderer Renderer) error {
 	return err
 }
 
-func (o *OpenAPI) SetMetadata(metadata map[string]string) {
-	o.metadata = metadata
-}
-
 func (o *OpenAPI) GetMetadata() map[string]string {
 	return o.metadata
 }

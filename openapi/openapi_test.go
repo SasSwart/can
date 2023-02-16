@@ -1,9 +1,12 @@
 package openapi
 
 import (
+	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	"gopkg.in/yaml.v3"
 )
 
 func TestOpenAPI_LoadOpenAPI(t *testing.T) {
@@ -185,7 +188,7 @@ func TestOpenAPI_SetChild(t *testing.T) {
 
 func TestOpenAPI_GetName(t *testing.T) {
 	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
-	SetRenderer(openapi, GinRenderer{})
+	_ = SetRenderer(openapi, GinRenderer{})
 	name := openapi.GetName()
 	if name != testGinRenderedOpenAPIName {
 		t.Errorf("wanted %s, got %s", testGinRenderedOpenAPIName, name)
@@ -193,6 +196,33 @@ func TestOpenAPI_GetName(t *testing.T) {
 }
 
 func TestOpenAPI_ResolveRefs(t *testing.T) {
-	// TODO
-	//(key string, parent, child Traversable) (Traversable, error) {
+	api := OpenAPI{
+		node: node{
+			basePath: filepath.Dir(testAbsOpenAPI),
+		},
+		Components: Components{},
+		Paths:      map[string]*PathItem{},
+	}
+	content, _ := os.ReadFile(testAbsOpenAPI)
+	_ = yaml.Unmarshal(content, &api)
+
+	newApi, err := Traverse(&api, resolveRefs)
+
+	if err != nil {
+		t.Errorf(err.Error()) // just bubbling up is enough here
+	}
+	if newApi == nil {
+		t.Errorf("%s resulted in a nil api tree", testOpenapiFile)
+	}
+}
+
+func TestOpenAPI_SetMetadata(t *testing.T) {
+	apiSpec, _ := LoadOpenAPI(testAbsOpenAPI)
+	data := map[string]string{"this": "is", "some": "metadata"}
+	traversable := Dig(apiSpec, testEndpoint, testMethod, testReqBody, testMediaType, testSchema, "name")
+
+	traversable.SetMetadata(data)
+	if !reflect.DeepEqual(apiSpec.metadata, data) {
+		t.Fatalf("new metadata did not populate to root of tree. wanted %v, got %v", data, apiSpec.metadata)
+	}
 }
