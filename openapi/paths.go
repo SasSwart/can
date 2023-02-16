@@ -34,7 +34,7 @@ func (p *PathItem) GetPath() string {
 
 func (p *PathItem) getBasePath() string {
 	if p.parent == nil {
-		return ""
+		panic("PathItem should never be at the root of the tree")
 	}
 	// TODO: Deal with absolute paths for both of these parameters
 	// For now both of these params are assumed relative

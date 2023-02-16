@@ -38,9 +38,9 @@ func TestOpenAPI_PathItem_Operations(t *testing.T) {
 func TestOpenAPI_PathItem_SetRenderer(t *testing.T) {
 	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	for _, path := range openapi.getChildren() {
-		path.setRenderer(GinRenderer{})
-		got := path.getRenderer()
 		want := GinRenderer{}
+		path.setRenderer(want)
+		got := path.getRenderer()
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("SetRenderer(GinRenderer{}) was unsuccessful")
 		}
