@@ -8,7 +8,7 @@ func TestOpenAPI_LoadsRequestBodyValidation(t *testing.T) {
 		t.Fail()
 	}
 
-	traversable := Dig(apiSpec, testEndpoint, testMethod, testReqBody, testMediaType, testSchema)
+	traversable := Dig(apiSpec, testEndpoint, testMethod, testReqBody, testMediaType, testSchema, "name")
 	name := traversable.(*Schema)
 	if name.MinLength != 1 {
 		t.Errorf("got minLength %v, wanted %v", name.MinLength, 1)
@@ -19,7 +19,7 @@ func TestOpenAPI_LoadsRequestBodyValidation(t *testing.T) {
 	if name.Pattern != testPattern {
 		t.Errorf("got pattern %v, wanted %v", name.Pattern, testPattern)
 	}
-	if name.Required[0] != "name" {
-		t.Errorf("found required field %v at index [0], wanted %v", name.Required[0], "name")
+	if name.IsRequired("name") {
+		t.Errorf("found required field %v at index [0], wanted %v", name.IsRequired("name"), "name")
 	}
 }

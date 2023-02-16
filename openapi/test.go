@@ -16,10 +16,11 @@ const testMediaType = "application/json"
 const testOpenapiFile = "fixtures/validation.yaml"
 const testSchema = "Model" // the Dig() key used to access any schema held within a MediaType
 const testPattern = "^([a-zA-Z0-9])+([-_ @\\.]([a-zA-Z0-9])+)*$"
-const testGinRenderedPathItemName = "EndpointValidationFixture"
-const testGinRenderedResponseName = "PostEndpointValidationFixture201Response"
-const testGinRenderedMediaItemName = "PostEndpointValidationFixtureRequestbody"
+const testGinRenderedPathItemName = "ValidationFixtureEndpoint"
+const testGinRenderedResponseName = "ValidationFixtureEndpointPost201Response"
+const testGinRenderedMediaItemName = "ValidationFixtureEndpointPostRequestBody"
 const testGinRenderedOpenAPIName = "ValidationFixture"
+const Debug = false
 
 var testAbsOpenAPI, _ = filepath.Abs(testOpenapiFile)
 

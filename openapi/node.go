@@ -36,7 +36,11 @@ const (
 )
 
 func (n *node) SetMetadata(metadata map[string]string) {
-	n.parent.SetMetadata(metadata)
+	if _, ok := n.GetParent().(*OpenAPI); ok {
+		n.parent.SetMetadata(metadata)
+		return
+	}
+	n.parent.GetParent().SetMetadata(metadata)
 }
 
 var _ Traversable = &node{}
@@ -63,7 +67,10 @@ func (n *node) setParent(parent Traversable) {
 
 // getBasePath recurses up the parental ladder until it's overridden by the *OpenAPI method
 func (n *node) getBasePath() string {
-	return n.parent.getBasePath()
+	if n.GetParent() == nil {
+		return n.basePath
+	}
+	return n.parent.GetParent().getBasePath()
 }
 
 func (n *node) GetOutputFile() string {
@@ -85,10 +92,19 @@ func (n *node) setName(name string) {
 }
 
 func (n *node) setRenderer(r Renderer) {
-	n.renderer = r
+	if n.parent == nil {
+		n.renderer = r
+		return
+	}
+	if n.parent.getRenderer() == nil {
+		n.parent.setRenderer(r)
+	}
 }
 
 func (n *node) getRenderer() Renderer {
+	if n.parent == nil {
+		return n.renderer
+	}
 	return n.parent.getRenderer()
 }
 

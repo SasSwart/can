@@ -63,3 +63,16 @@ func (s *Schema) getBasePath() string {
 func (s *Schema) getRef() string {
 	return s.Ref
 }
+
+func (s *Schema) IsRequired(property string) bool {
+	if s.Required == nil {
+		return false
+	}
+
+	for _, item := range s.Required {
+		if item == property {
+			return true
+		}
+	}
+	return false
+}

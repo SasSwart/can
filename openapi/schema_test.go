@@ -95,3 +95,18 @@ func TestSchema_ResolveRefs(t *testing.T) {
 	// TODO
 	t.Error("TODO load refs through the use of the composed `node` struct and test against that")
 }
+
+func TestOpenAPI_IsRequired(t *testing.T) {
+	nilSchema := &Schema{
+		Required: nil,
+	}
+	schemaWithRequiredName := &Schema{
+		Required: []string{"name"},
+	}
+	if nilSchema.IsRequired("name") {
+		t.Fatalf("Name does not exist in nilSchema")
+	}
+	if !schemaWithRequiredName.IsRequired("name") {
+		t.Fatalf("Name does exist in schemaWithRequiredName and was not found")
+	}
+}

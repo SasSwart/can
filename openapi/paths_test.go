@@ -7,12 +7,8 @@ import (
 
 func TestPathItem_GetName(t *testing.T) {
 	openapi, _ := LoadOpenAPI(testOpenapiFile)
-	SetRenderer(openapi, GinRenderer{})
+	_ = SetRenderer(openapi, GinRenderer{})
 	path := Dig(openapi, testEndpoint)
-	if path.getRenderer() == nil {
-		t.Log("Renderer is nil, setting renderer manually")
-		path.setRenderer(GinRenderer{})
-	}
 	if path.GetName() != testGinRenderedPathItemName {
 		t.Errorf("got %v, expected %v", path.GetName(), testGinRenderedPathItemName)
 	}
@@ -43,8 +39,9 @@ func TestPathItem_SetRenderer(t *testing.T) {
 	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	for _, path := range openapi.getChildren() {
 		path.setRenderer(GinRenderer{})
-		GinRenderer := GinRenderer{}
-		if !reflect.DeepEqual(path.getRenderer(), GinRenderer) {
+		got := path.getRenderer()
+		want := GinRenderer{}
+		if !reflect.DeepEqual(got, want) {
 			t.Errorf("SetRenderer(GinRenderer{}) was unsuccessful")
 		}
 	}

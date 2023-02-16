@@ -7,7 +7,7 @@ import (
 
 func TestMediaType_GetName(t *testing.T) {
 	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
-	SetRenderer(openapi, GinRenderer{})
+	_ = SetRenderer(openapi, GinRenderer{})
 	mt := Dig(openapi, testEndpoint, testMethod, testReqBody, testMediaType)
 	name := mt.GetName()
 	if name != testGinRenderedMediaItemName {

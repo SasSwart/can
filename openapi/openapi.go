@@ -74,10 +74,6 @@ func SetRenderer(api *OpenAPI, renderer Renderer) error {
 	return err
 }
 
-func (o *OpenAPI) getRenderer() Renderer {
-	return o.renderer
-}
-
 func (o *OpenAPI) SetMetadata(metadata map[string]string) {
 	o.metadata = metadata
 }
@@ -88,10 +84,6 @@ func (o *OpenAPI) GetMetadata() map[string]string {
 
 func (o *OpenAPI) getRef() string {
 	return ""
-}
-
-func (o *OpenAPI) getBasePath() string {
-	return o.node.basePath
 }
 
 func (o *OpenAPI) GetName() string {
