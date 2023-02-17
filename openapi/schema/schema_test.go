@@ -1,93 +1,93 @@
-package schema
+package schema_test
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi/media_type"
+	"github.com/sasswart/gin-in-a-can/openapi/media"
+	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"reflect"
 	"testing"
 )
 
-func emptySchemaWith(childProperties, childItems, parent bool) *Schema {
-	properties := map[string]*Schema{
+func emptySchemaWith(childProperties, childItems, parent bool) *schema.Schema {
+	properties := map[string]*schema.Schema{
 		"renderable":        {},
 		"anotherRenderable": {},
 	}
-	item := &Schema{}
-	p := &media_type.MediaType{ // PARENT
+	item := &schema.Schema{}
+	p := &media.Type{ // PARENT
 		Node: tree.Node{},
-		name: "parentName",
-		Schema: &Schema{
+		Schema: &schema.Schema{
 			Node: tree.Node{
-				parent: &media_type.MediaType{},
-				name:   "parentModel",
+				Name: "parentModel",
 			},
 			Type: "string",
 		},
 	}
+	p.Schema.Node.SetParent(&media.Type{})
 	mainNode := tree.Node{
-		parent: p, // PARENT POINT
-		name:   "mainModel",
+		Name: "mainModel",
 	}
+	mainNode.SetParent(p)
 	switch {
 	case parent && !childProperties && !childItems:
-		return &Schema{ // BASE SCHEMA
+		return &schema.Schema{ // BASE SCHEMA
 			Node: mainNode,
 			Type: "string",
 		}
 	case !parent && childProperties && !childItems:
-		return &Schema{ // BASE SCHEMA
+		return &schema.Schema{ // BASE SCHEMA
 			Node:       mainNode,
 			Type:       "string",
 			Properties: properties, // CHILD POINT
 		}
 	case !parent && !childProperties && childItems:
-		return &Schema{ // BASE SCHEMA
+		return &schema.Schema{ // BASE SCHEMA
 			Node:  mainNode,
 			Type:  "string",
 			Items: item, // CHILD POINT
 		}
 	case !parent && childProperties && childItems:
 
-		return &Schema{ // BASE SCHEMA
+		return &schema.Schema{ // BASE SCHEMA
 			Node:       mainNode,
 			Type:       "string",
 			Properties: properties, // CHILD POINT
 			Items:      item,       // CHILD POINT
 		}
 	}
-	return &Schema{}
+	return &schema.Schema{}
 }
 
 func TestOpenAPI_Schema_getChildren(t *testing.T) {
 	// Sanity Check
 	schemaWithChildren := emptySchemaWith(false, false, false)
-	shouldBeEmpty := schemaWithChildren.getChildren()
-	s := &Schema{}
-	if !reflect.DeepEqual(shouldBeEmpty, s.getChildren()) {
+	shouldBeEmpty := schemaWithChildren.GetChildren()
+	s := &schema.Schema{}
+	if !reflect.DeepEqual(shouldBeEmpty, s.GetChildren()) {
 		t.Error("shouldBeEmpty is not empty")
 	}
 	schemaWithChildren = emptySchemaWith(true, true, false)
-	shouldBePropAndItemChildren := schemaWithChildren.getChildren()
+	shouldBePropAndItemChildren := schemaWithChildren.GetChildren()
 	if shouldBePropAndItemChildren == nil {
 		t.Error("shouldBePropAndItemChildren is nil")
 	}
 	schemaWithChildren = emptySchemaWith(false, true, false)
-	shouldBeItemChildren := schemaWithChildren.getChildren()
+	shouldBeItemChildren := schemaWithChildren.GetChildren()
 	if shouldBeItemChildren == nil {
 		t.Error("shouldBeItemChildren is nil")
 	}
 	schemaWithChildren = emptySchemaWith(true, false, false)
-	shouldBePropChildren := schemaWithChildren.getChildren()
+	shouldBePropChildren := schemaWithChildren.GetChildren()
 	if shouldBePropChildren == nil {
 		t.Error("shouldBePropChildren is nil")
 	}
 }
 
 func TestOpenAPI_Schema_IsRequired(t *testing.T) {
-	nilSchema := &Schema{
+	nilSchema := &schema.Schema{
 		Required: nil,
 	}
-	schemaWithRequiredName := &Schema{
+	schemaWithRequiredName := &schema.Schema{
 		Required: []string{"name"},
 	}
 	if nilSchema.IsRequired("name") {

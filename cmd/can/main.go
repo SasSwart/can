@@ -19,34 +19,32 @@ import (
 var Renderer *render.Engine
 
 func main() {
-	configData, err := loadConfig()
+	c, err := loadConfig()
 	if err != nil {
 		fmt.Println(fmt.Errorf("loadConfig error: %w", err))
 		os.Exit(1)
 	}
 
-	fmt.Printf("Reading API specification from \"%s\"\n", absoluteOpenAPIFile(configData))
+	fmt.Printf("Reading API specification from \"%s\"\n", absoluteOpenAPIFile(c))
 	apiSpec, err := root.LoadAPISpec(
-		absoluteOpenAPIFile(configData),
+		absoluteOpenAPIFile(c),
 	)
 	if err != nil {
 		fmt.Println(fmt.Errorf("openapi.LoadAPISpec error: %w", err))
 		os.Exit(1)
 	}
 
-	engine := render.Engine{}
-	Renderer = engine.New(render.GinRenderer{}, render.Config{
-		ModuleName:        ,
-		BasePackageName:   ,
-		TemplateDirectory: ,
-		TemplateName:      ,
-	})
+	err = setupRenderer(c)
+	if err != nil {
+		fmt.Println(fmt.Errorf("global setupRenderer() error: %w", err))
+		os.Exit(1)
+	}
 
 	apiSpec.SetMetadata(map[string]string{
-		"package": configData.Generator.BasePackageName,
+		"package": c.BasePackageName,
 	})
 
-	renderNode := buildRenderNode(configData)
+	renderNode := buildRenderNode()
 	_, err = tree.Traverse(apiSpec, renderNode)
 	if err != nil {
 		fmt.Println(fmt.Errorf("openapi.Traverse(apiSpec, renderNode) error: %w", err))
@@ -54,18 +52,18 @@ func main() {
 	}
 }
 
-func buildRenderNode(config config.Config) tree.TraversalFunc {
-	return func(key string, parent, child tree.NodeTraverser) (tree.NodeTraverser, error) {
+func buildRenderNode() tree.TraversalFunc {
+	return func(key string, parent, node tree.NodeTraverser) (tree.NodeTraverser, error) {
 		var templateFile string
-		switch child.(type) {
+		switch node.(type) {
 		case *root.Root:
 			templateFile = "openapi.tmpl"
 		case *path.Item:
 			templateFile = "path_item.tmpl"
 		case *schema.Schema:
-			schemaType := child.(*schema.Schema).Type
+			schemaType := node.(*schema.Schema).Type
 			if schemaType != "object" && schemaType != "array" {
-				return child, nil
+				return node, nil
 			}
 			templateFile = "schema.tmpl"
 		case *operation.Operation:
@@ -73,23 +71,18 @@ func buildRenderNode(config config.Config) tree.TraversalFunc {
 		}
 
 		if templateFile == "" {
-			return child, nil
+			return node, nil
 		}
-		_, err := Renderer.Render(config, child, templateFile)
+		_, err := Renderer.Render(node, templateFile)
 		if err != nil {
-			return child, err
+			return node, err
 		}
 
-		return child, nil
+		return node, nil
 	}
 }
 
 func loadConfig() (config.Config, error) {
-	exe, err := os.Readlink("/proc/self/exe")
-	if err != nil {
-		return config.Config{}, fmt.Errorf("could not read /proc/self/exe: %w\n", err)
-	}
-
 	wd, err := os.Getwd()
 	if err != nil {
 		return config.Config{}, fmt.Errorf("could not determine working directory: %w\n", err)
@@ -117,7 +110,6 @@ func loadConfig() (config.Config, error) {
 	configData := config.Config{
 		WorkingDirectory: wd,
 		ConfigFilePath:   viper.ConfigFileUsed(),
-		},
 	}
 
 	err = viper.Unmarshal(&configData)
@@ -133,22 +125,42 @@ func loadConfig() (config.Config, error) {
 // except the working directory could be relative.
 func absoluteOpenAPIFile(config config.Config) string {
 	var absoluteOpenAPIFile string
-	if filepath.IsAbs(config.OpenAPI.OpenAPIFile) {
-		absoluteOpenAPIFile = config.OpenAPI.OpenAPIFile
+	if filepath.IsAbs(config.OpenAPIFile) {
+		absoluteOpenAPIFile = config.OpenAPIFile
 	} else {
 		if filepath.IsAbs(config.ConfigFilePath) {
 			absoluteOpenAPIFile = filepath.Join(
 				filepath.Dir(config.ConfigFilePath),
-				config.OpenAPI.OpenAPIFile,
+				config.OpenAPIFile,
 			)
 		} else {
 			absoluteOpenAPIFile = filepath.Join(
 				config.WorkingDirectory,
 				filepath.Dir(config.ConfigFilePath),
-				config.OpenAPI.OpenAPIFile,
+				config.OpenAPIFile,
 			)
 		}
 	}
 
 	return absoluteOpenAPIFile
+}
+
+func setupRenderer(c config.Config) error {
+	exe, err := os.Readlink("/proc/self/exe")
+	if err != nil {
+		return fmt.Errorf("could not read /proc/self/exe: %w", err)
+	}
+
+	Renderer = render.Engine{}.New(render.GinRenderer{}, render.Config{
+		TemplateDirectory: filepath.Join(filepath.Dir(exe), "templates"),
+
+		// this allows us to keep the config.Config type out of the render package
+		ModuleName:       c.ModuleName,
+		BasePackageName:  c.BasePackageName,
+		TemplateName:     c.TemplateName,
+		OutputPath:       c.OutputPath,
+		WorkingDirectory: c.WorkingDirectory,
+		ConfigFilePath:   c.ConfigFilePath,
+	})
+	return nil
 }

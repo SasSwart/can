@@ -1,4 +1,4 @@
-package openapi
+package servers
 
 // Server is a programmatic representation of the OpenApi Document object defined here: https://swagger.io/specification/#openapi-object
 type Server struct {

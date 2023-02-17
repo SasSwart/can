@@ -23,11 +23,6 @@ type Item struct {
 	Parameters  []parameter.Parameter
 }
 
-func (p *Item) GetOutputFile() string {
-	errors.Unimplemented("(p *Item) GetOutputFile()")
-	return ""
-}
-
 func (p *Item) GetChildren() map[string]tree.NodeTraverser {
 	return p.Operations()
 }
@@ -69,10 +64,9 @@ func (p *Item) Operations() map[string]tree.NodeTraverser {
 }
 
 func (p *Item) SetChild(i string, child tree.NodeTraverser) {
-	if op, ok := child.(*operation.Operation); ok {
-		p.Operations()[i] = op
+	if t, ok := child.(*operation.Operation); ok {
+		p.Operations()[i] = t
 		return
-
 	}
-	errors.CastFail("(p *PathItem) setChild()", "NodeTraverser", "*schema.Schema")
+	errors.CastFail("(o *Root) setChild", "NodeTraverser", "*schema.Schema")
 }

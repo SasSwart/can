@@ -2,12 +2,10 @@ package render
 
 import (
 	"github.com/sasswart/gin-in-a-can/errors"
-	"github.com/sasswart/gin-in-a-can/openapi/root"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"path/filepath"
 	"strings"
 )
 
@@ -15,7 +13,7 @@ var _ Renderer = GinRenderer{}
 
 type GinRenderer struct{}
 
-func (g GinRenderer) SanitiseType(n tree.NodeTraverser) string {
+func (g GinRenderer) sanitiseType(n tree.NodeTraverser) string {
 	// TODO This needs to be specific to the *Schema without needing the package imported
 	s, ok := n.(*schema.Schema)
 	if !ok {
@@ -35,26 +33,26 @@ func (g GinRenderer) SanitiseType(n tree.NodeTraverser) string {
 	}
 }
 
-func (g GinRenderer) SanitiseName(s string) string {
+func (g GinRenderer) sanitiseName(s string) string {
 	caser := cases.Title(language.English)
 
-	// Replace - with _ (- is not allowed in go func names)
+	// Replace - with "" (- is not allowed in go func names)
 	pathSegments := strings.Split(s, "-")
 	nameSegments := make([]string, len(pathSegments))
 	for i, segment := range pathSegments {
 		nameSegments[i] = caser.String(segment)
 	}
-	s = strings.Join(nameSegments, "_")
+	s = strings.Join(nameSegments, "")
 
-	// Replace : with _ (- is not allowed in go func names)
+	// Replace : with "" (- is not allowed in go func names)
 	pathSegments = strings.Split(s, ":")
 	nameSegments = make([]string, len(pathSegments))
 	for i, segment := range pathSegments {
 		nameSegments[i] = caser.String(segment)
 	}
-	s = strings.Join(nameSegments, "_")
+	s = strings.Join(nameSegments, "")
 
-	// Replace " " with _ (" " is not allowed in go func names)
+	// Replace " " with "" (" " is not allowed in go func names)
 	pathSegments = strings.Split(s, " ")
 	nameSegments = make([]string, len(pathSegments))
 	for i, segment := range pathSegments {
@@ -79,20 +77,25 @@ func (g GinRenderer) SanitiseName(s string) string {
 
 	return strings.Join(nameSegments, "")
 }
-
-func (g GinRenderer) GetOutputFile(t tree.NodeTraverser) string {
-	var dir string
-	switch t.(type) {
-	case *root.Root:
-		dir = ""
+func (g GinRenderer) getOutputFile(n tree.NodeTraverser) string {
+	switch n.(type) {
 	case *schema.Schema:
-		dir = "models"
+		return g.sanitiseName("models/") + n.GetName()
+	//case *root.Root:
+	//	return n.GetName() + ".go"
+	//case *media.Type:
+	//	return n.GetName() + ".go"
+	//case *operation.Operation:
+	//	return n.GetName() + ".go"
+	//case *parameter.Parameter:
+	//	return n.GetName() + ".go"
+	//case *path.Item:
+	//	return n.GetName() + ".go"
+	//case *request.Body:
+	//	return n.GetName() + ".go"
+	//case *response.Response:
+	//	return n.GetName() + ".go"
+	default:
+		return g.sanitiseName(n.GetName()) + ".go"
 	}
-	name := t.GetName()
-	return filepath.Join(dir, name+".go")
 }
-
-//func (g GinRenderer) GetOutputFile(n *tree.Node) string {
-//	// TODO this function can do without it's overrides
-//	return n.GetRenderer().GetOutputFile(n)
-//}

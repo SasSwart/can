@@ -2,8 +2,7 @@ package response
 
 import (
 	"github.com/sasswart/gin-in-a-can/errors"
-	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/sasswart/gin-in-a-can/openapi/media_type"
+	"github.com/sasswart/gin-in-a-can/openapi/media"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"strconv"
 )
@@ -14,19 +13,12 @@ var _ tree.NodeTraverser = &Response{}
 type Response struct {
 	tree.Node
 	Ref         string
-	Description string                    `yaml:"description"`
-	Headers     map[string]openapi.Header // can also be a $ref
-	Content     map[string]media_type.MediaType
-	Links       map[string]openapi.Link // can also be a $ref
-}
+	Description string `yaml:"description"`
+	Content     map[string]media.Type
 
-func (r *Response) GetOutputFile() string {
-	errors.Unimplemented("(r *Response) GetOutputFile()")
-	return ""
-}
-
-func (r *Response) GetName() string {
-	return r.GetParent().GetName() + r.GetRenderer().SanitiseName(r.name) + "Response"
+	// TODO these cause an import cycle
+	//Headers     map[string]openapi.Header // can also be a $ref
+	//Links       map[string]openapi.Link // can also be a $ref
 }
 
 func (r *Response) GetRef() string {
@@ -47,9 +39,9 @@ func (r *Response) GetChildren() map[string]tree.NodeTraverser {
 
 func (r *Response) SetChild(i string, t tree.NodeTraverser) {
 	if _, err := strconv.Atoi(i); err != nil || i == "default" {
-		mediaType, ok := t.(*media_type.MediaType)
+		mediaType, ok := t.(*media.Type)
 		if !ok {
-			errors.CastFail("(r *Response) SetChild()", "NodeTraverser", "*media_type.MediaType")
+			errors.CastFail("(r *Response) SetChild()", "NodeTraverser", "*media_type.Type")
 		}
 		r.Content[i] = *mediaType
 		return

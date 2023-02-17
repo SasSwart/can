@@ -3,9 +3,8 @@ package operation
 import (
 	"github.com/sasswart/gin-in-a-can/errors"
 	"github.com/sasswart/gin-in-a-can/openapi/parameter"
-	"github.com/sasswart/gin-in-a-can/openapi/request_body"
+	"github.com/sasswart/gin-in-a-can/openapi/request"
 	"github.com/sasswart/gin-in-a-can/openapi/response"
-	"github.com/sasswart/gin-in-a-can/openapi/root"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"strconv"
 )
@@ -19,16 +18,13 @@ type Operation struct {
 	Summary     string
 	Description string
 	Parameters  []parameter.Parameter         // can be a $ref
-	RequestBody request_body.RequestBody      `yaml:"requestBody"` // can be a $ref
+	RequestBody request.Body                  `yaml:"requestBody"` // can be a $ref
 	Responses   map[string]*response.Response // can be a $ref
 	//Callbacks 	map[string]*Callback // can be a $ref
-	OperationId  string `yaml:"operationId"`
-	ExternalDocs root.ExternalDocs
-}
+	OperationId string `yaml:"operationId"`
 
-func (o *Operation) GetOutputFile() string {
-	errors.Unimplemented("(o *Operation) GetOutputFile()")
-	return ""
+	// TODO this will cause an import cycle
+	//ExternalDocs root.ExternalDocs
 }
 
 func (o *Operation) getRef() string {
@@ -49,7 +45,7 @@ func (o *Operation) getChildren() map[string]tree.NodeTraverser {
 
 	// Request Body
 
-	children["RequestBody"] = &o.RequestBody
+	children["Body"] = &o.RequestBody
 
 	// Response
 	for name := range o.Responses {
@@ -65,11 +61,11 @@ func (o *Operation) setChild(i string, child tree.NodeTraverser) {
 		j, _ := strconv.Atoi(i)
 		o.Parameters[j] = *child.(*parameter.Parameter)
 		return
-	case *request_body.RequestBody:
-		o.RequestBody = *child.(*request_body.RequestBody)
+	case *request.Body:
+		o.RequestBody = *child.(*request.Body)
 		return
 	case *response.Response:
-		child.Responses[i] = child.(*response.Response)
+		o.Responses[i] = child.(*response.Response)
 		return
 	default:
 		errors.CastFail("(o *Operation) setChild", "NodeTraverser", "undefined (default case)")

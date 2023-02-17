@@ -1,4 +1,4 @@
-package parameter
+package parameter_test
 
 import (
 	"github.com/sasswart/gin-in-a-can/openapi/root"

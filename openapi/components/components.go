@@ -1,23 +1,23 @@
-package openapi
+package components
 
 import (
 	"github.com/sasswart/gin-in-a-can/openapi/parameter"
-	"github.com/sasswart/gin-in-a-can/openapi/request_body"
+	"github.com/sasswart/gin-in-a-can/openapi/request"
 	"github.com/sasswart/gin-in-a-can/openapi/response"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 )
 
 // Components is a programmatic representation of the Components object defined here: https://swagger.io/specification/#components-object
 type Components struct {
-	Schemas         map[string]schema.Schema            // can also be a $ref
-	Responses       map[string]response.Response        // can also be a $ref
-	Parameters      map[string]parameter.Parameter      // can also be a $ref
-	Examples        map[string]Example                  // can also be a $ref
-	RequestBodies   map[string]request_body.RequestBody // can also be a $ref
-	Headers         map[string]Header                   // can also be a $ref
-	SecuritySchemes map[string]SecurityScheme           // can also be a $ref
-	Links           map[string]Link                     // can also be a $ref
-	Callbacks       map[string]Callback                 // can also be a $ref
+	Schemas         map[string]schema.Schema       // can also be a $ref
+	Responses       map[string]response.Response   // can also be a $ref
+	Parameters      map[string]parameter.Parameter // can also be a $ref
+	Examples        map[string]Example             // can also be a $ref
+	RequestBodies   map[string]request.Body        // can also be a $ref
+	Headers         map[string]Header              // can also be a $ref
+	SecuritySchemes map[string]SecurityScheme      // can also be a $ref
+	Links           map[string]Link                // can also be a $ref
+	Callbacks       map[string]Callback            // can also be a $ref
 }
 
 // Example is a programmatic representation of the Example object defined here: https://swagger.io/specification/#components-object

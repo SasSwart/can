@@ -21,31 +21,23 @@ type Parameter struct {
 	Schema          *schema.Schema // Acts as alternative description of param
 }
 
-func (p *Parameter) getRef() string {
+func (p *Parameter) GetRef() string {
 	return p.Ref
 }
 
-func (p *Parameter) getChildren() map[string]tree.NodeTraverser {
+func (p *Parameter) GetChildren() map[string]tree.NodeTraverser {
 	return map[string]tree.NodeTraverser{
 		"Model": p.Schema,
 	}
 }
-
-func (p *Parameter) GetOutputFile() string {
-	// TODO this override can be removed and this logic dealt with by the node{} composable
-	return p.GetRenderer().GetOutputFile(p)
-}
-
 func (p *Parameter) GetName() string {
-	// TODO can this be done through switch node.parent.(Type)?
-	name := p.GetParent().GetName() + p.GetRenderer().SanitiseName(p.Name) + "Parameter"
-	return name
+	return p.GetParent().GetName() + p.Name + "Parameter"
 }
 
-func (p *Parameter) setChild(_ string, t tree.NodeTraverser) {
-	s, ok := t.(*schema.Schema)
-	if !ok {
-		errors.CastFail("(p *Parameter) setChild()", "NodeTraverser", "*schema.Schema")
+func (p *Parameter) SetChild(_ string, t tree.NodeTraverser) {
+	if s, ok := t.(*schema.Schema); ok {
+		p.Schema = s
+		return
 	}
-	p.Schema = s
+	errors.CastFail("(r *Body) setChild()", "NodeTraverser", "*media_type.Type")
 }

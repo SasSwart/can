@@ -1,4 +1,4 @@
-package openapi
+package info
 
 // Info is a programmatic representation of the Info object defined here: https://swagger.io/specification/#info-object
 type Info struct {
