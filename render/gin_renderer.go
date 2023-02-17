@@ -1,23 +1,21 @@
-package openapi
+package render
 
 import (
+	"github.com/sasswart/gin-in-a-can/openapi/root"
+	"github.com/sasswart/gin-in-a-can/openapi/schema"
+	"github.com/sasswart/gin-in-a-can/tree"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"path/filepath"
 	"strings"
 )
 
-type Renderer interface {
-	sanitiseName(string) string
-	sanitiseType(*Schema) string
-	getOutputFile(Traversable) string
-}
-
 var _ Renderer = GinRenderer{}
 
 type GinRenderer struct{}
 
-func (g GinRenderer) sanitiseType(s *Schema) string {
+func (g GinRenderer) SanitiseType(s *tree.Node) string {
+	// TODO This needs to be specific to the *Schema without needing the package imported
 	switch s.Type {
 	case "boolean":
 		return "bool"
@@ -32,7 +30,7 @@ func (g GinRenderer) sanitiseType(s *Schema) string {
 	}
 }
 
-func (g GinRenderer) sanitiseName(s string) string {
+func (g GinRenderer) SanitiseName(s string) string {
 	caser := cases.Title(language.English)
 
 	// Replace - with _ (- is not allowed in go func names)
@@ -77,14 +75,35 @@ func (g GinRenderer) sanitiseName(s string) string {
 	return strings.Join(nameSegments, "")
 }
 
-func (g GinRenderer) getOutputFile(t Traversable) string {
+func (g GinRenderer) GetOutputFile(t tree.Node) string {
 	var dir string
 	switch t.(type) {
-	case *OpenAPI:
+	case *root.Root:
 		dir = ""
-	case *Schema:
+	case *schema.Schema:
 		dir = "models"
 	}
 	name := t.GetName()
 	return filepath.Join(dir, name+".go")
+}
+func (g GinRenderer) SetRenderer(n *tree.Node) {
+	if n.GetParent() == nil {
+		n.renderer = r
+		return
+	}
+	if g.GetRenderer(n.GetParent()) == nil {
+		n.GetParent().SetRenderer(r)
+	}
+}
+
+func (g GinRenderer) GetRenderer(n *tree.Node) Renderer {
+	if n.GetParent() == nil {
+		return canRenderer
+	}
+	return g.GetRenderer(n.GetParent())
+}
+
+func (g GinRenderer) GetOutputFile(n *tree.Node) string {
+	// TODO this function can do without it's overrides
+	return n.GetRenderer().GetOutputFile(n)
 }

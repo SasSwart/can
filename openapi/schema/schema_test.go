@@ -1,6 +1,8 @@
-package openapi
+package schema
 
 import (
+	"github.com/sasswart/gin-in-a-can/openapi/media_type"
+	"github.com/sasswart/gin-in-a-can/tree"
 	"reflect"
 	"testing"
 )
@@ -11,43 +13,43 @@ func emptySchemaWith(childProperties, childItems, parent bool) *Schema {
 		"anotherRenderable": {},
 	}
 	item := &Schema{}
-	p := &MediaType{ // PARENT
-		node: node{},
+	p := &media_type.MediaType{ // PARENT
+		Node: tree.Node{},
 		name: "parentName",
 		Schema: &Schema{
-			node: node{
-				parent: &MediaType{},
+			Node: tree.Node{
+				parent: &media_type.MediaType{},
 				name:   "parentModel",
 			},
 			Type: "string",
 		},
 	}
-	mainNode := node{
+	mainNode := tree.Node{
 		parent: p, // PARENT POINT
 		name:   "mainModel",
 	}
 	switch {
 	case parent && !childProperties && !childItems:
 		return &Schema{ // BASE SCHEMA
-			node: mainNode,
+			Node: mainNode,
 			Type: "string",
 		}
 	case !parent && childProperties && !childItems:
 		return &Schema{ // BASE SCHEMA
-			node:       mainNode,
+			Node:       mainNode,
 			Type:       "string",
 			Properties: properties, // CHILD POINT
 		}
 	case !parent && !childProperties && childItems:
 		return &Schema{ // BASE SCHEMA
-			node:  mainNode,
+			Node:  mainNode,
 			Type:  "string",
 			Items: item, // CHILD POINT
 		}
 	case !parent && childProperties && childItems:
 
 		return &Schema{ // BASE SCHEMA
-			node:       mainNode,
+			Node:       mainNode,
 			Type:       "string",
 			Properties: properties, // CHILD POINT
 			Items:      item,       // CHILD POINT

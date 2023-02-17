@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/sasswart/gin-in-a-can/config"
-	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/tree"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"os"
@@ -14,8 +14,27 @@ import (
 	"text/template"
 )
 
+type Engine struct {
+	Renderer Renderer
+}
+
+func (e Engine) New(renderer Renderer) *Engine {
+	return &Engine{Renderer: renderer}
+}
+
+type Renderer interface {
+	SanitiseName(string) string
+
+	SanitiseType(n *tree.Node) string
+
+	GetOutputFile(n tree.Node) string
+
+	SetRenderer(n *tree.Node) error
+	GetRenderer(n *tree.Node) Renderer
+}
+
 // Render is the main parsing and rendering steps within the render library
-func Render(config config.Config, data openapi.Traversable, templateFile string) ([]byte, error) {
+func Render(config config.Config, data tree.NodeTraverser, templateFile string) ([]byte, error) {
 	var absoluteTemplateDirectory string
 	switch true {
 	case filepath.IsAbs(config.Generator.TemplateDirectory):

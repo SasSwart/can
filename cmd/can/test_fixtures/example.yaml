@@ -2,5 +2,5 @@ generator:
   moduleName: github.com/sasswart/gin-in-a-can
   basePackageName: api
 openapi:
-  openAPIFile: ./docs/openapi.yml
+  openAPIFile: ./docs/root.yml
 outputPath: .

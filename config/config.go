@@ -1,10 +1,12 @@
 package config
 
-import "github.com/sasswart/gin-in-a-can/openapi"
+import (
+	"github.com/sasswart/gin-in-a-can/openapi/root"
+)
 
 type Config struct {
 	Generator        GeneratorConfig
-	OpenAPI          openapi.Config
+	OpenAPI          root.Config
 	OutputPath       string
 	WorkingDirectory string
 	ConfigFilePath   string

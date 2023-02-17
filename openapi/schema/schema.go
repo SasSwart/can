@@ -1,14 +1,17 @@
-package openapi
+package schema
 
 import (
+	"github.com/sasswart/gin-in-a-can/openapi/errors"
+	"github.com/sasswart/gin-in-a-can/render"
+	"github.com/sasswart/gin-in-a-can/tree"
 	"path/filepath"
 )
 
-var _ Traversable = &Schema{}
+var _ tree.NodeTraverser = &Schema{}
 
 // Schema is a programmatic representation of the Schema object defined here: https://swagger.io/specification/#schema-object
 type Schema struct {
-	node
+	tree.Node
 	Ref                  string `yaml:"$ref"`
 	Description          string
 	Type                 string
@@ -22,14 +25,19 @@ type Schema struct {
 	Required             []string
 }
 
+func (s *Schema) GetRenderer() render.Renderer {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (s *Schema) GetType() string {
-	renderer := s.getRenderer()
-	sanitisedType := renderer.sanitiseType(s)
+	renderer := s.GetRenderer()
+	sanitisedType := renderer.SanitiseType(s)
 	return sanitisedType
 }
 
-func (s *Schema) getChildren() map[string]Traversable {
-	children := map[string]Traversable{}
+func (s *Schema) GetChildren() map[string]tree.NodeTraverser {
+	children := map[string]tree.NodeTraverser{}
 	for name := range s.Properties {
 		property := s.Properties[name]
 		children[name] = property
@@ -40,7 +48,7 @@ func (s *Schema) getChildren() map[string]Traversable {
 	return children
 }
 
-func (s *Schema) setChild(i string, t Traversable) {
+func (s *Schema) SetChild(i string, t tree.NodeTraverser) {
 	if schema, ok := t.(*Schema); ok {
 		if i == "item" {
 			s.Items = schema
@@ -49,18 +57,18 @@ func (s *Schema) setChild(i string, t Traversable) {
 		}
 		return
 	}
-	panic("(s *Schema) setChild(): " + errCastFail)
+	panic("(s *Schema) setChild(): " + errors.ErrCastFail)
 }
 
-func (s *Schema) getBasePath() string {
-	if s.parent == nil {
+func (s *Schema) GetBasePath() string {
+	if s.GetParent() == nil {
 		return ""
 	}
-	basePath := filepath.Join(s.parent.getBasePath(), filepath.Dir(s.Ref))
+	basePath := filepath.Join(s.GetParent().GetBasePath(), filepath.Dir(s.Ref))
 	return basePath
 }
 
-func (s *Schema) getRef() string {
+func (s *Schema) GetRef() string {
 	return s.Ref
 }
 

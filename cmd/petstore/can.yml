@@ -3,5 +3,5 @@ generator:
   moduleName: github.com/sasswart/gin-in-a-can/cmd/petstore
   basePackageName: api
 openAPI:
-  openAPIFile: ./docs/openapi.yml
+  openAPIFile: ./docs/root.yml
 outputPath: ./api

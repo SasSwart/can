@@ -4,11 +4,15 @@ import (
 	"flag"
 	"fmt"
 	"github.com/sasswart/gin-in-a-can/config"
+	"github.com/sasswart/gin-in-a-can/openapi/operation"
+	"github.com/sasswart/gin-in-a-can/openapi/path"
+	"github.com/sasswart/gin-in-a-can/openapi/root"
+	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/render"
+	"github.com/sasswart/gin-in-a-can/tree"
 	"os"
 	"path/filepath"
 
-	"github.com/sasswart/gin-in-a-can/openapi"
 	"github.com/spf13/viper"
 )
 
@@ -20,15 +24,18 @@ func main() {
 	}
 
 	fmt.Printf("Reading API specification from \"%s\"\n", absoluteOpenAPIFile(configData))
-	apiSpec, err := openapi.LoadOpenAPI(
+	apiSpec, err := root.LoadAPISpec(
 		absoluteOpenAPIFile(configData),
 	)
 	if err != nil {
-		fmt.Println(fmt.Errorf("openapi.LoadOpenAPI error: %w", err))
+		fmt.Println(fmt.Errorf("openapi.LoadAPISpec error: %w", err))
 		os.Exit(1)
 	}
 
-	err = openapi.SetRenderer(apiSpec, openapi.GinRenderer{})
+	engine := render.Engine{}
+	canRenderer := engine.New(render.GinRenderer{})
+
+	err = canRenderer.SetRenderer(apiSpec)
 	if err != nil {
 		fmt.Println(fmt.Errorf("openapi.SetRenderer error: %w", err))
 		os.Exit(1)
@@ -39,28 +46,28 @@ func main() {
 	})
 
 	renderNode := buildRenderNode(configData)
-	_, err = openapi.Traverse(apiSpec, renderNode)
+	_, err = tree.Traverse(apiSpec, renderNode)
 	if err != nil {
 		fmt.Println(fmt.Errorf("openapi.Traverse(apiSpec, renderNode) error: %w", err))
 		os.Exit(1)
 	}
 }
 
-func buildRenderNode(config config.Config) openapi.TraversalFunc {
-	return func(key string, parent, child openapi.Traversable) (openapi.Traversable, error) {
+func buildRenderNode(config config.Config) tree.TraversalFunc {
+	return func(key string, parent, child tree.NodeTraverser) (tree.NodeTraverser, error) {
 		var templateFile string
 		switch child.(type) {
-		case *openapi.OpenAPI:
+		case *root.Root:
 			templateFile = "openapi.tmpl"
-		case *openapi.PathItem:
+		case *path.Item:
 			templateFile = "path_item.tmpl"
-		case *openapi.Schema:
-			schemaType := child.(*openapi.Schema).Type
+		case *schema.Schema:
+			schemaType := child.(*schema.Schema).Type
 			if schemaType != "object" && schemaType != "array" {
 				return child, nil
 			}
 			templateFile = "schema.tmpl"
-		case *openapi.Operation:
+		case *operation.Operation:
 			templateFile = "operation.tmpl"
 		}
 
@@ -123,7 +130,7 @@ func loadConfig() (config.Config, error) {
 }
 
 // absoluteOpenAPIFile uses the current working directory, resolved config file and the openAPI file that was specified
-// in the config file to determine the absolute path to and OpenAPI file. It takes into account that any of these,
+// in the config file to determine the absolute path to and Root file. It takes into account that any of these,
 // except the working directory could be relative.
 func absoluteOpenAPIFile(config config.Config) string {
 	var absoluteOpenAPIFile string

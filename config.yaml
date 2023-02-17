@@ -1,7 +1,7 @@
 # render:
 #   moduleName: github.com/<account>/<repository>
 #   basePackageName: api
-# openapi:
-#   openAPIFile: ./docs/openapi.yml
+# root:
+#   openAPIFile: ./docs/root.yml
 # outputPath: .
 # templateDirectory: ./templates
