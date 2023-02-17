@@ -14,66 +14,84 @@ import (
 	"text/template"
 )
 
+type Config struct {
+	ModuleName        string
+	BasePackageName   string
+	TemplateDirectory string
+	TemplateName      string
+}
+type EngineInterface interface {
+	New(renderer Renderer, config Config) *Engine
+	GetRenderer() Renderer
+	Render(config config.Config, data tree.NodeTraverser, templateFile string) ([]byte, error)
+
+	// TODO Not needed after New() constructor introduced
+	//SetRenderer(renderer Renderer)
+}
 type Engine struct {
-	Renderer Renderer
+	renderer Renderer
+	config   Config
 }
 
-func (e Engine) New(renderer Renderer) *Engine {
-	return &Engine{Renderer: renderer}
+var _ EngineInterface = Engine{}
+
+func (e Engine) New(renderer Renderer, config Config) *Engine {
+	return &Engine{renderer: renderer, config: config}
+}
+
+func (e Engine) GetRenderer() Renderer {
+	return e.renderer
 }
 
 type Renderer interface {
 	SanitiseName(string) string
+	SanitiseType(n tree.NodeTraverser) string
 
-	SanitiseType(n *tree.Node) string
-
-	GetOutputFile(n tree.Node) string
-
-	SetRenderer(n *tree.Node) error
-	GetRenderer(n *tree.Node) Renderer
+	GetOutputFile(n tree.NodeTraverser) string
 }
 
-// Render is the main parsing and rendering steps within the render library
-func Render(config config.Config, data tree.NodeTraverser, templateFile string) ([]byte, error) {
-	var absoluteTemplateDirectory string
+// Render contains the parsing and rendering steps
+func (e Engine) Render(config config.Config, data tree.NodeTraverser, templateFile string) ([]byte, error) {
+	var templateDirAbs string
 	switch true {
-	case filepath.IsAbs(config.Generator.TemplateDirectory):
-		absoluteTemplateDirectory = filepath.Join(
-			config.Generator.TemplateDirectory,
-			config.Generator.TemplateName,
+	case filepath.IsAbs(e.config.TemplateDirectory):
+		templateDirAbs = filepath.Join(
+			e.config.TemplateDirectory,
+			e.config.TemplateName,
 		)
+		// TODO Render shouldn't have to know about the config file path. This seems hacky
 	case filepath.IsAbs(config.ConfigFilePath):
-		absoluteTemplateDirectory = filepath.Join(
+		templateDirAbs = filepath.Join(
 			filepath.Dir(config.ConfigFilePath),
-			config.Generator.TemplateDirectory,
-			config.Generator.TemplateName,
+			e.config.TemplateDirectory,
+			e.config.TemplateName,
 		)
 	default:
-		absoluteTemplateDirectory = filepath.Join(
+		templateDirAbs = filepath.Join(
 			config.WorkingDirectory,
 			filepath.Dir(config.ConfigFilePath),
-			config.Generator.TemplateDirectory,
-			config.Generator.TemplateName,
+			e.config.TemplateDirectory,
+			e.config.TemplateName,
 		)
 	}
 
-	var absoluteOutputFile string
+	var outputFileAbs string
 	switch true {
 	case filepath.IsAbs(config.OutputPath):
-		absoluteOutputFile = config.OutputPath
+		outputFileAbs = config.OutputPath
 	case filepath.IsAbs(config.ConfigFilePath):
-		absoluteOutputFile = filepath.Join(
+		outputFileAbs = filepath.Join(
 			filepath.Dir(config.ConfigFilePath),
 			config.OutputPath,
 		)
 	default:
-		absoluteOutputFile = filepath.Join(
+		outputFileAbs = filepath.Join(
 			config.WorkingDirectory,
 			filepath.Dir(config.ConfigFilePath),
 			config.OutputPath,
 		)
 	}
-	absoluteOutputFile = filepath.Join(absoluteOutputFile, data.GetOutputFile())
+	outputFileAbs = filepath.Join(outputFileAbs, data.GetOutputFile())
 
 	buff := bytes.NewBuffer([]byte{})
 
@@ -81,7 +99,7 @@ func Render(config config.Config, data tree.NodeTraverser, templateFile string) 
 
 	templater.Funcs(templateFuncMap)
 
-	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", absoluteTemplateDirectory))
+	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", templateDirAbs))
 	if err != nil {
 		return nil, err
 	}
@@ -93,12 +111,12 @@ func Render(config config.Config, data tree.NodeTraverser, templateFile string) 
 
 	fmt.Printf("Rendering %s using %s\n", data.GetOutputFile(), templateFile)
 
-	outputDirectory := filepath.Dir(absoluteOutputFile)
-	if _, err := os.Stat(outputDirectory); errors.Is(err, os.ErrNotExist) {
-		_ = os.MkdirAll(outputDirectory, 0755)
+	outputDirAbs := filepath.Dir(outputFileAbs)
+	if _, err := os.Stat(outputDirAbs); errors.Is(err, os.ErrNotExist) {
+		_ = os.MkdirAll(outputDirAbs, 0755)
 	}
 
-	err = os.WriteFile(absoluteOutputFile, buff.Bytes(), 0644)
+	err = os.WriteFile(outputFileAbs, buff.Bytes(), 0644)
 	if err != nil {
 		return nil, err
 	}

@@ -1,7 +1,7 @@
 package path
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi/errors"
+	"github.com/sasswart/gin-in-a-can/errors"
 	"github.com/sasswart/gin-in-a-can/openapi/operation"
 	"github.com/sasswart/gin-in-a-can/openapi/parameter"
 	"github.com/sasswart/gin-in-a-can/tree"
@@ -23,6 +23,11 @@ type Item struct {
 	Parameters  []parameter.Parameter
 }
 
+func (p *Item) GetOutputFile() string {
+	errors.Unimplemented("(p *Item) GetOutputFile()")
+	return ""
+}
+
 func (p *Item) GetChildren() map[string]tree.NodeTraverser {
 	return p.Operations()
 }
@@ -38,7 +43,7 @@ func (p *Item) GetPath() string {
 
 func (p *Item) GetBasePath() string {
 	if p.GetParent() == nil {
-		panic("PathItem should never be at the root of the tree")
+		errors.UndefinedBehaviour("(p *Item) GetBasePath()")
 	}
 	// TODO: Deal with absolute paths for both of these parameters
 	// For now both of these params are assumed relative
@@ -69,5 +74,5 @@ func (p *Item) SetChild(i string, child tree.NodeTraverser) {
 		return
 
 	}
-	panic("(p *PathItem) setChild(): " + errors.ErrCastFail)
+	errors.CastFail("(p *PathItem) setChild()", "NodeTraverser", "*schema.Schema")
 }

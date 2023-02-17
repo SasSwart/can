@@ -16,6 +16,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+var Renderer *render.Engine
+
 func main() {
 	configData, err := loadConfig()
 	if err != nil {
@@ -33,13 +35,12 @@ func main() {
 	}
 
 	engine := render.Engine{}
-	canRenderer := engine.New(render.GinRenderer{})
-
-	err = canRenderer.SetRenderer(apiSpec)
-	if err != nil {
-		fmt.Println(fmt.Errorf("openapi.SetRenderer error: %w", err))
-		os.Exit(1)
-	}
+	Renderer = engine.New(render.GinRenderer{}, render.Config{
+		ModuleName:        ,
+		BasePackageName:   ,
+		TemplateDirectory: ,
+		TemplateName:      ,
+	})
 
 	apiSpec.SetMetadata(map[string]string{
 		"package": configData.Generator.BasePackageName,
@@ -74,7 +75,7 @@ func buildRenderNode(config config.Config) tree.TraversalFunc {
 		if templateFile == "" {
 			return child, nil
 		}
-		_, err := render.Render(config, child, templateFile)
+		_, err := Renderer.Render(config, child, templateFile)
 		if err != nil {
 			return child, err
 		}
@@ -116,8 +117,6 @@ func loadConfig() (config.Config, error) {
 	configData := config.Config{
 		WorkingDirectory: wd,
 		ConfigFilePath:   viper.ConfigFileUsed(),
-		Generator: config.GeneratorConfig{
-			TemplateDirectory: filepath.Join(filepath.Dir(exe), "templates"),
 		},
 	}
 

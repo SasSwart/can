@@ -2,11 +2,10 @@ package root
 
 import (
 	"fmt"
+	"github.com/sasswart/gin-in-a-can/errors"
 	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/sasswart/gin-in-a-can/openapi/errors"
 	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/openapi/refs"
-	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	// TODO root package should not have to know about render
 	"github.com/sasswart/gin-in-a-can/render"
 	"github.com/sasswart/gin-in-a-can/tree"
@@ -41,7 +40,7 @@ func LoadAPISpec(openAPIFile string) (*Root, error) {
 			basePath: filepath.Dir(absPath),
 		},
 		Components: openapi.Components{
-			Schemas: map[string]schema.Schema{},
+			Schemas: nil,
 		},
 		Paths: map[string]*path.Item{},
 	}
@@ -113,7 +112,7 @@ func (o *Root) setChild(i string, child tree.NodeTraverser) {
 		o.Paths[i] = c
 		return
 	}
-	panic("(o *Root) setChild:" + errors.ErrCastFail)
+	errors.CastFail("(o *Root) setChild", "NodeTraverser", "*schema.Schema")
 }
 
 // resolveRefs calls readRef on references with the ref path modified appropriately for it's use

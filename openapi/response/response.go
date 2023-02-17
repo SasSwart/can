@@ -1,8 +1,8 @@
 package response
 
 import (
+	"github.com/sasswart/gin-in-a-can/errors"
 	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/sasswart/gin-in-a-can/openapi/errors"
 	"github.com/sasswart/gin-in-a-can/openapi/media_type"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"strconv"
@@ -20,6 +20,11 @@ type Response struct {
 	Links       map[string]openapi.Link // can also be a $ref
 }
 
+func (r *Response) GetOutputFile() string {
+	errors.Unimplemented("(r *Response) GetOutputFile()")
+	return ""
+}
+
 func (r *Response) GetName() string {
 	return r.GetParent().GetName() + r.GetRenderer().SanitiseName(r.name) + "Response"
 }
@@ -34,7 +39,7 @@ func (r *Response) GetChildren() map[string]tree.NodeTraverser {
 		if _, err := strconv.Atoi(name); err != nil || name == "default" {
 			responses[name] = &mediaType
 		} else {
-			panic("Response spec broken")
+			errors.UndefinedBehaviour("(r *Response) GetChildren()")
 		}
 	}
 	return responses
@@ -44,10 +49,10 @@ func (r *Response) SetChild(i string, t tree.NodeTraverser) {
 	if _, err := strconv.Atoi(i); err != nil || i == "default" {
 		mediaType, ok := t.(*media_type.MediaType)
 		if !ok {
-			panic("(r *Response) SetChild(): " + errors.ErrCastFail)
+			errors.CastFail("(r *Response) SetChild()", "NodeTraverser", "*media_type.MediaType")
 		}
 		r.Content[i] = *mediaType
 		return
 	}
-	panic("(r *Response) SetChild(): Response spec broken. Key should either be int as string or `default`")
+	errors.UndefinedBehaviour("(r *Response) SetChild()")
 }

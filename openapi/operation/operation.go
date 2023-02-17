@@ -1,7 +1,7 @@
 package operation
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi/errors"
+	"github.com/sasswart/gin-in-a-can/errors"
 	"github.com/sasswart/gin-in-a-can/openapi/parameter"
 	"github.com/sasswart/gin-in-a-can/openapi/request_body"
 	"github.com/sasswart/gin-in-a-can/openapi/response"
@@ -26,6 +26,11 @@ type Operation struct {
 	ExternalDocs root.ExternalDocs
 }
 
+func (o *Operation) GetOutputFile() string {
+	errors.Unimplemented("(o *Operation) GetOutputFile()")
+	return ""
+}
+
 func (o *Operation) getRef() string {
 	return ""
 }
@@ -37,9 +42,9 @@ func (o *Operation) getChildren() map[string]tree.NodeTraverser {
 	}
 	// Parameters
 	for i := range o.Parameters {
-		parameter := o.Parameters[i]
+		p := o.Parameters[i]
 		paramIndex := strconv.Itoa(i)
-		children[paramIndex] = &parameter
+		children[paramIndex] = &p
 	}
 
 	// Request Body
@@ -48,8 +53,8 @@ func (o *Operation) getChildren() map[string]tree.NodeTraverser {
 
 	// Response
 	for name := range o.Responses {
-		response := o.Responses[name]
-		children[name] = response
+		r := o.Responses[name]
+		children[name] = r
 	}
 	return children
 }
@@ -58,18 +63,15 @@ func (o *Operation) setChild(i string, child tree.NodeTraverser) {
 	switch child.(type) {
 	case *parameter.Parameter:
 		j, _ := strconv.Atoi(i)
-		param, _ := child.(*parameter.Parameter)
-		o.Parameters[j] = *param
+		o.Parameters[j] = *child.(*parameter.Parameter)
 		return
 	case *request_body.RequestBody:
-		requestBody, _ := child.(*request_body.RequestBody)
-		o.RequestBody = *requestBody
+		o.RequestBody = *child.(*request_body.RequestBody)
 		return
 	case *response.Response:
-		response, _ := child.(*response.Response)
-		o.Responses[i] = response
+		child.Responses[i] = child.(*response.Response)
 		return
 	default:
-		panic("(o *Root) setChild(): " + errors.ErrCastFail)
+		errors.CastFail("(o *Operation) setChild", "NodeTraverser", "undefined (default case)")
 	}
 }

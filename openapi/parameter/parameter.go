@@ -1,7 +1,7 @@
 package parameter
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi/errors"
+	"github.com/sasswart/gin-in-a-can/errors"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/tree"
 )
@@ -45,7 +45,7 @@ func (p *Parameter) GetName() string {
 func (p *Parameter) setChild(_ string, t tree.NodeTraverser) {
 	s, ok := t.(*schema.Schema)
 	if !ok {
-		panic("(p *Parameter) setChild(): " + errors.ErrCastFail)
+		errors.CastFail("(p *Parameter) setChild()", "NodeTraverser", "*schema.Schema")
 	}
 	p.Schema = s
 }

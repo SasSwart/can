@@ -1,6 +1,7 @@
 package render
 
 import (
+	"github.com/sasswart/gin-in-a-can/errors"
 	"github.com/sasswart/gin-in-a-can/openapi/root"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/tree"
@@ -14,8 +15,12 @@ var _ Renderer = GinRenderer{}
 
 type GinRenderer struct{}
 
-func (g GinRenderer) SanitiseType(s *tree.Node) string {
+func (g GinRenderer) SanitiseType(n tree.NodeTraverser) string {
 	// TODO This needs to be specific to the *Schema without needing the package imported
+	s, ok := n.(*schema.Schema)
+	if !ok {
+		errors.CastFail("(g GinRenderer) SanitiseType(s *tree.Node)", "*Node", "*schema.Schema")
+	}
 	switch s.Type {
 	case "boolean":
 		return "bool"
@@ -75,7 +80,7 @@ func (g GinRenderer) SanitiseName(s string) string {
 	return strings.Join(nameSegments, "")
 }
 
-func (g GinRenderer) GetOutputFile(t tree.Node) string {
+func (g GinRenderer) GetOutputFile(t tree.NodeTraverser) string {
 	var dir string
 	switch t.(type) {
 	case *root.Root:
@@ -86,24 +91,8 @@ func (g GinRenderer) GetOutputFile(t tree.Node) string {
 	name := t.GetName()
 	return filepath.Join(dir, name+".go")
 }
-func (g GinRenderer) SetRenderer(n *tree.Node) {
-	if n.GetParent() == nil {
-		n.renderer = r
-		return
-	}
-	if g.GetRenderer(n.GetParent()) == nil {
-		n.GetParent().SetRenderer(r)
-	}
-}
 
-func (g GinRenderer) GetRenderer(n *tree.Node) Renderer {
-	if n.GetParent() == nil {
-		return canRenderer
-	}
-	return g.GetRenderer(n.GetParent())
-}
-
-func (g GinRenderer) GetOutputFile(n *tree.Node) string {
-	// TODO this function can do without it's overrides
-	return n.GetRenderer().GetOutputFile(n)
-}
+//func (g GinRenderer) GetOutputFile(n *tree.Node) string {
+//	// TODO this function can do without it's overrides
+//	return n.GetRenderer().GetOutputFile(n)
+//}

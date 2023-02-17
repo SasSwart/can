@@ -1,7 +1,7 @@
 package request_body
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi/errors"
+	"github.com/sasswart/gin-in-a-can/errors"
 	"github.com/sasswart/gin-in-a-can/openapi/media_type"
 	"github.com/sasswart/gin-in-a-can/tree"
 )
@@ -15,6 +15,11 @@ type RequestBody struct {
 	Description string
 	Content     map[string]*media_type.MediaType
 	Required    bool
+}
+
+func (r *RequestBody) GetOutputFile() string {
+	errors.Unimplemented("(r *RequestBody) GetOutputFile()")
+	return ""
 }
 
 func (r *RequestBody) GetName() string {
@@ -40,5 +45,5 @@ func (r *RequestBody) SetChild(i string, t tree.NodeTraverser) {
 		r.Content[i] = content
 		return
 	}
-	panic("(r *RequestBody) setChild(): " + errors.ErrCastFail)
+	errors.CastFail("(r *RequestBody) setChild()", "NodeTraverser", "*media_type.MediaType")
 }

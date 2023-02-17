@@ -1,7 +1,7 @@
 package schema
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi/errors"
+	"github.com/sasswart/gin-in-a-can/errors"
 	"github.com/sasswart/gin-in-a-can/render"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"path/filepath"
@@ -25,9 +25,14 @@ type Schema struct {
 	Required             []string
 }
 
+func (s *Schema) GetOutputFile() string {
+	errors.Unimplemented("(s *Schema) GetOutputFile()")
+	return ""
+}
+
 func (s *Schema) GetRenderer() render.Renderer {
-	//TODO implement me
-	panic("implement me")
+	errors.Unimplemented("(s *Schema) GetRenderer()")
+	return nil
 }
 
 func (s *Schema) GetType() string {
@@ -57,7 +62,7 @@ func (s *Schema) SetChild(i string, t tree.NodeTraverser) {
 		}
 		return
 	}
-	panic("(s *Schema) setChild(): " + errors.ErrCastFail)
+	errors.CastFail("(s *Schema) SetChild()", "NodeTraverser", "*schema.Schema")
 }
 
 func (s *Schema) GetBasePath() string {

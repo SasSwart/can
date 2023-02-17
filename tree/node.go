@@ -2,7 +2,7 @@ package tree
 
 import (
 	"fmt"
-	"github.com/sasswart/gin-in-a-can/openapi/errors"
+	"github.com/sasswart/gin-in-a-can/errors"
 	"github.com/sasswart/gin-in-a-can/render"
 
 	// TODO tree package shouldn't have to know about the root
@@ -68,11 +68,12 @@ func (n *Node) GetMetadata() map[string]string {
 }
 
 func (n *Node) GetChildren() map[string]NodeTraverser {
-	panic("(n *Node) GetChildren():" + errors.ErrNotImplemented)
+	errors.Unimplemented("(n *Node) GetChildren()")
+	return nil
 }
 
 func (n *Node) SetChild(_ string, _ NodeTraverser) {
-	panic("(n *Node) SetChild():" + errors.ErrNotImplemented)
+	errors.Unimplemented("(n *Node) SetChild()")
 }
 
 func (n *Node) GetParent() NodeTraverser {
@@ -97,7 +98,7 @@ func (n *Node) GetBasePath() string {
 //}
 
 func (n *Node) GetRef() string {
-	panic("(n *Node) GetRef():" + errors.ErrNotImplemented)
+	errors.Unimplemented("(n *Node) GetRef()")
 	return ""
 }
 
@@ -148,7 +149,7 @@ func Traverse[T NodeTraverser](node T, f TraversalFunc) (T, error) {
 
 	result, err := f("", nil, node)
 	if err != nil {
-		return node, fmt.Errorf("traversal function[%#v] error: %w", f, err)
+		return node, fmt.Errorf("traversal function[%p] error: %w", f, err)
 	}
 
 	node, ok := result.(T)
