@@ -18,10 +18,10 @@ type Config struct {
 	ConfigFilePath    string
 }
 type Renderer interface {
-	sanitiseName(string) string
-	sanitiseType(n tree.NodeTraverser) string
+	SanitiseName(string) string
+	SanitiseType(n tree.NodeTraverser) string
 
-	getOutputFile(n tree.NodeTraverser) string
+	GetOutputFile(n tree.NodeTraverser) string
 	//getName(n tree.NodeTraverser) string
 }
 

@@ -13,7 +13,7 @@ var _ Renderer = GinRenderer{}
 
 type GinRenderer struct{}
 
-func (g GinRenderer) sanitiseType(n tree.NodeTraverser) string {
+func (g GinRenderer) SanitiseType(n tree.NodeTraverser) string {
 	// TODO This needs to be specific to the *Schema without needing the package imported
 	s, ok := n.(*schema.Schema)
 	if !ok {
@@ -33,7 +33,8 @@ func (g GinRenderer) sanitiseType(n tree.NodeTraverser) string {
 	}
 }
 
-func (g GinRenderer) sanitiseName(s string) string {
+func (g GinRenderer) SanitiseName(s string) string {
+
 	caser := cases.Title(language.English)
 
 	// Replace - with "" (- is not allowed in go func names)
@@ -77,10 +78,10 @@ func (g GinRenderer) sanitiseName(s string) string {
 
 	return strings.Join(nameSegments, "")
 }
-func (g GinRenderer) getOutputFile(n tree.NodeTraverser) string {
+func (g GinRenderer) GetOutputFile(n tree.NodeTraverser) string {
 	switch n.(type) {
 	case *schema.Schema:
-		return g.sanitiseName("models/") + n.GetName()
+		return g.SanitiseName("models/") + n.GetName()
 	//case *root.Root:
 	//	return n.GetName() + ".go"
 	//case *media.Type:
@@ -96,6 +97,6 @@ func (g GinRenderer) getOutputFile(n tree.NodeTraverser) string {
 	//case *response.Response:
 	//	return n.GetName() + ".go"
 	default:
-		return g.sanitiseName(n.GetName()) + ".go"
+		return g.SanitiseName(n.GetName()) + ".go"
 	}
 }
