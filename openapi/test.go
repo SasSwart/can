@@ -20,7 +20,8 @@ const testGinRenderedPathItemName = "ValidationFixtureEndpoint"
 const testGinRenderedResponseName = "ValidationFixtureEndpointPost201Response"
 const testGinRenderedMediaItemName = "ValidationFixtureEndpointPostRequestBody"
 const testGinRenderedOpenAPIName = "ValidationFixture"
-const Debug = false
+
+var DEBUG = false
 
 var testAbsOpenAPI, _ = filepath.Abs(testOpenapiFile)
 

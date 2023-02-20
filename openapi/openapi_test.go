@@ -117,7 +117,7 @@ func TestOpenAPI_ResolveRefs(t *testing.T) {
 
 func TestOpenAPI_SetMetadata(t *testing.T) {
 	apiSpec, _ := LoadOpenAPI(testAbsOpenAPI)
-	data := map[string]string{"this": "is", "some": "metadata"}
+	data := Metadata{"this": "is", "some": "metadata"}
 	traversable := Dig(apiSpec, testEndpoint, testMethod, testReqBody, testMediaType, testSchema, "name")
 
 	traversable.SetMetadata(data)

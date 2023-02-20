@@ -19,7 +19,6 @@ type OpenAPI struct {
 	Servers    []Server
 	Paths      map[string]*PathItem
 	Components Components
-	metadata   map[string]string
 }
 
 func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {

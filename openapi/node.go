@@ -2,6 +2,7 @@ package openapi
 
 import "fmt"
 
+type Metadata map[string]string
 type Traversable interface {
 	// Tree Traversable
 	getChildren() map[string]Traversable
@@ -17,8 +18,8 @@ type Traversable interface {
 	setRenderer(r Renderer)
 	getRenderer() Renderer
 	GetOutputFile() string
-	GetMetadata() map[string]string
-	SetMetadata(metadata map[string]string)
+	GetMetadata() Metadata
+	SetMetadata(metadata Metadata)
 }
 
 type TraversalFunc func(key string, parent, child Traversable) (Traversable, error)
@@ -28,6 +29,7 @@ type node struct {
 	parent   Traversable
 	name     string
 	renderer Renderer
+	metadata Metadata
 }
 
 const (
@@ -35,25 +37,22 @@ const (
 	errCastFail       = " cast failed"
 )
 
-func (n *node) SetMetadata(metadata map[string]string) {
-	if n.parent.GetParent() == nil {
-		root, ok := n.GetParent().(*OpenAPI)
-		if ok {
-			root.metadata = metadata
-			return
-		}
-		panic("we should never get here as *OpenAPI should always be at the top of the tree")
+func (n *node) SetMetadata(metadata Metadata) {
+	if n.GetParent() == nil {
+		n.metadata = metadata
+		return
 	}
-	n.parent.SetMetadata(metadata)
+	n.GetParent().SetMetadata(metadata)
+
 }
 
 var _ Traversable = &node{}
 
-func (n *node) GetMetadata() map[string]string {
-	if root, ok := n.parent.(*OpenAPI); ok {
-		return root.metadata
+func (n *node) GetMetadata() Metadata {
+	if n.GetParent() == nil {
+		return n.metadata
 	}
-	return n.parent.GetMetadata()
+	return n.GetParent().GetMetadata()
 }
 
 func (n *node) getChildren() map[string]Traversable {
