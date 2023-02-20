@@ -4,9 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"github.com/sasswart/gin-in-a-can/config"
+	"github.com/sasswart/gin-in-a-can/openapi"
 	"github.com/sasswart/gin-in-a-can/openapi/operation"
 	"github.com/sasswart/gin-in-a-can/openapi/path"
-	"github.com/sasswart/gin-in-a-can/openapi/root"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/render"
 	"github.com/sasswart/gin-in-a-can/tree"
@@ -26,7 +26,7 @@ func main() {
 	}
 
 	fmt.Printf("Reading API specification from \"%s\"\n", absoluteOpenAPIFile(c))
-	apiSpec, err := root.LoadAPISpec(
+	apiSpec, err := openapi.LoadAPISpec(
 		absoluteOpenAPIFile(c),
 	)
 	if err != nil {
@@ -56,7 +56,7 @@ func buildRenderNode() tree.TraversalFunc {
 	return func(key string, parent, node tree.NodeTraverser) (tree.NodeTraverser, error) {
 		var templateFile string
 		switch node.(type) {
-		case *root.Root:
+		case *openapi.OpenAPI:
 			templateFile = "openapi.tmpl"
 		case *path.Item:
 			templateFile = "path_item.tmpl"
@@ -122,7 +122,7 @@ func loadConfig() (config.Config, error) {
 }
 
 // absoluteOpenAPIFile uses the current working directory, resolved config file and the openAPI file that was specified
-// in the config file to determine the absolute path to and Root file. It takes into account that any of these,
+// in the config file to determine the absolute path to and OpenAPI file. It takes into account that any of these,
 // except the working directory could be relative.
 func absoluteOpenAPIFile(config config.Config) string {
 	var absoluteOpenAPIFile string

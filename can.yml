@@ -3,5 +3,5 @@ generator:
   moduleName: github.com/sasswart/gin-in-a-can/cmd/test_api
   basePackageName: api
 openAPI:
-  openAPIFile: ./root/fixtures/validation_no_refs.yaml
+  openAPIFile: ./openapi/test/fixtures/validation_no_refs.yaml
 outputPath: .

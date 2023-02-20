@@ -1,14 +1,14 @@
 package request_test
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi/root"
+	"github.com/sasswart/gin-in-a-can/openapi"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/openapi/test"
 	"testing"
 )
 
 func TestOpenAPI_LoadsRequestBodyValidation(t *testing.T) {
-	apiSpec, err := root.LoadAPISpec(test.AbsOpenAPI)
+	apiSpec, err := openapi.LoadAPISpec(test.AbsOpenAPI)
 	if err != nil {
 		t.Fail()
 	}

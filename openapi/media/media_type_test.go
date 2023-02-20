@@ -1,7 +1,7 @@
 package media_test
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi/root"
+	"github.com/sasswart/gin-in-a-can/openapi"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/openapi/test"
 	"github.com/sasswart/gin-in-a-can/tree"
@@ -10,7 +10,7 @@ import (
 )
 
 func TestOpenAPI_MediaType_GetName(t *testing.T) {
-	apiSpec, _ := root.LoadAPISpec(test.AbsOpenAPI)
+	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
 	//_ = root.SetRenderer(apiSpec, render.GinRenderer{})
 	mt := test.Dig(apiSpec, test.Endpoint, test.Method, test.ReqBody, test.MediaType)
 	name := mt.GetName()
@@ -20,7 +20,7 @@ func TestOpenAPI_MediaType_GetName(t *testing.T) {
 }
 
 func TestOpenAPI_MediaType_GetChildren(t *testing.T) {
-	apiSpec, _ := root.LoadAPISpec(test.AbsOpenAPI)
+	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
 	mt := test.Dig(apiSpec, test.Endpoint, test.Method, test.ReqBody, test.MediaType)
 	children := mt.GetChildren()
 	for model, s := range children {
@@ -38,7 +38,7 @@ func TestOpenAPI_MediaType_GetChildren(t *testing.T) {
 }
 
 func TestOpenAPI_MediaType_SetChild(t *testing.T) {
-	apiSpec, _ := root.LoadAPISpec(test.AbsOpenAPI)
+	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
 	mt := test.Dig(apiSpec, test.Endpoint, test.Method, test.ReqBody, test.MediaType)
 	s, _ := test.Dig(mt, test.Schema).(*schema.Schema)
 	sOld := *s

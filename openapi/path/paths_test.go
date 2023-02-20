@@ -1,24 +1,25 @@
 package path_test
 
 import (
+	"github.com/sasswart/gin-in-a-can/openapi"
 	"github.com/sasswart/gin-in-a-can/openapi/operation"
 	"github.com/sasswart/gin-in-a-can/openapi/path"
-	"github.com/sasswart/gin-in-a-can/openapi/root"
 	"github.com/sasswart/gin-in-a-can/openapi/test"
+	"github.com/sasswart/gin-in-a-can/render"
 	"testing"
 )
 
 func TestOpenAPI_PathItem_GetName(t *testing.T) {
-	apiSpec, _ := root.LoadAPISpec(test.AbsOpenAPI)
-	//_ = root.SetRenderer(apiSpec, render.GinRenderer{})
-	path := test.Dig(apiSpec, test.Endpoint)
-	if path.GetName() != test.GinRenderedPathItemName {
-		t.Errorf("got %v, expected %v", path.GetName(), test.GinRenderedPathItemName)
+	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
+	_ = render.Engine{}.New(render.GinRenderer{}, render.Config{})
+	p := test.Dig(apiSpec, test.Endpoint)
+	if p.GetName() != test.GinRenderedPathItemName {
+		t.Errorf("got %v, expected %v", p.GetName(), test.GinRenderedPathItemName)
 	}
 }
 
 func TestOpenAPI_PathItem_Operations(t *testing.T) {
-	apiSpec, _ := root.LoadAPISpec(test.AbsOpenAPI)
+	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
 	for _, v := range apiSpec.GetChildren() {
 		p := v.(*path.Item)
 		for method, op := range p.Operations() {
@@ -38,34 +39,22 @@ func TestOpenAPI_PathItem_Operations(t *testing.T) {
 
 }
 
-func TestOpenAPI_PathItem_SetRenderer(t *testing.T) {
-	//apiSpec, _ := root.LoadAPISpec(test.AbsOpenAPI)
-	//for _, path := range apiSpec.GetChildren() {
-	//	want := render.GinRenderer{}
-	//	path.SetRenderer(want)
-	//	got := path.GetRenderer()
-	//	if !reflect.DeepEqual(got, want) {
-	//		t.Errorf("SetRenderer(GinRenderer{}) was unsuccessful")
-	//	}
-	//}
-}
-
 func TestOpenAPI_PathItem_GetBasePath(t *testing.T) {
-	apiSpec, _ := root.LoadAPISpec(test.AbsOpenAPI)
-	for _, path := range apiSpec.GetChildren() {
-		if path.GetBasePath() != test.BasePath {
-			t.Errorf("got %v, expected %v", path.GetBasePath(), test.BasePath)
+	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
+	for _, p := range apiSpec.GetChildren() {
+		if p.GetBasePath() != test.BasePath {
+			t.Errorf("got %v, expected %v", p.GetBasePath(), test.BasePath)
 		}
 	}
 }
 
 func TestOpenAPI_PathItem_GetParent(t *testing.T) {
-	apiSpec, _ := root.LoadAPISpec(test.AbsOpenAPI)
-	for _, path := range apiSpec.GetChildren() {
-		parent := path.GetParent()
-		_, ok := parent.(*root.Root)
+	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
+	for _, p := range apiSpec.GetChildren() {
+		parent := p.GetParent()
+		_, ok := parent.(*openapi.OpenAPI)
 		if !ok {
-			t.Errorf("PathItem.GetParent() did not return an Root type")
+			t.Errorf("PathItem.GetParent() did not return an OpenAPI type")
 		}
 	}
 }

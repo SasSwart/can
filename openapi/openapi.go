@@ -1,4 +1,4 @@
-package root
+package openapi
 
 import (
 	"fmt"
@@ -21,21 +21,21 @@ type ExternalDocs struct {
 	Url         string `yaml:"url"`
 }
 
-// Root is a programmatic representation of the OpenApi Document object defined here: https://swagger.io/specification/#openapi-object
-type Root struct {
+// OpenAPI is a programmatic representation of the OpenApi Document object defined here: https://swagger.io/specification/#openapi-object
+type OpenAPI struct {
 	tree.Node
-	OpenAPI    string `yaml:"openapi"`
+	OpenAPI    string `yaml:"openapi"` // TODO it's unclear what this refers to
 	Info       info.Info
 	Servers    []servers.Server
 	Paths      map[string]*path.Item
 	Components components.Components
 }
 
-func (o *Root) GetRef() string {
+func (o *OpenAPI) GetRef() string {
 	return ""
 }
 
-func (o *Root) getChildren() map[string]tree.NodeTraverser {
+func (o *OpenAPI) getChildren() map[string]tree.NodeTraverser {
 	traversables := map[string]tree.NodeTraverser{}
 	for s := range o.Paths {
 		p := o.Paths[s]
@@ -44,21 +44,21 @@ func (o *Root) getChildren() map[string]tree.NodeTraverser {
 	return traversables
 }
 
-func (o *Root) setChild(i string, child tree.NodeTraverser) {
+func (o *OpenAPI) setChild(i string, child tree.NodeTraverser) {
 	if c, ok := child.(*path.Item); ok {
 		o.Paths[i] = c
 		return
 	}
-	errors.CastFail("(o *Root) setChild", "NodeTraverser", "*schema.Schema")
+	errors.CastFail("(o *OpenAPI) setChild", "NodeTraverser", "*schema.Schema")
 }
 
-func LoadAPISpec(openAPIFile string) (*Root, error) {
+func LoadAPISpec(openAPIFile string) (*OpenAPI, error) {
 	// skeleton
 	absPath, err := filepath.Abs(openAPIFile)
 	if err != nil {
 		return nil, err
 	}
-	api := Root{
+	api := OpenAPI{
 		Node: tree.Node{},
 		Components: components.Components{
 			Schemas: nil,
@@ -94,7 +94,7 @@ func LoadAPISpec(openAPIFile string) (*Root, error) {
 // ResolveRefs calls readRef on references with the ref path modified appropriately for it's use
 func ResolveRefs(key string, parent, node tree.NodeTraverser) (tree.NodeTraverser, error) {
 	node.SetParent(parent)
-	if _, ok := node.(*Root); !ok {
+	if _, ok := node.(*OpenAPI); !ok {
 		node.SetName(key) // Don't set the root name as that's already been done by this point
 	}
 	nodeRef := node.GetRef()

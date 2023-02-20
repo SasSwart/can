@@ -1,8 +1,8 @@
-package root_test
+package openapi_test
 
 import (
+	"github.com/sasswart/gin-in-a-can/openapi"
 	"github.com/sasswart/gin-in-a-can/openapi/path"
-	"github.com/sasswart/gin-in-a-can/openapi/root"
 	"github.com/sasswart/gin-in-a-can/openapi/test"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"os"
@@ -14,7 +14,7 @@ import (
 )
 
 func TestOpenAPI_LoadOpenAPI(t *testing.T) {
-	apiSpec, err := root.LoadAPISpec(test.AbsOpenAPI)
+	apiSpec, err := openapi.LoadAPISpec(test.AbsOpenAPI)
 	if err != nil {
 		t.Errorf("could not load file %s:%s", test.OpenapiFile, err.Error())
 	}
@@ -36,7 +36,7 @@ func TestOpenAPI_SetRenderer(t *testing.T) {
 }
 
 func TestOpenAPI_GetBasePath(t *testing.T) {
-	apiSpec, _ := root.LoadAPISpec(test.AbsOpenAPI)
+	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
 	wanted := filepath.Dir(test.AbsOpenAPI)
 	if apiSpec.GetBasePath() != wanted {
 		t.Errorf("could not get basePath %s, got %s", wanted, apiSpec.GetBasePath())
@@ -44,7 +44,7 @@ func TestOpenAPI_GetBasePath(t *testing.T) {
 }
 
 func TestOpenAPI_GetParent(t *testing.T) {
-	apiSpec, _ := root.LoadAPISpec(test.AbsOpenAPI)
+	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
 	p := apiSpec.GetParent()
 	if p != nil {
 		t.Errorf("the root openapi file found a parent: %v", p)
@@ -52,7 +52,7 @@ func TestOpenAPI_GetParent(t *testing.T) {
 }
 
 func TestGetOpenAPI_GetChildren(t *testing.T) {
-	apiSpec, _ := root.LoadAPISpec(test.AbsOpenAPI)
+	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
 	paths := apiSpec.GetChildren()
 	if len(paths) == 0 {
 		t.Errorf("error occured or test yaml file has no paths to get")
@@ -68,7 +68,7 @@ func TestGetOpenAPI_GetChildren(t *testing.T) {
 }
 
 func TestOpenAPI_SetChild(t *testing.T) {
-	apiSpec, _ := root.LoadAPISpec(test.AbsOpenAPI)
+	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
 	pathKey := "new"
 	want := path.Item{
 		Description: "new path item",
@@ -90,7 +90,7 @@ func TestOpenAPI_SetChild(t *testing.T) {
 }
 
 func TestOpenAPI_GetName(t *testing.T) {
-	apiSpec, _ := root.LoadAPISpec(test.AbsOpenAPI)
+	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
 	//_ = SetRenderer(apiSpec, render.GinRenderer{})
 	name := apiSpec.GetName()
 	if name != test.GinRenderedOpenAPIName {
@@ -99,7 +99,7 @@ func TestOpenAPI_GetName(t *testing.T) {
 }
 
 func TestOpenAPI_ResolveRefs(t *testing.T) {
-	apiSpec := root.Root{
+	apiSpec := openapi.OpenAPI{
 		Node: tree.Node{
 			//basePath: filepath.Dir(test.AbsOpenAPI),
 		},
@@ -109,7 +109,7 @@ func TestOpenAPI_ResolveRefs(t *testing.T) {
 	content, _ := os.ReadFile(test.AbsOpenAPI)
 	_ = yaml.Unmarshal(content, &apiSpec)
 
-	newApi, err := tree.Traverse(&apiSpec, root.ResolveRefs)
+	newApi, err := tree.Traverse(&apiSpec, openapi.ResolveRefs)
 
 	if err != nil {
 		t.Errorf(err.Error()) // just bubbling up is enough here
@@ -127,7 +127,7 @@ func TestOpenAPI_readRef(t *testing.T) {
 }
 
 func TestOpenAPI_SetMetadata(t *testing.T) {
-	apiSpec, _ := root.LoadAPISpec(test.AbsOpenAPI)
+	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
 	data := map[string]string{"this": "is", "some": "metadata"}
 	traversable := test.Dig(apiSpec, test.Endpoint, test.Method, test.ReqBody, test.MediaType, test.Schema, "name")
 
