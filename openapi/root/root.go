@@ -7,13 +7,13 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/info"
 	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/openapi/servers"
-	"github.com/sasswart/gin-in-a-can/openapi/test"
-
 	"github.com/sasswart/gin-in-a-can/tree"
 	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
 )
+
+var DEBUG bool
 
 // ExternalDocs is a programmatic representation of the External Docs object defined here: https://swagger.io/specification/#external-documentation-object
 type ExternalDocs struct {
@@ -29,22 +29,7 @@ type Root struct {
 	Servers    []servers.Server
 	Paths      map[string]*path.Item
 	Components components.Components
-	metadata   map[string]string
 }
-
-//func SetRenderer(api *Root, renderer render.Renderer) error {
-//	// TODO move this to render package, asserting type where needed, to avoid import cycles
-//	_, err := tree.Traverse(api, func(_ string, _, child tree.NodeTraverser) (tree.NodeTraverser, error) {
-//		child.SetRenderer(renderer)
-//		parent := child.GetParent()
-//		if parent != nil {
-//			parent.SetRenderer(renderer)
-//		}
-//
-//		return child, nil
-//	})
-//	return err
-//}
 
 func (o *Root) GetRef() string {
 	return ""
@@ -53,8 +38,8 @@ func (o *Root) GetRef() string {
 func (o *Root) getChildren() map[string]tree.NodeTraverser {
 	traversables := map[string]tree.NodeTraverser{}
 	for s := range o.Paths {
-		path := o.Paths[s]
-		traversables[s] = path
+		p := o.Paths[s]
+		traversables[s] = p
 	}
 	return traversables
 }
@@ -127,7 +112,7 @@ func ResolveRefs(key string, parent, node tree.NodeTraverser) (tree.NodeTraverse
 // ReadRef takes a reference and attempts to unmarshal it's content into the struct being passed as `i`.
 // As it happens, this ref is contained within the struct that is being unmarshalled into.
 func readRef(absFilename string, n tree.NodeTraverser) error {
-	if test.Debug { // this can be a particularly noisy Printf call
+	if DEBUG { // this can be a particularly noisy Printf call
 		fmt.Printf("Reading reference: %s\n", absFilename)
 	}
 	content, err := os.ReadFile(absFilename)

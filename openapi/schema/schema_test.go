@@ -8,76 +8,54 @@ import (
 	"testing"
 )
 
-func emptySchemaWith(childProperties, childItems, parent bool) *schema.Schema {
-	properties := map[string]*schema.Schema{
+func (s *Schema) withProperties() *Schema {
+	s.Properties = map[string]*Schema{
 		"renderable":        {},
 		"anotherRenderable": {},
 	}
-	item := &schema.Schema{}
-	p := &media.Type{ // PARENT
-		Node: tree.Node{},
-		Schema: &schema.Schema{
-			Node: tree.Node{
-				Name: "parentModel",
+	return s
+}
+
+func (s *Schema) withItems() *Schema {
+	s.Items = &Schema{}
+	return s
+}
+
+func (s *Schema) withParent() *Schema {
+	s.parent = &MediaType{
+		node: node{},
+		name: "parentName",
+		Schema: &Schema{
+			node: node{
+				parent: &MediaType{},
+				name:   "parentModel",
 			},
 			Type: "string",
 		},
 	}
-	p.Schema.Node.SetParent(&media.Type{})
-	mainNode := tree.Node{
-		Name: "mainModel",
-	}
-	mainNode.SetParent(p)
-	switch {
-	case parent && !childProperties && !childItems:
-		return &schema.Schema{ // BASE SCHEMA
-			Node: mainNode,
-			Type: "string",
-		}
-	case !parent && childProperties && !childItems:
-		return &schema.Schema{ // BASE SCHEMA
-			Node:       mainNode,
-			Type:       "string",
-			Properties: properties, // CHILD POINT
-		}
-	case !parent && !childProperties && childItems:
-		return &schema.Schema{ // BASE SCHEMA
-			Node:  mainNode,
-			Type:  "string",
-			Items: item, // CHILD POINT
-		}
-	case !parent && childProperties && childItems:
-
-		return &schema.Schema{ // BASE SCHEMA
-			Node:       mainNode,
-			Type:       "string",
-			Properties: properties, // CHILD POINT
-			Items:      item,       // CHILD POINT
-		}
-	}
-	return &schema.Schema{}
+	return s
 }
 
 func TestOpenAPI_Schema_getChildren(t *testing.T) {
 	// Sanity Check
-	schemaWithChildren := emptySchemaWith(false, false, false)
-	shouldBeEmpty := schemaWithChildren.GetChildren()
-	s := &schema.Schema{}
-	if !reflect.DeepEqual(shouldBeEmpty, s.GetChildren()) {
+	schema := new(Schema)
+	shouldBeEmpty := schema.getChildren()
+	s := &Schema{}
+	if !reflect.DeepEqual(shouldBeEmpty, s.getChildren()) {
 		t.Error("shouldBeEmpty is not empty")
 	}
-	schemaWithChildren = emptySchemaWith(true, true, false)
-	shouldBePropAndItemChildren := schemaWithChildren.GetChildren()
-	if shouldBePropAndItemChildren == nil {
-		t.Error("shouldBePropAndItemChildren is nil")
+	schemaWithChildren := new(Schema).withProperties().withItems()
+	shouldBePropAndItems := schemaWithChildren.getChildren()
+	if shouldBePropAndItems == nil {
+		t.Error("shouldBePropAndItems is nil")
 	}
-	schemaWithChildren = emptySchemaWith(false, true, false)
-	shouldBeItemChildren := schemaWithChildren.GetChildren()
+	schemaWithChildren = new(Schema).withItems()
+	shouldBeItemChildren := schemaWithChildren.getChildren()
 	if shouldBeItemChildren == nil {
 		t.Error("shouldBeItemChildren is nil")
 	}
-	schemaWithChildren = emptySchemaWith(true, false, false)
-	shouldBePropChildren := schemaWithChildren.GetChildren()
+	schemaWithChildren = new(Schema).withProperties()
+	shouldBePropChildren := schemaWithChildren.getChildren()
 	if shouldBePropChildren == nil {
 		t.Error("shouldBePropChildren is nil")
 	}

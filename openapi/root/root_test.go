@@ -70,19 +70,19 @@ func TestGetOpenAPI_GetChildren(t *testing.T) {
 func TestOpenAPI_SetChild(t *testing.T) {
 	apiSpec, _ := root.LoadAPISpec(test.AbsOpenAPI)
 	pathKey := "new"
-	p := path.Item{
+	want := path.Item{
 		Description: "new path item",
 	}
-	apiSpec.SetChild(pathKey, &p)
+	apiSpec.SetChild(pathKey, &want)
 
-	paths := apiSpec.GetChildren()
-	for k, v := range paths {
+	got := apiSpec.GetChildren()
+	for k, v := range got {
 		if k == pathKey {
-			path, ok := v.(*path.Item) // test that it's a *PathItem
+			p, ok := v.(*path.Item) // test that it's a *PathItem
 			if !ok {
 				t.Errorf("Non-valid pathItem found")
 			}
-			if !reflect.DeepEqual(*path, p) {
+			if !reflect.DeepEqual(*p, want) {
 				t.Errorf("path item set is not equivalent to path item retrieved")
 			}
 		}

@@ -12,7 +12,6 @@ import (
 const Endpoint = "/endpoint"
 const Method = "post"
 const ReqBody = "RequestBody"
-const EmptyParamName = "Param"
 const MediaType = "application/json"
 const OpenapiFile = "fixtures/validation.yaml"
 const Schema = "Model" // the Dig() key used to access any schema held within a MediaType
@@ -21,7 +20,6 @@ const GinRenderedPathItemName = "ValidationFixtureEndpoint"
 const GinRenderedResponseName = "ValidationFixtureEndpointPost201Response"
 const GinRenderedMediaItemName = "ValidationFixtureEndpointPostRequestBody"
 const GinRenderedOpenAPIName = "ValidationFixture"
-const Debug = false
 
 var AbsOpenAPI, _ = filepath.Abs(OpenapiFile)
 
