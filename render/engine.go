@@ -38,45 +38,7 @@ func (e Engine) GetRenderer() Renderer {
 
 // Render contains the parsing and rendering steps
 func (e Engine) Render(node tree.NodeTraverser, templateFile string) ([]byte, error) {
-	var templateDirAbs string
-	switch true {
-	case filepath.IsAbs(e.config.Template.Directory):
-		templateDirAbs = filepath.Join(
-			e.config.Template.Directory,
-			e.config.Template.Name,
-		)
-		// TODO Render shouldn't have to know about the FilePath file path. This seems hacky
-	case filepath.IsAbs(e.config.FilePath):
-		templateDirAbs = filepath.Join(
-			filepath.Dir(e.config.FilePath),
-			e.config.Template.Directory,
-			e.config.Template.Name,
-		)
-	default:
-		templateDirAbs = filepath.Join(
-			e.config.FilePath,
-			filepath.Dir(e.config.FilePath),
-			e.config.Template.Directory,
-			e.config.Template.Name,
-		)
-	}
 
-	var outputFileAbs string
-	switch true {
-	case filepath.IsAbs(e.config.FilePath):
-		outputFileAbs = e.config.FilePath
-	case filepath.IsAbs(e.config.FilePath):
-		outputFileAbs = filepath.Join(
-			filepath.Dir(e.config.FilePath),
-			e.config.OutputPath,
-		)
-	default:
-		outputFileAbs = filepath.Join(
-			e.config.WorkingDirectory,
-			filepath.Dir(e.config.FilePath),
-			e.config.OutputPath,
-		)
-	}
 	outputFileAbs = filepath.Join(outputFileAbs, e.renderer.GetOutputFile(node))
 
 	buff := bytes.NewBuffer([]byte{})
