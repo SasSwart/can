@@ -71,7 +71,7 @@ func (e Engine) Render(node tree.NodeTraverser, templateFile string) ([]byte, er
 			e.config.OutputPath,
 		)
 	}
-	outputFileAbs = filepath.Join(outputFileAbs, e.renderer.getOutputFile(node))
+	outputFileAbs = filepath.Join(outputFileAbs, e.renderer.GetOutputFile(node))
 
 	buff := bytes.NewBuffer([]byte{})
 
@@ -89,7 +89,7 @@ func (e Engine) Render(node tree.NodeTraverser, templateFile string) ([]byte, er
 		return nil, err
 	}
 
-	fmt.Printf("Rendering %s using %s\n", e.renderer.getOutputFile(node), templateFile)
+	fmt.Printf("Rendering %s using %s\n", e.renderer.GetOutputFile(node), templateFile)
 
 	outputDirAbs := filepath.Dir(outputFileAbs)
 	if _, err := os.Stat(outputDirAbs); errors.Is(err, os.ErrNotExist) {

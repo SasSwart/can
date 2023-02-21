@@ -17,11 +17,6 @@ type Body struct {
 	Required    bool
 }
 
-func (r *Body) GetOutputFile() string {
-	errors.Unimplemented("(r *Body) GetOutputFile()")
-	return ""
-}
-
 func (r *Body) GetName() string {
 	name := r.GetParent().GetName() + r.Name
 	return name

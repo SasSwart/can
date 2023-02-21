@@ -2,8 +2,11 @@ package request_test
 
 import (
 	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/openapi/media"
+	"github.com/sasswart/gin-in-a-can/openapi/request"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/openapi/test"
+	"github.com/sasswart/gin-in-a-can/tree"
 	"testing"
 )
 
@@ -29,10 +32,10 @@ func TestOpenAPI_LoadsRequestBodyValidation(t *testing.T) {
 	}
 }
 
-func TestOpenAPI_RequestBody_setChild(t *testing.T) {
-	t.Errorf("TODO")
-}
-func TestOpenAPI_RequestBody_getChildren(t *testing.T) {
+func TestOpenAPI_RequestBody_GetAndSetChild(t *testing.T) {
+	rb := &request.Body{}
+	child := &media.Type{Node: tree.Node{Name: "MediaTypeTest"}}
+	rb.SetChild("1", child)
 	t.Errorf("TODO")
 }
 func TestOpenAPI_RequestBody_getName(t *testing.T) {

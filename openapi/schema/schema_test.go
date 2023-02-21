@@ -2,10 +2,49 @@ package schema_test
 
 import (
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
+	"github.com/sasswart/gin-in-a-can/tree"
 	"testing"
 )
 
-func TestOpenAPI_Schema_getChildren(t *testing.T) {
+func TestOpenAPI_Schema_SetAndGetChildren(t *testing.T) {
+	s := new(schema.Schema)
+	s.Items = new(schema.Schema)
+	s.Properties = make(map[string]*schema.Schema, 4)
+	s.Name = "Test Schema"
+	this := &schema.Schema{
+		Node: tree.Node{
+			Name: "schema item",
+		},
+	}
+	that := &schema.Schema{
+		Node: tree.Node{
+			Name: "that",
+		},
+	}
+	theOther := &schema.Schema{
+		Node: tree.Node{
+			Name: "theOther",
+		},
+	}
+	s.SetChild("item", this)
+	s.SetChild("that", that)
+	s.SetChild("theOther", theOther)
+	children := s.GetChildren()
+
+	// Check Item
+	if children["item"].(*schema.Schema) != this {
+		t.Fail()
+	}
+	// Check Properties
+	if children["that"].(*schema.Schema) != that {
+		t.Fail()
+	}
+	if children["theOther"].(*schema.Schema) != theOther {
+		t.Fail()
+	}
+}
+
+func TestOpenAPI_Schema_GetBasePath(t *testing.T) {
 	t.Errorf("TODO")
 }
 

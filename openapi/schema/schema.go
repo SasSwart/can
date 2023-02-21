@@ -29,12 +29,6 @@ func (s *Schema) GetOutputFile() string {
 	return ""
 }
 
-//func (s *Schema) GetType() string {
-//	renderer := s.GetRenderer()
-//	sanitisedType := renderer.SanitiseType(s)
-//	return sanitisedType
-//}
-
 func (s *Schema) GetChildren() map[string]tree.NodeTraverser {
 	children := map[string]tree.NodeTraverser{}
 	for name := range s.Properties {

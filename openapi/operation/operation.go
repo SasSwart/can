@@ -27,11 +27,11 @@ type Operation struct {
 	//ExternalDocs root.ExternalDocs
 }
 
-func (o *Operation) getRef() string {
+func (o *Operation) GetRef() string {
 	return ""
 }
 
-func (o *Operation) getChildren() map[string]tree.NodeTraverser {
+func (o *Operation) GetChildren() map[string]tree.NodeTraverser {
 	children := map[string]tree.NodeTraverser{}
 	if o == nil {
 		return children
@@ -55,7 +55,7 @@ func (o *Operation) getChildren() map[string]tree.NodeTraverser {
 	return children
 }
 
-func (o *Operation) setChild(i string, child tree.NodeTraverser) {
+func (o *Operation) SetChild(i string, child tree.NodeTraverser) {
 	switch child.(type) {
 	case *parameter.Parameter:
 		j, _ := strconv.Atoi(i)

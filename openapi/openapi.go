@@ -14,6 +14,7 @@ import (
 )
 
 var DEBUG bool
+var _ tree.NodeTraverser = &OpenAPI{}
 
 // ExternalDocs is a programmatic representation of the External Docs object defined here: https://swagger.io/specification/#external-documentation-object
 type ExternalDocs struct {
@@ -35,7 +36,7 @@ func (o *OpenAPI) GetRef() string {
 	return ""
 }
 
-func (o *OpenAPI) getChildren() map[string]tree.NodeTraverser {
+func (o *OpenAPI) GetChildren() map[string]tree.NodeTraverser {
 	traversables := map[string]tree.NodeTraverser{}
 	for s := range o.Paths {
 		p := o.Paths[s]
@@ -44,7 +45,7 @@ func (o *OpenAPI) getChildren() map[string]tree.NodeTraverser {
 	return traversables
 }
 
-func (o *OpenAPI) setChild(i string, child tree.NodeTraverser) {
+func (o *OpenAPI) SetChild(i string, child tree.NodeTraverser) {
 	if c, ok := child.(*path.Item); ok {
 		o.Paths[i] = c
 		return
@@ -79,7 +80,7 @@ func LoadAPISpec(openAPIFile string) (*OpenAPI, error) {
 		return nil, fmt.Errorf("yaml unmarshalling error: %w", err)
 	}
 
-	api.Name = api.Info.Title
+	api.SetName(api.Info.Title)
 
 	// Resolve references
 	newApi, err := tree.Traverse(&api, ResolveRefs)

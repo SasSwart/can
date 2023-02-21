@@ -5,13 +5,11 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/operation"
 	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/openapi/test"
-	"github.com/sasswart/gin-in-a-can/render"
 	"testing"
 )
 
 func TestOpenAPI_PathItem_GetName(t *testing.T) {
-	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
-	_ = render.Engine{}.New(render.GinRenderer{}, render.Config{})
+	apiSpec, _ := openapi.LoadAPISpec("../" + test.OpenapiFile)
 	p := test.Dig(apiSpec, test.Endpoint)
 	if p.GetName() != test.GinRenderedPathItemName {
 		t.Errorf("got %v, expected %v", p.GetName(), test.GinRenderedPathItemName)
