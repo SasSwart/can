@@ -40,8 +40,9 @@ func (n *Node) GetName() string {
 }
 
 func (n *Node) SetBasePath(path string) {
-	if n.GetParent() != nil {
+	if n.GetParent() == nil {
 		n.basePath = path
+		return
 	}
 	n.GetParent().SetBasePath(path)
 }

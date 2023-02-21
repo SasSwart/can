@@ -57,5 +57,5 @@ func Traverse[T NodeTraverser](node T, f TraversalFunc) (T, error) {
 		return node, fmt.Errorf("function parameter f should return the same type that is was given")
 	}
 
-	return TraverseRecursor(node, f)
+	return TraverseRecursor(node, f) // An error is being swallowed here
 }
