@@ -4,6 +4,11 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/sasswart/gin-in-a-can/config"
+	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/openapi/operation"
+	"github.com/sasswart/gin-in-a-can/openapi/path"
+	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"os"
 	"path/filepath"
@@ -11,18 +16,19 @@ import (
 )
 
 type EngineInterface interface {
-	New(renderer Renderer, config Config) *Engine
+	New(renderer Renderer, config config.Data) *Engine
 	GetRenderer() Renderer
 	Render(data tree.NodeTraverser, templateFile string) ([]byte, error)
+	BuildRenderNode() tree.TraversalFunc
 }
 type Engine struct {
 	renderer Renderer
-	config   Config
+	config   config.Data
 }
 
 var _ EngineInterface = Engine{}
 
-func (e Engine) New(renderer Renderer, config Config) *Engine {
+func (e Engine) New(renderer Renderer, config config.Data) *Engine {
 	return &Engine{renderer: renderer, config: config}
 }
 
@@ -34,40 +40,40 @@ func (e Engine) GetRenderer() Renderer {
 func (e Engine) Render(node tree.NodeTraverser, templateFile string) ([]byte, error) {
 	var templateDirAbs string
 	switch true {
-	case filepath.IsAbs(e.config.TemplateDirectory):
+	case filepath.IsAbs(e.config.Template.Directory):
 		templateDirAbs = filepath.Join(
-			e.config.TemplateDirectory,
-			e.config.TemplateName,
+			e.config.Template.Directory,
+			e.config.Template.Name,
 		)
-		// TODO Render shouldn't have to know about the ConfigFilePath file path. This seems hacky
-	case filepath.IsAbs(e.config.ConfigFilePath):
+		// TODO Render shouldn't have to know about the FilePath file path. This seems hacky
+	case filepath.IsAbs(e.config.FilePath):
 		templateDirAbs = filepath.Join(
-			filepath.Dir(e.config.ConfigFilePath),
-			e.config.TemplateDirectory,
-			e.config.TemplateName,
+			filepath.Dir(e.config.FilePath),
+			e.config.Template.Directory,
+			e.config.Template.Name,
 		)
 	default:
 		templateDirAbs = filepath.Join(
-			e.config.ConfigFilePath,
-			filepath.Dir(e.config.ConfigFilePath),
-			e.config.TemplateDirectory,
-			e.config.TemplateName,
+			e.config.FilePath,
+			filepath.Dir(e.config.FilePath),
+			e.config.Template.Directory,
+			e.config.Template.Name,
 		)
 	}
 
 	var outputFileAbs string
 	switch true {
-	case filepath.IsAbs(e.config.ConfigFilePath):
-		outputFileAbs = e.config.ConfigFilePath
-	case filepath.IsAbs(e.config.ConfigFilePath):
+	case filepath.IsAbs(e.config.FilePath):
+		outputFileAbs = e.config.FilePath
+	case filepath.IsAbs(e.config.FilePath):
 		outputFileAbs = filepath.Join(
-			filepath.Dir(e.config.ConfigFilePath),
+			filepath.Dir(e.config.FilePath),
 			e.config.OutputPath,
 		)
 	default:
 		outputFileAbs = filepath.Join(
 			e.config.WorkingDirectory,
-			filepath.Dir(e.config.ConfigFilePath),
+			filepath.Dir(e.config.FilePath),
 			e.config.OutputPath,
 		)
 	}
@@ -102,4 +108,34 @@ func (e Engine) Render(node tree.NodeTraverser, templateFile string) ([]byte, er
 	}
 
 	return buff.Bytes(), nil
+}
+func (e Engine) BuildRenderNode() tree.TraversalFunc {
+	return func(key string, parent, node tree.NodeTraverser) (tree.NodeTraverser, error) {
+		var templateFile string
+		switch node.(type) {
+		case *openapi.OpenAPI:
+			templateFile = "openapi.tmpl"
+		case *path.Item:
+			templateFile = "path_item.tmpl"
+		case *schema.Schema:
+			schemaType := node.(*schema.Schema).Type
+			if schemaType != "object" && schemaType != "array" {
+				return node, nil
+			}
+			templateFile = "schema.tmpl"
+		case *operation.Operation:
+			templateFile = "operation.tmpl"
+		}
+
+		if templateFile == "" {
+			return node, nil
+		}
+
+		_, err := e.Render(node, templateFile)
+		if err != nil {
+			return node, err
+		}
+
+		return node, nil
+	}
 }

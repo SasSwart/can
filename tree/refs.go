@@ -2,6 +2,7 @@ package tree
 
 import (
 	"fmt"
+	"github.com/sasswart/gin-in-a-can/errors"
 	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
@@ -10,7 +11,7 @@ import (
 // ReadRef takes a reference and attempts to unmarshal it's content into the struct being passed as `i`.
 // As it happens, this ref is contained within the struct that is being unmarshalled into.
 func readRef(absFilename string, n NodeTraverser) error {
-	if DEBUG { // this can be a particularly noisy Printf call
+	if errors.DEBUG { // this can be a particularly noisy Printf call
 		fmt.Printf("Reading reference: %s\n", absFilename)
 	}
 	content, err := os.ReadFile(absFilename)
@@ -44,5 +45,3 @@ func ResolveRefs(key string, parent, node NodeTraverser) (NodeTraverser, error) 
 	}
 	return node, nil
 }
-
-var DEBUG bool

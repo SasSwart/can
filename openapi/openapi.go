@@ -93,16 +93,3 @@ func LoadAPISpec(openAPIFile string) (*OpenAPI, error) {
 
 	return newApi, err
 }
-
-type Config struct {
-	ModuleName        string
-	BasePackageName   string
-	TemplateDirectory string
-	TemplateName      string
-	// Used to live in renderer config
-	// TODO structure this in a more accessible way
-	OpenAPIFile      string
-	OutputPath       string
-	WorkingDirectory string
-	ConfigFilePath   string
-}

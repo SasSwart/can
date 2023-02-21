@@ -1,14 +1,20 @@
 package render_test
 
 import (
+	"github.com/sasswart/gin-in-a-can/config"
 	"github.com/sasswart/gin-in-a-can/render"
 	"testing"
 )
 
-var Renderer *render.Engine
+var e *render.Engine
 
 func resetTestRenderer() {
-	Renderer = render.Engine{}.New(render.GinRenderer{}, render.Config{})
+	cfg := config.Data{}
+	err := cfg.Load()
+	if err != nil {
+		panic(err.Error())
+	}
+	e = render.Engine{}.New(render.GinRenderer{}, cfg)
 }
 
 func Test_Render_Render(t *testing.T) {

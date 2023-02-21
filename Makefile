@@ -1,5 +1,10 @@
 APP_GO_FILES := $(shell find . -name '*.go')
 
+.PHONY:run
+run:  build/linux_amd64
+	./build/linux_amd64/can \
+		--configFile ${HOME}/Documents/stratus/backend/can_bff.yml \
+
 all: linux_amd64.zip
 
 linux_amd64.zip: build/linux_amd64 LICENSE
