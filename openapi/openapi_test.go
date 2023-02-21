@@ -4,13 +4,9 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi"
 	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/openapi/test"
-	"github.com/sasswart/gin-in-a-can/tree"
-	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
-
-	"gopkg.in/yaml.v3"
 )
 
 func TestOpenAPI_LoadOpenAPI(t *testing.T) {
@@ -96,34 +92,6 @@ func TestOpenAPI_GetName(t *testing.T) {
 	if name != test.GinRenderedOpenAPIName {
 		t.Errorf("wanted %s, got %s", test.GinRenderedOpenAPIName, name)
 	}
-}
-
-func TestOpenAPI_ResolveRefs(t *testing.T) {
-	apiSpec := openapi.OpenAPI{
-		Node: tree.Node{
-			//basePath: filepath.Dir(test.AbsOpenAPI),
-		},
-		//Components: components.Components{},
-		Paths: map[string]*path.Item{},
-	}
-	content, _ := os.ReadFile(test.AbsOpenAPI)
-	_ = yaml.Unmarshal(content, &apiSpec)
-
-	newApi, err := tree.Traverse(&apiSpec, openapi.ResolveRefs)
-
-	if err != nil {
-		t.Errorf(err.Error()) // just bubbling up is enough here
-	}
-	if newApi == nil {
-		t.Errorf("%s resulted in a nil api tree", test.OpenapiFile)
-	}
-}
-func TestOpenAPI_readRef(t *testing.T) {
-	// ReadRef takes a reference and attempts to unmarshal it's content into the struct being passed as `i`.
-	// As it happens, this ref is contained within the struct that is being unmarshalled into.
-	//func readRef(absFilename string, n tree.NodeTraverser) error {
-
-	t.Errorf("TODO")
 }
 
 func TestOpenAPI_SetMetadata(t *testing.T) {

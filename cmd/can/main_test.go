@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/sasswart/gin-in-a-can/config"
+	"github.com/sasswart/gin-in-a-can/openapi"
 	"os"
 	"reflect"
 	"testing"
@@ -11,11 +11,11 @@ func TestLoadConfig(t *testing.T) {
 	wd, _ := os.Getwd()
 	tests := []struct {
 		configFile     string
-		expectedConfig config.Config
+		expectedConfig openapi.Config
 		expectedErr    bool
 	}{
-		{configFile: "", expectedConfig: config.Config{}, expectedErr: true},
-		{configFile: "test_fixtures/example.yaml", expectedConfig: config.Config{
+		{configFile: "", expectedConfig: openapi.Config{}, expectedErr: true},
+		{configFile: "test_fixtures/example.yaml", expectedConfig: openapi.Config{
 			//Generator: config.GeneratorConfig{
 			//	ModuleName:      "github.com/sasswart/gin-in-a-can",
 			//	BasePackageName: "api",

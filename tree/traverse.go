@@ -12,9 +12,9 @@ type Traverser interface {
 
 type TraversalFunc func(key string, parent, child NodeTraverser) (NodeTraverser, error)
 
-// TraverseRecursor is an auxiliary function to Traverse that initiates a recursive loop over a tree of NodeTraverser
+// traverseRecursor is an auxiliary function to Traverse that initiates a recursive loop over a tree of NodeTraverser
 // structs, applying a given function at every step.
-func TraverseRecursor[T NodeTraverser](node T, f TraversalFunc) (T, error) {
+func traverseRecursor[T NodeTraverser](node T, f TraversalFunc) (T, error) {
 	children := node.GetChildren()
 	for i := range children {
 		child := children[i]
@@ -31,7 +31,7 @@ func TraverseRecursor[T NodeTraverser](node T, f TraversalFunc) (T, error) {
 		if newChild == nil {
 			continue
 		}
-		_, err = TraverseRecursor(newChild, f)
+		_, err = traverseRecursor(newChild, f)
 		if err != nil {
 			return node, err
 		}
@@ -40,22 +40,22 @@ func TraverseRecursor[T NodeTraverser](node T, f TraversalFunc) (T, error) {
 	return node, nil
 }
 
-// Traverse takes a NodeTraverser Node and enters into a recursive loop (TraverseRecursor) that applies a given function
+// Traverse takes a NodeTraverser Node and enters into a recursive loop (traverseRecursor) that applies a given function
 // to the Node.
 func Traverse[T NodeTraverser](node T, f TraversalFunc) (T, error) {
 	if f == nil {
-		return node, fmt.Errorf("no traversal function supplied")
+		return node, fmt.Errorf("`Traverse`:: no traversal function supplied")
 	}
 
 	result, err := f("", nil, node)
 	if err != nil {
-		return node, fmt.Errorf("traversal function[%p] error: %w", f, err)
+		return node, fmt.Errorf("`Traverse`:: traversal function[%p] error: %w", f, err)
 	}
 
 	node, ok := result.(T)
 	if !ok {
-		return node, fmt.Errorf("function parameter f should return the same type that is was given")
+		return node, fmt.Errorf("`Traverse`:: function parameter f should return the same type that is was given")
 	}
 
-	return TraverseRecursor(node, f) // An error is being swallowed here
+	return traverseRecursor(node, f) // An error is being swallowed here
 }
