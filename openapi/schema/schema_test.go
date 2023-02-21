@@ -1,8 +1,10 @@
 package schema_test
 
 import (
+	"github.com/sasswart/gin-in-a-can/openapi/parameter"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/tree"
+	"strings"
 	"testing"
 )
 
@@ -44,8 +46,19 @@ func TestOpenAPI_Schema_SetAndGetChildren(t *testing.T) {
 	}
 }
 
-func TestOpenAPI_Schema_GetBasePath(t *testing.T) {
-	t.Errorf("TODO")
+func TestOpenAPI_Schema_GetAndSetBasePath(t *testing.T) {
+	ref := "testRef/ref"
+	basePath := "/base/path/"
+	want := basePath + strings.Split(ref, "/")[0]
+	s := &schema.Schema{Ref: ref, Node: tree.Node{}}
+	p := parameter.Parameter{Schema: s}
+	s.SetParent(&p)
+
+	p.GetChildren()["Model"].(*schema.Schema).SetBasePath(basePath)
+	got := p.GetChildren()["Model"].(*schema.Schema).GetBasePath()
+	if want != got {
+		t.Fail()
+	}
 }
 
 func TestOpenAPI_Schema_IsRequired(t *testing.T) {

@@ -18,6 +18,9 @@ type Body struct {
 }
 
 func (r *Body) GetName() string {
+	if r.GetParent() == nil {
+		return r.Name
+	}
 	name := r.GetParent().GetName() + r.Name
 	return name
 }
@@ -36,6 +39,9 @@ func (r *Body) GetChildren() map[string]tree.NodeTraverser {
 }
 
 func (r *Body) SetChild(i string, t tree.NodeTraverser) {
+	if r.Content == nil {
+		r.Content = make(map[string]*media.Type, 4)
+	}
 	if content, ok := t.(*media.Type); ok {
 		r.Content[i] = content
 		return

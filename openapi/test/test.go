@@ -11,11 +11,19 @@ import (
 
 const Endpoint = "/endpoint"
 const Method = "post"
-const ReqBody = "RequestBody"
+const ReqBody = "Body"
 const MediaType = "application/json"
-const OpenapiFile = "test/fixtures/validation.yaml"
+const OpenapiFile = "../test/fixtures/validation.yaml"
 const Schema = "Model" // the Dig() key used to access any schema held within a MediaType
 const Pattern = "^([a-zA-Z0-9])+([-_ @\\.]([a-zA-Z0-9])+)*$"
+
+// These are expected validation strings before they hit the renderer
+const PathName = "Validation Fixture/endpoint"
+const ResponseName = "Validation Fixture /endpoint post201Response"
+const MediaItemName = "Validation Fixture/endpointpostBodyapplication/json"
+const OpenAPIName = "Validation Fixture"
+
+// These are expected validation strings after they have been processed by the renderer
 const GinRenderedPathItemName = "ValidationFixtureEndpoint"
 const GinRenderedResponseName = "ValidationFixtureEndpointPost201Response"
 const GinRenderedMediaItemName = "ValidationFixtureEndpointPostRequestBody"

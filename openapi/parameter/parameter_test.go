@@ -2,7 +2,11 @@ package parameter_test
 
 import (
 	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/openapi/parameter"
+	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/openapi/test"
+	"github.com/sasswart/gin-in-a-can/tree"
+	"reflect"
 	"testing"
 )
 
@@ -20,7 +24,39 @@ func TestOpenAPILoadsParameterValidation(t *testing.T) {
 		t.Errorf("Expected id parameter->schema->format to contain `uuid`, not %v", IDParam.Schema.Format)
 	}
 }
+func TestOpenAPI_Parameter_GetRef(t *testing.T) {
+	want := "testRef"
+	p := parameter.Parameter{Ref: want}
+	got := p.GetRef()
+	if want != got {
+		t.Fail()
+	}
+}
 
-func TestOpenAPI_Parameter_getChildren(t *testing.T) {
-	t.Errorf("TODO")
+func TestOpenAPI_Parameter_SetAndGetName(t *testing.T) {
+	p := parameter.Parameter{
+		Node: tree.Node{
+			Name: "This should be overwritten by SetName()",
+		},
+	}
+	want := "testName"
+	p.SetName(want)
+	want += "Parameter" // This is done in GetName()
+	got := p.GetName()
+	if want != got {
+		t.Errorf("wanted %s but got %s", want, got)
+	}
+}
+func TestOpenAPI_Parameter_SetAndGetChildren(t *testing.T) {
+	p := parameter.Parameter{
+		Node: tree.Node{
+			Name: "This should be overwritten by SetName()",
+		},
+	}
+	want := schema.Schema{Node: tree.Node{Name: "testName"}}
+	p.SetChild("", &want)
+	got := p.GetChildren()["Model"]
+	if !reflect.DeepEqual(*got.(*schema.Schema), want) {
+		t.Fail()
+	}
 }

@@ -12,7 +12,7 @@ var _ tree.NodeTraverser = &Parameter{}
 type Parameter struct {
 	tree.Node
 	Ref             string         `yaml:"$ref"`
-	Name            string         `yaml:"name"`
+	ParamName       string         `yaml:"name"` // TODO not sure if this is a duplicate of the name var in the accompanying Node
 	In              string         `yaml:"in"`
 	Description     string         `yaml:"description"`
 	Required        bool           `yaml:"required"`
@@ -31,6 +31,9 @@ func (p *Parameter) GetChildren() map[string]tree.NodeTraverser {
 	}
 }
 func (p *Parameter) GetName() string {
+	if p.GetParent() == nil {
+		return p.Name + "Parameter"
+	}
 	return p.GetParent().GetName() + p.Name + "Parameter"
 }
 

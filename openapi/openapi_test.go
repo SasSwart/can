@@ -10,9 +10,9 @@ import (
 )
 
 func TestOpenAPI_LoadOpenAPI(t *testing.T) {
-	apiSpec, err := openapi.LoadAPISpec(test.AbsOpenAPI)
+	apiSpec, err := openapi.LoadAPISpec(test.OpenapiFile)
 	if err != nil {
-		t.Errorf("could not load file %s:%s", test.OpenapiFile, err.Error())
+		t.Errorf("could not load file %s", err.Error())
 	}
 	if apiSpec == nil {
 		t.Errorf("could not load file %s:%s", test.OpenapiFile, err.Error())
@@ -89,8 +89,8 @@ func TestOpenAPI_GetName(t *testing.T) {
 	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
 	//_ = SetRenderer(apiSpec, render.GinRenderer{})
 	name := apiSpec.GetName()
-	if name != test.GinRenderedOpenAPIName {
-		t.Errorf("wanted %s, got %s", test.GinRenderedOpenAPIName, name)
+	if name != test.OpenAPIName {
+		t.Errorf("wanted %s, got %s", test.OpenAPIName, name)
 	}
 }
 

@@ -11,7 +11,7 @@ paths:
           description: endpoint UUID
           required: true
           schema:
-            $ref: ./../testRefs/test_ref_generic.yaml
+            $ref: ./testRefs/test_ref_generic.yaml
       responses:
         204:
           description: Project deleted successfully

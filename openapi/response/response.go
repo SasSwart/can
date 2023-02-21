@@ -38,6 +38,9 @@ func (r *Response) GetChildren() map[string]tree.NodeTraverser {
 }
 
 func (r *Response) SetChild(i string, t tree.NodeTraverser) {
+	if r.Content == nil {
+		r.Content = make(map[string]media.Type, 4)
+	}
 	if _, err := strconv.Atoi(i); err != nil || i == "default" {
 		mediaType, ok := t.(*media.Type)
 		if !ok {

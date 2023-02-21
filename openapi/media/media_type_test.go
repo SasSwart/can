@@ -10,17 +10,16 @@ import (
 )
 
 func TestOpenAPI_MediaType_GetName(t *testing.T) {
-	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
-	//_ = root.SetRenderer(apiSpec, render.GinRenderer{})
+	apiSpec, _ := openapi.LoadAPISpec(test.OpenapiFile)
 	mt := test.Dig(apiSpec, test.Endpoint, test.Method, test.ReqBody, test.MediaType)
 	name := mt.GetName()
-	if name != test.GinRenderedMediaItemName {
-		t.Errorf("expected %v, got %v", test.GinRenderedMediaItemName, name)
+	if name != test.MediaItemName {
+		t.Errorf("expected %v, got %v", test.MediaItemName, name)
 	}
 }
 
 func TestOpenAPI_MediaType_GetChildren(t *testing.T) {
-	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
+	apiSpec, _ := openapi.LoadAPISpec(test.OpenapiFile)
 	mt := test.Dig(apiSpec, test.Endpoint, test.Method, test.ReqBody, test.MediaType)
 	children := mt.GetChildren()
 	for model, s := range children {
@@ -38,7 +37,7 @@ func TestOpenAPI_MediaType_GetChildren(t *testing.T) {
 }
 
 func TestOpenAPI_MediaType_SetChild(t *testing.T) {
-	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
+	apiSpec, _ := openapi.LoadAPISpec(test.OpenapiFile)
 	mt := test.Dig(apiSpec, test.Endpoint, test.Method, test.ReqBody, test.MediaType)
 	s, _ := test.Dig(mt, test.Schema).(*schema.Schema)
 	sOld := *s

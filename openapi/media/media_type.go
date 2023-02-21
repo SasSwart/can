@@ -16,6 +16,9 @@ type Type struct {
 }
 
 func (m *Type) GetName() string {
+	if m.GetParent() == nil {
+		return m.Name
+	}
 	return m.GetParent().GetName() + m.Name
 }
 func (m *Type) GetRef() string {

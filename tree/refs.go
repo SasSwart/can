@@ -36,7 +36,8 @@ func ResolveRefs(key string, parent, node NodeTraverser) (NodeTraverser, error) 
 	if nodeRef != "" {
 		openapiBasePath := node.GetBasePath()
 		ref := filepath.Base(node.GetRef())
-		err := readRef(filepath.Join(openapiBasePath, ref), node)
+		path := filepath.Join(openapiBasePath, ref)
+		err := readRef(path, node)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to read reference:\n%w", err)
 		}

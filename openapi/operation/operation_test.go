@@ -20,9 +20,10 @@ func TestOpenAPI_Operation_GetBasePath(t *testing.T) {
 		t.Logf("%v method found with base path: %v", method, op.GetBasePath())
 		basePaths = append(basePaths, op.GetBasePath())
 	}
+	want := apiSpec.GetBasePath() // accurate if apiSpec resolves as top most node ( as it should have GetParent() == nil )
 	for _, path := range basePaths {
-		if path != test.BasePath {
-			t.Errorf("%v found, expected: %v", path, test.BasePath)
+		if path != want {
+			t.Errorf("%v found, expected: %v", path, want)
 		}
 	}
 }

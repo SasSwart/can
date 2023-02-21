@@ -24,11 +24,6 @@ type Schema struct {
 	Required             []string
 }
 
-func (s *Schema) GetOutputFile() string {
-	errors.Unimplemented("(s *Schema) GetOutputFile()")
-	return ""
-}
-
 func (s *Schema) GetChildren() map[string]tree.NodeTraverser {
 	children := map[string]tree.NodeTraverser{}
 	for name := range s.Properties {
@@ -53,6 +48,7 @@ func (s *Schema) SetChild(i string, t tree.NodeTraverser) {
 	errors.CastFail("(s *Schema) SetChild()", "NodeTraverser", "*schema.Schema")
 }
 
+// GetBasePath should be defined on any function that could need referential resolution
 func (s *Schema) GetBasePath() string {
 	if s.GetParent() == nil {
 		return ""
@@ -63,6 +59,22 @@ func (s *Schema) GetBasePath() string {
 
 func (s *Schema) GetRef() string {
 	return s.Ref
+}
+
+// TODO this should be language agnostic and currently only caters for golang
+func (s *Schema) GetType() string {
+	switch s.Type {
+	case "boolean":
+		return "bool"
+	case "array":
+		return "[]" + s.GetChildren()["Model"].GetName()
+	case "integer":
+		return "int"
+	case "object":
+		return "struct"
+	default:
+		return s.Type
+	}
 }
 
 func (s *Schema) IsRequired(property string) bool {

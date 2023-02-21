@@ -5,7 +5,6 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/operation"
 	"github.com/sasswart/gin-in-a-can/openapi/parameter"
 	"github.com/sasswart/gin-in-a-can/tree"
-	"path/filepath"
 )
 
 var _ tree.NodeTraverser = &Item{}
@@ -23,10 +22,6 @@ type Item struct {
 	Parameters  []parameter.Parameter
 }
 
-func (p *Item) GetChildren() map[string]tree.NodeTraverser {
-	return p.Operations()
-}
-
 func (p *Item) GetRef() string {
 	return p.Ref
 }
@@ -36,17 +31,18 @@ func (p *Item) GetPath() string {
 	return name
 }
 
-func (p *Item) GetBasePath() string {
-	if p.GetParent() == nil {
-		errors.UndefinedBehaviour("(p *Item) GetBasePath()")
+func (p *Item) SetChild(i string, child tree.NodeTraverser) {
+	if t, ok := child.(*operation.Operation); ok {
+		p.operations()[i] = t
+		return
 	}
-	// TODO: Deal with absolute paths for both of these parameters
-	// For now both of these params are assumed relative
-	basePath := filepath.Join(p.GetParent().GetBasePath(), filepath.Dir(p.Ref))
-	return basePath
+	errors.CastFail("(o *Root) setChild", "NodeTraverser", "*schema.Schema")
+}
+func (p *Item) GetChildren() map[string]tree.NodeTraverser {
+	return p.operations()
 }
 
-func (p *Item) Operations() map[string]tree.NodeTraverser {
+func (p *Item) operations() map[string]tree.NodeTraverser {
 	operations := map[string]tree.NodeTraverser{}
 	if p.Get != nil {
 		operations["get"] = p.Get
@@ -61,12 +57,4 @@ func (p *Item) Operations() map[string]tree.NodeTraverser {
 		operations["delete"] = p.Delete
 	}
 	return operations
-}
-
-func (p *Item) SetChild(i string, child tree.NodeTraverser) {
-	if t, ok := child.(*operation.Operation); ok {
-		p.Operations()[i] = t
-		return
-	}
-	errors.CastFail("(o *Root) setChild", "NodeTraverser", "*schema.Schema")
 }

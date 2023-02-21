@@ -1,58 +1,48 @@
 package path_test
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi"
 	"github.com/sasswart/gin-in-a-can/openapi/operation"
 	"github.com/sasswart/gin-in-a-can/openapi/path"
-	"github.com/sasswart/gin-in-a-can/openapi/test"
+	"github.com/sasswart/gin-in-a-can/tree"
 	"testing"
 )
 
-func TestOpenAPI_PathItem_GetName(t *testing.T) {
-	apiSpec, _ := openapi.LoadAPISpec("../" + test.OpenapiFile)
-	p := test.Dig(apiSpec, test.Endpoint)
-	if p.GetName() != test.GinRenderedPathItemName {
-		t.Errorf("got %v, expected %v", p.GetName(), test.GinRenderedPathItemName)
+func TestOpenAPI_PathItem_GetAndSetName(t *testing.T) {
+	want := "testName"
+	i := path.Item{Node: tree.Node{Name: "this should be overwritten by a call to SetName()"}}
+	i.SetName(want)
+	got := i.GetName()
+	if got != want {
+		t.Fail()
 	}
 }
 
-func TestOpenAPI_PathItem_Operations(t *testing.T) {
-	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
-	for _, v := range apiSpec.GetChildren() {
-		p := v.(*path.Item)
-		for method, op := range p.Operations() {
-			switch method {
-			case "post":
-			case "get":
-			case "patch":
-			case "delete":
-				o, ok := op.(*operation.Operation)
-				if !ok {
-					t.Errorf("PathItem.Operations() is not successfully returning *Operations")
-				}
-				t.Logf(o.OperationId)
+func TestOpenAPI_PathItem_GetAndSetChildren(t *testing.T) {
+	i := path.Item{}
+	i.SetChild("post", &operation.Operation{})
+	i.SetChild("get", &operation.Operation{})
+	i.SetChild("patch", &operation.Operation{})
+	i.SetChild("delete", &operation.Operation{})
+	for method, op := range i.GetChildren() {
+		switch method {
+		case "post":
+		case "get":
+		case "patch":
+		case "delete":
+			o, ok := op.(*operation.Operation)
+			if !ok {
+				t.Errorf("PathItem.operations() is not successfully returning *operations")
 			}
-		}
-	}
-
-}
-
-func TestOpenAPI_PathItem_GetBasePath(t *testing.T) {
-	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
-	for _, p := range apiSpec.GetChildren() {
-		if p.GetBasePath() != test.BasePath {
-			t.Errorf("got %v, expected %v", p.GetBasePath(), test.BasePath)
+			t.Logf(o.OperationId)
 		}
 	}
 }
 
-func TestOpenAPI_PathItem_GetParent(t *testing.T) {
-	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
-	for _, p := range apiSpec.GetChildren() {
-		parent := p.GetParent()
-		_, ok := parent.(*openapi.OpenAPI)
-		if !ok {
-			t.Errorf("PathItem.GetParent() did not return an OpenAPI type")
-		}
+func TestOpenAPI_PathItem_GetRef(t *testing.T) {
+	want := "testRef"
+	i := path.Item{Ref: want}
+	got := i.GetRef()
+	if got != want {
+		t.Fail()
 	}
 }

@@ -11,7 +11,7 @@ import (
 )
 
 func TestOpenAPI_LoadsRequestBodyValidation(t *testing.T) {
-	apiSpec, err := openapi.LoadAPISpec(test.AbsOpenAPI)
+	apiSpec, err := openapi.LoadAPISpec(test.OpenapiFile)
 	if err != nil {
 		t.Fail()
 	}
@@ -34,10 +34,21 @@ func TestOpenAPI_LoadsRequestBodyValidation(t *testing.T) {
 
 func TestOpenAPI_RequestBody_GetAndSetChild(t *testing.T) {
 	rb := &request.Body{}
-	child := &media.Type{Node: tree.Node{Name: "MediaTypeTest"}}
-	rb.SetChild("1", child)
-	t.Errorf("TODO")
+	want := &media.Type{Node: tree.Node{Name: "MediaTypeTest"}}
+	rb.SetChild("1", want)
+	got := rb.GetChildren()["1"]
+	if got != want {
+		t.Fail()
+	}
 }
-func TestOpenAPI_RequestBody_getName(t *testing.T) {
-	t.Errorf("TODO")
+func TestOpenAPI_RequestBody_SetAndGetName(t *testing.T) {
+	rb := &request.Body{Node: tree.Node{
+		Name: "this should be replaced by SetName()",
+	}}
+	want := "testName"
+	rb.SetName(want)
+	got := rb.GetName()
+	if got != want {
+		t.Fail()
+	}
 }
