@@ -33,7 +33,6 @@ type Data struct {
 	OpenAPIFile    string
 	AbsOpenAPIPath string
 
-	// OutputPath is ./gen by default
 	OutputPath string
 
 	// WorkingDirectory is set through calling os.Getwd()
@@ -87,7 +86,7 @@ func (d Data) Load() error {
 	d.FilePath = viper.ConfigFileUsed()
 	d.TemplatesDir = filepath.Join(filepath.Dir(exe), "templates")
 	d.absOpenAPIPaths()
-	d.absOutputFilePaths()
+	d.absTemplateDirs()
 
 	err = viper.Unmarshal(&d)
 	if err != nil {
@@ -133,31 +132,12 @@ func (d Data) absOpenAPIPaths() {
 	}
 }
 func (d Data) absTemplateDirs() {
-		switch true {
-		case filepath.IsAbs(d.TemplatesDir)
-			d.Template.AbsDirectory = filepath.Join(d.TemplatesDir, d.Template.Name)
-		case filepath.IsAbs(d.FilePath):
-			d.Template.AbsDirectory = filepath.Join(filepath.Dir(d.FilePath), d.TemplatesDir, d.Template.Name)
-		default:
-			d.Template.AbsDirectory = filepath.Join(d.WorkingDirectory, filepath.Dir(d.FilePath), d.TemplatesDir, d.Template.Name)
-		}
-}
-
-func (d Data) absOutputFilePaths() {
-	//var outputFileAbs string
 	switch true {
+	case filepath.IsAbs(d.TemplatesDir):
+		d.Template.AbsDirectory = filepath.Join(d.TemplatesDir, d.Template.Name)
 	case filepath.IsAbs(d.FilePath):
-		//outputFileAbs = d.FilePath
-	case filepath.IsAbs(d.FilePath):
-		//outputFileAbs = filepath.Join(
-		//	filepath.Dir(d.FilePath),
-		//	d.OutputPath,
-		//)
+		d.Template.AbsDirectory = filepath.Join(filepath.Dir(d.FilePath), d.TemplatesDir, d.Template.Name)
 	default:
-		//outputFileAbs = filepath.Join(
-		//	d.WorkingDirectory,
-		//	filepath.Dir(d.FilePath),
-		//	d.OutputPath,
-		//)
+		d.Template.AbsDirectory = filepath.Join(d.WorkingDirectory, filepath.Dir(d.FilePath), d.TemplatesDir, d.Template.Name)
 	}
 }

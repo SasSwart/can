@@ -39,15 +39,29 @@ func (e Engine) GetRenderer() Renderer {
 // Render contains the parsing and rendering steps
 func (e Engine) Render(node tree.NodeTraverser, templateFile string) ([]byte, error) {
 
-	outputFileAbs = filepath.Join(outputFileAbs, e.renderer.GetOutputFile(node))
-
+	var absOutputFile string
+	switch true {
+	case filepath.IsAbs(e.config.OutputPath):
+		absOutputFile = e.config.OutputPath
+	case filepath.IsAbs(e.config.FilePath):
+		absOutputFile = filepath.Join(
+			filepath.Dir(e.config.FilePath),
+			e.config.OutputPath,
+		)
+	default:
+		absOutputFile = filepath.Join(
+			e.config.WorkingDirectory,
+			filepath.Dir(e.config.FilePath),
+			e.config.OutputPath,
+		)
+	}
 	buff := bytes.NewBuffer([]byte{})
 
 	templater := template.New(templateFile)
 
 	templater.Funcs(templateFuncMap)
 
-	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", templateDirAbs))
+	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", e.config.Template.AbsDirectory))
 	if err != nil {
 		return nil, err
 	}
@@ -59,12 +73,12 @@ func (e Engine) Render(node tree.NodeTraverser, templateFile string) ([]byte, er
 
 	fmt.Printf("Rendering %s using %s\n", e.renderer.GetOutputFile(node), templateFile)
 
-	outputDirAbs := filepath.Dir(outputFileAbs)
+	outputDirAbs := filepath.Dir(absOutputFile)
 	if _, err := os.Stat(outputDirAbs); errors.Is(err, os.ErrNotExist) {
 		_ = os.MkdirAll(outputDirAbs, 0755)
 	}
 
-	err = os.WriteFile(outputFileAbs, buff.Bytes(), 0644)
+	err = os.WriteFile(absOutputFile, buff.Bytes(), 0644)
 	if err != nil {
 		return nil, err
 	}
