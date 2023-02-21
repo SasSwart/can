@@ -7,24 +7,17 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/request"
 	"github.com/sasswart/gin-in-a-can/openapi/response"
 	"github.com/sasswart/gin-in-a-can/openapi/test"
-	"github.com/sasswart/gin-in-a-can/tree"
+	"reflect"
 	"testing"
 )
 
-func TestOpenAPI_Operation_GetBasePath(t *testing.T) {
-	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
-	ops := test.Dig(apiSpec, test.Endpoint)
-
-	var basePaths []string
-	for method, op := range ops.GetChildren() {
-		t.Logf("%v method found with base path: %v", method, op.GetBasePath())
-		basePaths = append(basePaths, op.GetBasePath())
-	}
-	want := apiSpec.GetBasePath() // accurate if apiSpec resolves as top most node ( as it should have GetParent() == nil )
-	for _, path := range basePaths {
-		if path != want {
-			t.Errorf("%v found, expected: %v", path, want)
-		}
+func TestOpenAPI_Operation_SetAndGetBasePath(t *testing.T) {
+	want := "test/Base/Path"
+	o := operation.Operation{}
+	o.SetBasePath(want)
+	got := o.GetBasePath()
+	if want != got {
+		t.Fail()
 	}
 }
 
@@ -40,7 +33,7 @@ func TestOpenAPI_Operation_GetRef(t *testing.T) {
 	}
 }
 
-func TestOpenAPI_Operation_GetParent(t *testing.T) {
+func TestOpenAPI_Operation_SetAndGetParent(t *testing.T) {
 	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
 	ops := test.Dig(apiSpec, test.Endpoint)
 	for _, o := range ops.GetChildren() {
@@ -50,69 +43,29 @@ func TestOpenAPI_Operation_GetParent(t *testing.T) {
 	}
 }
 
-func TestOpenAPI_Operation_GetChildren(t *testing.T) {
-	//apiSpec, _ := root.LoadAPISpec(test.AbsOpenAPI)
-	//paths := test.Dig(apiSpec, test.Endpoint)
-	//for _, traversable := range paths.GetChildren() {
-	//	if operation, ok := traversable.(*Operation); ok {
-	//		for key, child := range operation.getChildren() {
-	//			if _, ok := child.(*request.Body); ok {
-	//				t.Logf("%s contained an object of type *Body", key)
-	//				t.Logf("heres your %s", test.ReqBody)
-	//				continue
-	//			}
-	//			if p, ok := child.(*parameter.Parameter); ok {
-	//				t.Logf("%s contained a *Parameter type", key)
-	//				t.Logf("Parameter %s, in %s", p.name, p.In)
-	//				continue
-	//			}
-	//			if _, ok := child.(*response.Response); ok {
-	//				t.Logf("%s contained a *Response type", key)
-	//				continue
-	//			}
-	//			t.Errorf("%s did not contain an object of type *Response, *Parameter, or *Body", key)
-	//		}
-	//	}
-	//}
-}
+func TestOpenAPI_Operation_SetAndGetChildren(t *testing.T) {
+	paramKey := "0"
+	paramWant := &parameter.Parameter{}
+	responseKey := "testKey"
+	responseWant := &response.Response{}
+	requestBodyKey := "Body"
+	requestBodyWant := &request.Body{}
 
-func TestOpenAPI_Operation_SetChild(t *testing.T) {
-	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
-	traversable := test.Dig(apiSpec, test.Endpoint)
-	operations := traversable.GetChildren()
+	o := operation.Operation{}
+	o.SetChild(paramKey, paramWant)
+	o.SetChild("", requestBodyWant)
+	o.SetChild(responseKey, responseWant)
 
-	// Test Data
-	p := parameter.Parameter{Node: tree.Node{Name: "newParameter"}}
-	reqBody := request.Body{Node: tree.Node{Name: "newReqBody"}}
-	r := response.Response{Node: tree.Node{Name: "newReqBody"}}
-	httpResponseCode := "499"
-
-	// Set children
-	for method, op := range operations {
-		t.Logf("Setting test children for %s method", method)
-		op.SetChild("", &p)
-		op.SetChild("", &reqBody)
-		op.SetChild(httpResponseCode, &r)
+	paramGot := o.GetChildren()[paramKey].(*parameter.Parameter)
+	if !reflect.DeepEqual(*paramGot, *paramWant) {
+		t.Errorf("param fetched differs from param prepared")
 	}
-
-	// Verify set children
-	//for method, op := range operations {
-	//	t.Logf("Getting test children for %s method", method)
-	//	children := op.GetChildren()
-	//	if got, ok := children[httpResponseCode].(*r.Response); ok {
-	//		if got.node.name != r.node.name {
-	//			t.Errorf("child %s: %s was not set properly", method, httpResponseCode)
-	//		}
-	//	}
-	//	if got, ok := children[test.ReqBody].(*request.Body); ok {
-	//		if got.node.name != reqBody.node.name {
-	//			t.Errorf("child %s: %s was not set properly", method, test.ReqBody)
-	//		}
-	//	}
-	//	if got, ok := children[test.EmptyParamName].(*p.Parameter); ok {
-	//		if got.node.name != p.node.name {
-	//			t.Errorf("child %s: %s was not set properly", method, test.EmptyParamName)
-	//		}
-	//	}
-	//}
+	requestBodyGot := o.GetChildren()[requestBodyKey].(*request.Body)
+	if !reflect.DeepEqual(*requestBodyGot, *requestBodyWant) {
+		t.Errorf("request body fetched differs from request body prepared")
+	}
+	responseGot := o.GetChildren()[responseKey].(*response.Response)
+	if !reflect.DeepEqual(*responseGot, *responseWant) {
+		t.Errorf("response fetched differs from response prepared")
+	}
 }

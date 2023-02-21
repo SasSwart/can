@@ -58,13 +58,15 @@ func (o *Operation) GetChildren() map[string]tree.NodeTraverser {
 func (o *Operation) SetChild(i string, child tree.NodeTraverser) {
 	switch child.(type) {
 	case *parameter.Parameter:
-		j, _ := strconv.Atoi(i)
-		o.Parameters[j] = *child.(*parameter.Parameter)
+		o.Parameters = append(o.Parameters, *child.(*parameter.Parameter))
 		return
 	case *request.Body:
 		o.RequestBody = *child.(*request.Body)
 		return
 	case *response.Response:
+		if o.Responses == nil {
+			o.Responses = make(map[string]*response.Response, 4)
+		}
 		o.Responses[i] = child.(*response.Response)
 		return
 	default:
