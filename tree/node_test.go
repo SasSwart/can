@@ -1,7 +1,10 @@
 package tree_test
 
 import (
+	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/tree"
+	"reflect"
 	"testing"
 )
 
@@ -29,11 +32,15 @@ func TestOpenAPI_Node_GetRef(t *testing.T) {
 	// Should not be implemented for this type
 }
 
-func TestOpenAPI_Node_GetMetadata(t *testing.T) {
-
-	t.Errorf("TODO")
-}
-
-func TestOpenAPI_Node_GetOutputFile(t *testing.T) {
-	t.Errorf("TODO")
+func TestOpenAPI_Node_GetAndSetMetadata(t *testing.T) {
+	p := path.Item{Node: tree.Node{}}
+	o := openapi.OpenAPI{Node: tree.Node{}}
+	p.SetParent(&o)
+	o.SetChild("/test", &p)
+	want := tree.Metadata{"key": "value"}
+	p.Node.SetMetadata(want)
+	got := o.Node.GetMetadata()
+	if !reflect.DeepEqual(want, got) {
+		t.Fail()
+	}
 }

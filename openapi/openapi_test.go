@@ -10,12 +10,13 @@ import (
 )
 
 func TestOpenAPI_LoadOpenAPI(t *testing.T) {
-	apiSpec, err := openapi.LoadAPISpec(test.OpenapiFile)
+	specPath := filepath.Join("openapi/" + test.OpenapiFile)
+	apiSpec, err := openapi.LoadAPISpec(specPath)
 	if err != nil {
-		t.Errorf("could not load file %s", err.Error())
+		t.Errorf(err.Error())
 	}
 	if apiSpec == nil {
-		t.Errorf("could not load file %s:%s", test.OpenapiFile, err.Error())
+		t.Errorf("could not load file %s:::%s", specPath, err.Error())
 	}
 }
 
@@ -31,11 +32,13 @@ func TestOpenAPI_SetRenderer(t *testing.T) {
 	//}
 }
 
-func TestOpenAPI_GetBasePath(t *testing.T) {
-	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
-	wanted := filepath.Dir(test.AbsOpenAPI)
-	if apiSpec.GetBasePath() != wanted {
-		t.Errorf("could not get basePath %s, got %s", wanted, apiSpec.GetBasePath())
+func TestOpenAPI_GetAndSetBasePath(t *testing.T) {
+	want := "test/Base/Path"
+	o := openapi.OpenAPI{}
+	o.SetBasePath(want)
+	got := o.GetBasePath()
+	if got != want {
+		t.Fail()
 	}
 }
 

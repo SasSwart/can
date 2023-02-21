@@ -61,6 +61,9 @@ func (n *Node) GetRef() string {
 
 // SetMetadata sets metadata for the root node of the tree
 func (n *Node) SetMetadata(metadata Metadata) {
+	if n.metadata == nil {
+		n.metadata = make(Metadata, 2)
+	}
 	if n.GetParent() == nil {
 		n.metadata = metadata
 		return

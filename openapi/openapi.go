@@ -45,6 +45,9 @@ func (o *OpenAPI) GetChildren() map[string]tree.NodeTraverser {
 }
 
 func (o *OpenAPI) SetChild(i string, child tree.NodeTraverser) {
+	if o.Paths == nil {
+		o.Paths = make(map[string]*path.Item, 4)
+	}
 	if c, ok := child.(*path.Item); ok {
 		o.Paths[i] = c
 		return
