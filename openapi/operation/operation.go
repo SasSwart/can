@@ -45,7 +45,7 @@ func (o *Operation) GetChildren() map[string]tree.NodeTraverser {
 
 	// Request Body
 
-	children["Body"] = &o.RequestBody
+	children[request.BodyKey] = &o.RequestBody
 
 	// Response
 	for name := range o.Responses {

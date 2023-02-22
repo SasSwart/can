@@ -55,7 +55,7 @@ func TestOpenAPI_Parameter_SetAndGetChildren(t *testing.T) {
 	}
 	want := schema.Schema{Node: tree.Node{Name: "testName"}}
 	p.SetChild("", &want)
-	got := p.GetChildren()["Model"]
+	got := p.GetChildren()[schema.Key]
 	if !reflect.DeepEqual(*got.(*schema.Schema), want) {
 		t.Fail()
 	}

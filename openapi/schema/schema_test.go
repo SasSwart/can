@@ -54,8 +54,8 @@ func TestOpenAPI_Schema_GetAndSetBasePath(t *testing.T) {
 	p := parameter.Parameter{Schema: s}
 	s.SetParent(&p)
 
-	p.GetChildren()["Model"].(*schema.Schema).SetBasePath(basePath)
-	got := p.GetChildren()["Model"].(*schema.Schema).GetBasePath()
+	p.GetChildren()[schema.Key].(*schema.Schema).SetBasePath(basePath)
+	got := p.GetChildren()[schema.Key].(*schema.Schema).GetBasePath()
 	if want != got {
 		t.Fail()
 	}

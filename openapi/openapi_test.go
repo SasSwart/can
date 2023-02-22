@@ -2,7 +2,10 @@ package openapi_test
 
 import (
 	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/openapi/media"
 	"github.com/sasswart/gin-in-a-can/openapi/path"
+	"github.com/sasswart/gin-in-a-can/openapi/request"
+	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/openapi/test"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"path/filepath"
@@ -74,7 +77,7 @@ func TestOpenAPI_MetadataSetPoint(t *testing.T) {
 	specPath := filepath.Join("openapi/" + test.OpenapiFile)
 	apiSpec, _ := openapi.LoadAPISpec(specPath)
 	data := tree.Metadata{"this": "is", "some": "metadata"}
-	traversable := test.Dig(apiSpec, test.Endpoint, test.Method, test.ReqBody, test.MediaType, test.Schema, "name")
+	traversable := test.Dig(apiSpec, test.Endpoint, path.Post, request.BodyKey, media.JSONKey, schema.Key, "name")
 
 	traversable.SetMetadata(data)
 	if !reflect.DeepEqual(apiSpec.GetMetadata(), data) {

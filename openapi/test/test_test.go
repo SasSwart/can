@@ -18,22 +18,22 @@ func TestOpenAPI_Dig(t *testing.T) {
 		t.Errorf("%#v should have been a %T", endpoint, &path.Item{})
 	}
 
-	method := Dig(endpoint, Method)
+	method := Dig(endpoint, path.Post)
 	if _, ok := method.(*operation.Operation); !ok {
 		t.Errorf("%#v should have been a %T", method, &operation.Operation{})
 	}
 
-	reqBody := Dig(method, ReqBody)
+	reqBody := Dig(method, request.BodyKey)
 	if _, ok := reqBody.(*request.Body); !ok {
 		t.Errorf("%#v should have been a %T", reqBody, &request.Body{})
 	}
 
-	mediaType := Dig(reqBody, MediaType)
+	mediaType := Dig(reqBody, media.JSONKey)
 	if _, ok := mediaType.(*media.Type); !ok {
 		t.Errorf("%#v should have been a %T", mediaType, &media.Type{})
 	}
 
-	s := Dig(mediaType, Schema)
+	s := Dig(mediaType, schema.Key)
 	if _, ok := s.(*schema.Schema); !ok {
 		t.Errorf("%#v should have been a %T", s, &schema.Schema{})
 	}

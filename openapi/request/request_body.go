@@ -6,6 +6,8 @@ import (
 	"github.com/sasswart/gin-in-a-can/tree"
 )
 
+const BodyKey = "Body"
+
 var _ tree.NodeTraverser = &Body{}
 
 // Body is a programmatic representation of the Body object defined here: https://swagger.io/specification/#request-body-object

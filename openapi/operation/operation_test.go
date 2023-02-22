@@ -48,7 +48,6 @@ func TestOpenAPI_Operation_SetAndGetChildren(t *testing.T) {
 	paramWant := &parameter.Parameter{}
 	responseKey := "testKey"
 	responseWant := &response.Response{}
-	requestBodyKey := "Body"
 	requestBodyWant := &request.Body{}
 
 	o := operation.Operation{}
@@ -60,7 +59,7 @@ func TestOpenAPI_Operation_SetAndGetChildren(t *testing.T) {
 	if !reflect.DeepEqual(*paramGot, *paramWant) {
 		t.Errorf("param fetched differs from param prepared")
 	}
-	requestBodyGot := o.GetChildren()[requestBodyKey].(*request.Body)
+	requestBodyGot := o.GetChildren()[request.BodyKey].(*request.Body)
 	if !reflect.DeepEqual(*requestBodyGot, *requestBodyWant) {
 		t.Errorf("request body fetched differs from request body prepared")
 	}

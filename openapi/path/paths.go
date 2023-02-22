@@ -7,6 +7,14 @@ import (
 	"github.com/sasswart/gin-in-a-can/tree"
 )
 
+// path method enum
+const (
+	Get    = "get"
+	Post   = "post"
+	Patch  = "patch"
+	Delete = "delete"
+)
+
 var _ tree.NodeTraverser = &Item{}
 
 // Item is a programmatic representation of the Path Item object defined here: https://swagger.io/specification/#path-item-object
@@ -45,16 +53,16 @@ func (p *Item) GetChildren() map[string]tree.NodeTraverser {
 func (p *Item) operations() map[string]tree.NodeTraverser {
 	operations := map[string]tree.NodeTraverser{}
 	if p.Get != nil {
-		operations["get"] = p.Get
+		operations[Get] = p.Get
 	}
 	if p.Post != nil {
-		operations["post"] = p.Post
+		operations[Post] = p.Post
 	}
 	if p.Patch != nil {
-		operations["patch"] = p.Patch
+		operations[Patch] = p.Patch
 	}
 	if p.Delete != nil {
-		operations["delete"] = p.Delete
+		operations[Delete] = p.Delete
 	}
 	return operations
 }

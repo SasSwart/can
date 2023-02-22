@@ -27,7 +27,7 @@ func (p *Parameter) GetRef() string {
 
 func (p *Parameter) GetChildren() map[string]tree.NodeTraverser {
 	return map[string]tree.NodeTraverser{
-		"Model": p.Schema,
+		schema.Key: p.Schema,
 	}
 }
 func (p *Parameter) GetName() string {

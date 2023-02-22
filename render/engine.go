@@ -38,7 +38,6 @@ func (e Engine) GetRenderer() Renderer {
 
 // Render contains the parsing and rendering steps
 func (e Engine) Render(node tree.NodeTraverser, templateFile string) ([]byte, error) {
-	e.getAbsOutputFilepath()
 	buff := bytes.NewBuffer([]byte{})
 
 	templater := template.New(templateFile)
@@ -57,12 +56,12 @@ func (e Engine) Render(node tree.NodeTraverser, templateFile string) ([]byte, er
 
 	fmt.Printf("Rendering %s using %s\n", e.renderer.GetOutputFile(node), templateFile)
 
-	outputDirAbs := filepath.Dir(absOutputFile)
+	outputDirAbs := filepath.Dir(e.config.GetOutPath())
 	if _, err := os.Stat(outputDirAbs); errors.Is(err, os.ErrNotExist) {
 		_ = os.MkdirAll(outputDirAbs, 0755)
 	}
 
-	err = os.WriteFile(absOutputFile, buff.Bytes(), 0644)
+	err = os.WriteFile(e.config.GetOutPath(), buff.Bytes(), 0644)
 	if err != nil {
 		return nil, err
 	}

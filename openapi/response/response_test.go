@@ -27,7 +27,7 @@ func TestOpenAPI_Response_GetRef(t *testing.T) {
 }
 func TestOpenAPI_Response_GetAndSetChildren(t *testing.T) {
 	mtName := "testMediaType"
-	mediaTypeString := "application/json"
+	mediaTypeString := media.JSONKey
 	want := media.Type{Node: tree.Node{Name: mtName}}
 	r := response.Response{}
 	r.SetChild(mediaTypeString, &want)

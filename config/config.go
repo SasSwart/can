@@ -100,6 +100,11 @@ func (d Data) Load() error {
 
 	return nil
 }
+
+func (d Data) GetOutPath() string {
+	return d.absOutputPath
+}
+
 func (d Data) validTemplateName(name string) bool {
 	dirs, err := os.ReadDir(d.TemplatesDir)
 	if err != nil {

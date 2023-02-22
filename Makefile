@@ -18,7 +18,7 @@ clean:
 
 .PHONY: test test_coverage
 test:
-	go test ./openapi/...
+	go test ./...
 
 test_coverage:
 	go test ./openapi -coverprofile=coverage.out

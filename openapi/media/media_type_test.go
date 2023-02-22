@@ -22,7 +22,7 @@ func TestOpenAPI_MediaType_GetAndSetChildren(t *testing.T) {
 	want := schema.Schema{Node: tree.Node{}}
 	mt := media.Type{Node: tree.Node{}}
 	mt.SetChild("", &want)
-	got := mt.GetChildren()["Model"].(*schema.Schema)
+	got := mt.GetChildren()[schema.Key].(*schema.Schema)
 	if !reflect.DeepEqual(&want, got) {
 		t.Fail()
 	}

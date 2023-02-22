@@ -3,6 +3,7 @@ package request_test
 import (
 	"github.com/sasswart/gin-in-a-can/openapi"
 	"github.com/sasswart/gin-in-a-can/openapi/media"
+	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/openapi/request"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/openapi/test"
@@ -16,7 +17,7 @@ func TestOpenAPI_LoadsRequestBodyValidation(t *testing.T) {
 		t.Fail()
 	}
 
-	traversable := test.Dig(apiSpec, test.Endpoint, test.Method, test.ReqBody, test.MediaType, test.Schema, "name")
+	traversable := test.Dig(apiSpec, test.Endpoint, path.Post, request.BodyKey, media.JSONKey, schema.Key, "name")
 	name := traversable.(*schema.Schema)
 	if name.MinLength != 1 {
 		t.Errorf("got minLength %v, wanted %v", name.MinLength, 1)

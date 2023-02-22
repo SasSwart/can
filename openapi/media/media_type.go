@@ -6,6 +6,10 @@ import (
 	"github.com/sasswart/gin-in-a-can/tree"
 )
 
+const (
+	JSONKey = "application/json"
+)
+
 var _ tree.NodeTraverser = &Type{}
 
 // Type is a programmatic representation of the Type object defined here: https://swagger.io/specification/#media-type-object
@@ -27,7 +31,7 @@ func (m *Type) GetRef() string {
 
 func (m *Type) GetChildren() map[string]tree.NodeTraverser {
 	return map[string]tree.NodeTraverser{
-		"Model": m.Schema,
+		schema.Key: m.Schema,
 	}
 }
 

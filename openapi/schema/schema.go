@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 )
 
+const Key = "Model"
+
 var _ tree.NodeTraverser = &Schema{}
 
 // Schema is a programmatic representation of the Schema object defined here: https://swagger.io/specification/#schema-object
