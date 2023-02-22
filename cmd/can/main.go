@@ -33,8 +33,7 @@ func main() {
 		"package": cfg.Generator.BasePackageName,
 	})
 
-	renderNode := Renderer.BuildRenderNode()
-	_, err = tree.Traverse(apiSpec, renderNode)
+	_, err = tree.Traverse(apiSpec, Renderer.BuildRenderNode())
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)

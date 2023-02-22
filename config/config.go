@@ -10,7 +10,9 @@ import (
 )
 
 // Data represents the config data used in the day-to-day running of can
+//
 //	TODO this may be vague in definition for the sake of its legibility in use
+//	TODO check for redundancy
 type Data struct {
 	Generator struct {
 		ModuleName string
@@ -34,7 +36,8 @@ type Data struct {
 	OpenAPIFile    string
 	AbsOpenAPIPath string
 
-	OutputPath string
+	OutputPath    string
+	absOutputPath string
 
 	// WorkingDirectory is set through calling os.Getwd()
 	WorkingDirectory string
@@ -88,6 +91,7 @@ func (d Data) Load() error {
 	d.TemplatesDir = filepath.Join(filepath.Dir(exe), "templates")
 	d.absOpenAPIPaths()
 	d.absTemplateDirs()
+	d.absOutputFilepaths()
 
 	err = viper.Unmarshal(&d)
 	if err != nil {
@@ -140,5 +144,22 @@ func (d Data) absTemplateDirs() {
 		d.Template.AbsDirectory = filepath.Join(filepath.Dir(d.FilePath), d.TemplatesDir, d.Template.Name)
 	default:
 		d.Template.AbsDirectory = filepath.Join(d.WorkingDirectory, filepath.Dir(d.FilePath), d.TemplatesDir, d.Template.Name)
+	}
+}
+func (d Data) absOutputFilepaths() {
+	switch true {
+	case filepath.IsAbs(d.OutputPath):
+		d.absOutputPath = d.OutputPath
+	case filepath.IsAbs(d.FilePath):
+		d.absOutputPath = filepath.Join(
+			filepath.Dir(d.FilePath),
+			d.OutputPath,
+		)
+	default:
+		d.absOutputPath = filepath.Join(
+			d.WorkingDirectory,
+			filepath.Dir(d.FilePath),
+			d.OutputPath,
+		)
 	}
 }

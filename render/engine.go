@@ -38,23 +38,7 @@ func (e Engine) GetRenderer() Renderer {
 
 // Render contains the parsing and rendering steps
 func (e Engine) Render(node tree.NodeTraverser, templateFile string) ([]byte, error) {
-
-	var absOutputFile string
-	switch true {
-	case filepath.IsAbs(e.config.OutputPath):
-		absOutputFile = e.config.OutputPath
-	case filepath.IsAbs(e.config.FilePath):
-		absOutputFile = filepath.Join(
-			filepath.Dir(e.config.FilePath),
-			e.config.OutputPath,
-		)
-	default:
-		absOutputFile = filepath.Join(
-			e.config.WorkingDirectory,
-			filepath.Dir(e.config.FilePath),
-			e.config.OutputPath,
-		)
-	}
+	e.getAbsOutputFilepath()
 	buff := bytes.NewBuffer([]byte{})
 
 	templater := template.New(templateFile)
