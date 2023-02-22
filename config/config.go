@@ -62,7 +62,10 @@ func (d Data) Load() error {
 	configFilePath := args.String("configFile", ".", "Specify which config file to use")
 	template := args.String("template", "", "Specify which template set to use")
 	args.BoolVar(&errors.DEBUG, "DEBUG", false, "Enable debug logging")
-	_ = args.Parse(os.Args[1:])
+	err = args.Parse(os.Args[1:])
+	if err != nil {
+		return err
+	}
 
 	if template == nil {
 		fmt.Printf("template is a required flag\nexiting...")
@@ -81,11 +84,10 @@ func (d Data) Load() error {
 		return fmt.Errorf("loadConfig:: could not read config file: %w\n", err)
 	}
 
-	exe, err := os.Readlink("/proc/self/exe")
+	exe, err := binPath()
 	if err != nil {
-		return fmt.Errorf("setupRenderer:: could not read /proc/self/exe: %w", err)
+		return err
 	}
-
 	d.WorkingDirectory = wd
 	d.FilePath = viper.ConfigFileUsed()
 	d.TemplatesDir = filepath.Join(filepath.Dir(exe), "templates")
@@ -167,4 +169,11 @@ func (d Data) absOutputFilepaths() {
 			d.OutputPath,
 		)
 	}
+}
+func binPath() (string, error) {
+	exe, err := os.Readlink("/proc/self/exe")
+	if err != nil {
+		return "", fmt.Errorf("binPath:: could not read /proc/self/exe: %w", err)
+	}
+	return exe, nil
 }

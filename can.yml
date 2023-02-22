@@ -1,4 +1,4 @@
-CodeGenerator:
+generator:
   moduleName: github.com/sasswart/gin-in-a-can/cmd/test_api
   basePackageName: api
 renderer:
