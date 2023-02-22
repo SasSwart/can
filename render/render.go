@@ -17,7 +17,10 @@ type Renderer interface {
 
 }
 
-// misc package functions
+//
+//// misc package functions
+//
+
 var templateFuncMap = template.FuncMap{
 	"ToUpper": strings.ToUpper,
 	"ToTitle": toTitleCase,
