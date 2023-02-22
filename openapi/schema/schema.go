@@ -41,6 +41,9 @@ func (s *Schema) SetChild(i string, t tree.NodeTraverser) {
 		if i == "item" {
 			s.Items = schema
 		} else {
+			if s.Properties == nil {
+				s.Properties = make(map[string]*Schema, 4)
+			}
 			s.Properties[i] = schema
 		}
 		return
@@ -61,13 +64,15 @@ func (s *Schema) GetRef() string {
 	return s.Ref
 }
 
-// TODO this should be language agnostic and currently only caters for golang
+// GetType sanitizes the prepares the contents of the Type field of a schema for use by the renderer
+//
+//	TODO this should be language agnostic and currently only caters for golang
 func (s *Schema) GetType() string {
 	switch s.Type {
 	case "boolean":
 		return "bool"
 	case "array":
-		return "[]" + s.GetChildren()["Model"].GetName()
+		return "[]" + s.GetChildren()["0"].(*Schema).GetName()
 	case "integer":
 		return "int"
 	case "object":

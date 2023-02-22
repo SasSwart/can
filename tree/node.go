@@ -33,10 +33,10 @@ func (n *Node) SetName(name string) {
 	n.Name = name
 }
 func (n *Node) GetName() string {
-	if n.GetParent() != nil {
-		return n.GetParent().GetName() + n.Name
+	if n.GetParent() == nil {
+		return n.Name
 	}
-	return n.Name
+	return n.GetParent().GetName() + n.Name
 }
 
 func (n *Node) SetBasePath(path string) {

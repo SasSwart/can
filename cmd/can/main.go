@@ -12,25 +12,25 @@ import (
 var Renderer *render.Engine
 
 func main() {
-	config := config.Data{}
-	err := config.Load()
+	cfg := config.Data{}
+	err := cfg.Load()
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
-	fmt.Printf("Reading API specification from \"%s\"\n", config.AbsOpenAPIPath)
-	apiSpec, err := openapi.LoadAPISpec(config.AbsOpenAPIPath)
+	fmt.Printf("Reading API specification from \"%s\"\n", cfg.AbsOpenAPIPath)
+	apiSpec, err := openapi.LoadAPISpec(cfg.AbsOpenAPIPath)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
-	Renderer = render.Engine{}.New(render.GinRenderer{}, config)
+	Renderer = render.Engine{}.New(render.GinRenderer{}, cfg)
 
 	apiSpec.SetMetadata(map[string]string{
 		// TODO this doesn't look right
-		"package": config.Generator.BasePackageName,
+		"package": cfg.Generator.BasePackageName,
 	})
 
 	renderNode := Renderer.BuildRenderNode()

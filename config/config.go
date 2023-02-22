@@ -9,7 +9,8 @@ import (
 	"path/filepath"
 )
 
-// TODO this may be vague in definition for the sake of it's legibility in use
+// Data represents the config data used in the day-to-day running of can
+//	TODO this may be vague in definition for the sake of its legibility in use
 type Data struct {
 	Generator struct {
 		ModuleName string

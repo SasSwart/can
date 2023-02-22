@@ -75,3 +75,54 @@ func TestOpenAPI_Schema_IsRequired(t *testing.T) {
 		t.Fatalf("Name does exist in schemaWithRequiredName and was not found")
 	}
 }
+func TestOpenAPI_Schema_GetType(t *testing.T) {
+	tests := []struct {
+		name       string
+		schemaType string
+		expected   string
+		properties *schema.Schema
+	}{
+		{
+			name:       "boolean conversion",
+			schemaType: "boolean",
+			expected:   "bool",
+		},
+		{
+			name:       "array conversion",
+			schemaType: "array",
+			expected:   "[]testname",
+			properties: &schema.Schema{
+				Node: tree.Node{
+					Name: "testname",
+				},
+				Properties: map[string]*schema.Schema{
+					"0": {},
+				},
+			},
+		},
+		{
+			name:       "object conversion",
+			schemaType: "object",
+			expected:   "struct",
+		},
+		{
+			name:       "other conversion",
+			schemaType: "somethingelse",
+			expected:   "somethingelse",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			s := &schema.Schema{}
+			s.Type = test.schemaType
+			if test.properties != nil {
+				s.SetChild("0", test.properties)
+			}
+			want := test.expected
+			got := s.GetType()
+			if want != got {
+				t.Errorf("Wanted %s but got %s\n", want, got)
+			}
+		})
+	}
+}

@@ -9,7 +9,7 @@ import (
 
 var _ tree.NodeTraverser = &Item{}
 
-// PathItem is a programmatic representation of the Path Item object defined here: https://swagger.io/specification/#path-item-object
+// Item is a programmatic representation of the Path Item object defined here: https://swagger.io/specification/#path-item-object
 type Item struct {
 	tree.Node
 	Ref         string `yaml:"$ref"` // must be defined in the format of a PathItem object
