@@ -12,8 +12,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var DEBUG *bool
-
 func main() {
 	configData, err := loadConfig()
 	if err != nil {
@@ -92,7 +90,7 @@ func loadConfig() (config.Config, error) {
 	args := flag.NewFlagSet("can", flag.ExitOnError)
 
 	var configFilePath = args.String("configFile", "", "Specify which config file to use")
-	args.BoolVar(&openapi.DEBUG, "DEBUG", false, "Enable debug logging")
+	args.BoolVar(&openapi.DEBUG, "debug", false, "Enable debug logging")
 	_ = args.Parse(os.Args[1:])
 
 	if configFilePath == nil {

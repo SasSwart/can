@@ -76,7 +76,7 @@ func (n *node) getBasePath() string {
 	if n.parent == nil {
 		return n.basePath
 	}
-	return n.parent.GetParent().getBasePath()
+	return n.GetParent().getBasePath()
 }
 
 // TODO this function can do without it's overrides

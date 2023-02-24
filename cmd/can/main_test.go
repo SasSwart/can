@@ -4,11 +4,13 @@ import (
 	"github.com/sasswart/gin-in-a-can/config"
 	"github.com/sasswart/gin-in-a-can/openapi"
 	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 )
 
 func TestLoadConfig(t *testing.T) {
+	exe, _ := os.Readlink("/proc/self/exe")
 	wd, _ := os.Getwd()
 	tests := []struct {
 		configFile     string
@@ -18,8 +20,9 @@ func TestLoadConfig(t *testing.T) {
 		{configFile: "", expectedConfig: config.Config{}, expectedErr: true},
 		{configFile: "test_fixtures/example.yaml", expectedConfig: config.Config{
 			Generator: config.GeneratorConfig{
-				ModuleName:      "github.com/sasswart/gin-in-a-can",
-				BasePackageName: "api",
+				ModuleName:        "github.com/sasswart/gin-in-a-can",
+				BasePackageName:   "api",
+				TemplateDirectory: filepath.Join(filepath.Dir(exe), "templates"),
 			},
 			OpenAPI: openapi.Config{
 				OpenAPIFile: "./docs/openapi.yml",
