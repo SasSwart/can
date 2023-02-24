@@ -13,6 +13,16 @@ func TestConfig_Load(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
+	if cfg.Generator.ModuleName != "github.com/test/api" ||
+		cfg.Generator.BasePackageName != "test" ||
+		*cfg.Template.Name != "go-gin" ||
+		cfg.Template.Directory != "./templates/go-gin" ||
+		cfg.TemplatesDir != "../templates" ||
+		cfg.OpenAPIFile != "openapi/test/fixtures/validation_no_refs.yaml" ||
+		cfg.OutputPath != "." {
+		t.Fail()
+	}
+
 }
 func TestConfig_validTemplateName(t *testing.T) {
 	cfg := newTestConfig()
@@ -115,17 +125,11 @@ func TestConfig_absOutputFilepaths(t *testing.T) {
 }
 
 func newTestConfig() Data {
-	os.Args = []string{"can", "-configFile=config_test.yaml", "-template=go-gin"}
+	os.Args = []string{"can", "-configFile=config_test.yml", "-template=go-gin"}
 	return Data{
-		Generator: struct {
-			ModuleName      string
-			BasePackageName string
-		}{
-			ModuleName:      "github.com/account/repository",
-			BasePackageName: "test_api",
-		},
-		TemplatesDir: "../templates",
-		OpenAPIFile:  "../openapi/test/fixtures/validation_no_refs.yaml",
-		OutputPath:   ".",
+		Generator:   Generator{},
+		Template:    Template{},
+		OpenAPIFile: "../openapi/test/fixtures/validation_no_refs.yaml",
+		OutputPath:  ".",
 	}
 }

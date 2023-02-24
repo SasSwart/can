@@ -17,24 +17,11 @@ const SemVer = "0.0.6"
 //	TODO this may be vague in definition for the sake of its legibility in use
 //	TODO check for redundancy
 type Data struct {
-	Generator struct {
-		ModuleName string
-
-		// BasePackageName represents the
-		BasePackageName string
-	}
+	Generator
+	Template
 
 	// left public due to it's need to be unmarshalled by Data.Load()
-	TemplatesDir string
-
-	// This struct is populated based on it's Name variable set as a CLI flag
-	Template struct {
-		Name *string
-
-		// Directory should be ./templates/${Name} by default
-		Directory    string
-		absDirectory string
-	}
+	TemplatesDir string `yaml:"templatesDir"`
 
 	// OpenAPIFile represents the path to the yaml OpenAPI 3 file to render
 	OpenAPIFile    string
@@ -46,11 +33,27 @@ type Data struct {
 	// workingDirectory is set through calling os.Getwd()
 	workingDirectory string
 
-	// ConfigPath is `.` if not set through the `--configFile` flag
+	// ConfigPath is `.` if not set through the `-configFile` flag
 	ConfigPath *string
 }
 
-func (d Data) Load() error {
+type Generator struct {
+	ModuleName string
+
+	// BasePackageName represents the
+	BasePackageName string
+}
+
+// Template is populated based on it's Name variable set as a CLI flag
+type Template struct {
+	Name *string
+
+	// Directory should be ./templates/${Name} by default
+	Directory    string
+	absDirectory string
+}
+
+func (d *Data) Load() error {
 	wd, err := os.Getwd()
 	if err != nil {
 		return fmt.Errorf("Config.load:: could not determine working directory: %w\n", err)
@@ -128,7 +131,7 @@ func (d Data) Load() error {
 	return nil
 }
 
-func (d Data) GetTemplateDir() (path string) {
+func (d *Data) GetTemplateDir() (path string) {
 	if d.Template.absDirectory != "" {
 		return d.Template.absDirectory
 	}
@@ -146,7 +149,7 @@ func (d Data) GetTemplateDir() (path string) {
 }
 
 // GetOutputFilepath is used by the render engine to determine where rendered files will be written to
-func (d Data) GetOutputFilepath() (path string) {
+func (d *Data) GetOutputFilepath() (path string) {
 	if d.absOutputPath != "" {
 		return d.absOutputPath
 	}
@@ -174,7 +177,7 @@ func (d Data) GetOutputFilepath() (path string) {
 // in the config file to determine the absolute path to an OpenAPI file. It takes into account that any of these,
 // except the working directory could be relative. It returns the absolute value on every call by caching the result of
 // it's first run and returning that on successive calls
-func (d Data) GetOpenAPIFilepath() (path string) {
+func (d *Data) GetOpenAPIFilepath() (path string) {
 	if d.absOpenAPIPath != "" { // we shouldn't have to run below logic multiple times
 		return d.absOpenAPIPath
 	}
@@ -201,7 +204,7 @@ func (d Data) GetOpenAPIFilepath() (path string) {
 	}
 }
 
-func (d Data) validTemplateName() bool {
+func (d *Data) validTemplateName() bool {
 	dirs, err := d.validTemplates()
 	if err != nil {
 		fmt.Println(fmt.Errorf("could not list valid templates in %s :: %w", d.TemplatesDir, err))
@@ -215,7 +218,7 @@ func (d Data) validTemplateName() bool {
 	return false
 }
 
-func (d Data) validTemplates() (templates []string, err error) {
+func (d *Data) validTemplates() (templates []string, err error) {
 	dirs, err := os.ReadDir(d.TemplatesDir)
 	if err != nil {
 		fmt.Println(fmt.Errorf("could not list directories %w", err))
@@ -226,8 +229,8 @@ func (d Data) validTemplates() (templates []string, err error) {
 	}
 	return templates, nil
 }
-func (d Data) resolveTemplateConfig() error {
-	exe, err := binPath()
+func (d *Data) resolveTemplateConfig() error {
+	exe, err := os.Executable()
 	if err != nil {
 		return err
 	}
@@ -237,14 +240,5 @@ func (d Data) resolveTemplateConfig() error {
 	if d.Template.Directory == "" {
 		d.Template.Directory = "./templates/" + *d.Template.Name
 	}
-
 	return nil
-}
-
-func binPath() (string, error) {
-	exe, err := os.Readlink("/proc/self/exe")
-	if err != nil {
-		return "", fmt.Errorf("binPath:: could not read /proc/self/exe: %w", err)
-	}
-	return exe, nil
 }
