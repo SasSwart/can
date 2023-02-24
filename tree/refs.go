@@ -11,7 +11,7 @@ import (
 // ReadRef takes a reference and attempts to unmarshal it's content into the struct being passed as `i`.
 // As it happens, this ref is contained within the struct that is being unmarshalled into.
 func readRef(absFilename string, n NodeTraverser) error {
-	if errors.DEBUG { // this can be a particularly noisy Printf call
+	if errors.Debug { // this can be a particularly noisy Printf call
 		fmt.Printf("Reading reference: %s\n", absFilename)
 	}
 	content, err := os.ReadFile(absFilename)

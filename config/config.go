@@ -53,7 +53,7 @@ func (d Data) Load() error {
 	}
 	var args *flag.FlagSet
 
-	if errors.DEBUG {
+	if errors.Debug {
 		args = flag.NewFlagSet("can", flag.ContinueOnError)
 	} else {
 		args = flag.NewFlagSet("can", flag.ExitOnError)
@@ -61,7 +61,7 @@ func (d Data) Load() error {
 
 	configFilePath := args.String("configFile", ".", "Specify which config file to use")
 	template := args.String("template", "", "Specify which template set to use")
-	args.BoolVar(&errors.DEBUG, "DEBUG", false, "Enable debug logging")
+	args.BoolVar(&errors.Debug, "debug", false, "Enable debug logging")
 	err = args.Parse(os.Args[1:])
 	if err != nil {
 		return err
