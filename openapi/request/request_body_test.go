@@ -6,7 +6,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/openapi/request"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
-	"github.com/sasswart/gin-in-a-can/openapi/test"
+	"github.com/sasswart/gin-in-a-can/test"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"testing"
 )

@@ -13,23 +13,31 @@ import (
 )
 
 var e *render.Engine
-var toRender = &openapi.OpenAPI{
-	Node: tree.Node{Name: "openapi"},
-	Paths: map[string]*path.Item{"/endpoint": {
+var toRender = buildTestSpec()
+func buildTestSpec() *openapi.OpenAPI {
+	root := openapi.OpenAPI{
+		Node: tree.Node{Name: "openapi"},
+	}
+
+	requestBody := request.Body{
+		Node: tree.Node{Name: "requestbody"},
+	}
+
+	requestBody2 :=  request.Body{
+		Node: tree.Node{Name: "requestbody2"},
+	}
+
+	path := map[string]*path.Item{"/endpoint": {
 		Node: tree.Node{Name: "pathitem"},
-		Get: &operation.Operation{
-			Node: tree.Node{Name: "operation"},
-			RequestBody: request.Body{
-				Node: tree.Node{Name: "requestbody"},
-			},
-		},
-		Post: &operation.Operation{
-			Node: tree.Node{Name: "pathitem2"},
-			RequestBody: request.Body{
-				Node: tree.Node{Name: "requestbody2"},
-			},
-		},
-	}},
+	}
+
+	get := operation.Operation{
+		Node: tree.Node{Name: "operation"},
+	}
+	post := &operation.Operation{
+		Node: tree.Node{Name: "pathitem2"},
+	}
+	return &openapi
 }
 
 func resetTestRenderer(cfg config.Data) {
@@ -37,19 +45,23 @@ func resetTestRenderer(cfg config.Data) {
 }
 
 func Test_Render_Render(t *testing.T) {
+	tempFolder, err := os.MkdirTemp(os.TempDir(), "CanTestArtifacts")
+	defer os.RemoveAll(tempFolder)
+
 	cfg := newTestConfig()
-	err := cfg.Load()
+	err = cfg.Load()
 	if err != nil {
 		t.Errorf(err.Error())
 	}
+	cfg.OutputPath = tempFolder
 	resetTestRenderer(cfg)
-	_, err = e.Render(toRender, cfg.GetTemplateDir())
+	_, err = tree.Traverse(toRender, e.BuildRenderNode())
 	if err != nil {
-		//t.Errorf(err.Error())
+		t.Errorf(err.Error())
 	}
 }
 func newTestConfig() config.Data {
-	os.Args = []string{"can", "-configFile=../config/config_test.yml", "-template=go-gin"}
+	os.Args = []string{"can", "-configFile=../config/config_test.yml", "-template=go-gin", "-debug=true"}
 	return config.Data{
 		Generator:    config.Generator{},
 		Template:     config.Template{},

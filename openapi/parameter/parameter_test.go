@@ -4,7 +4,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi"
 	"github.com/sasswart/gin-in-a-can/openapi/parameter"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
-	"github.com/sasswart/gin-in-a-can/openapi/test"
+	"github.com/sasswart/gin-in-a-can/test"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"reflect"
 	"testing"

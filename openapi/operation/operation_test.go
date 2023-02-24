@@ -6,7 +6,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/parameter"
 	"github.com/sasswart/gin-in-a-can/openapi/request"
 	"github.com/sasswart/gin-in-a-can/openapi/response"
-	"github.com/sasswart/gin-in-a-can/openapi/test"
+	"github.com/sasswart/gin-in-a-can/test"
 	"reflect"
 	"testing"
 )

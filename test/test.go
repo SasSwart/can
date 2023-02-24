@@ -24,6 +24,7 @@ const GinRenderedPathItemName = "ValidationFixtureEndpoint"
 const GinRenderedResponseName = "ValidationFixtureEndpointPost201Response"
 const GinRenderedMediaItemName = "ValidationFixtureEndpointPostRequestBody"
 const GinRenderedOpenAPIName = "ValidationFixture"
+const Folder = "Temp"
 
 var AbsOpenAPI, _ = filepath.Abs(OpenapiFile)
 

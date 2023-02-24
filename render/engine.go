@@ -18,7 +18,7 @@ import (
 type EngineInterface interface {
 	New(renderer Renderer, config config.Data) *Engine
 	GetRenderer() Renderer
-	Render(data tree.NodeTraverser, templateFile string) ([]byte, error)
+	render(data tree.NodeTraverser, templateFile string) ([]byte, error)
 	BuildRenderNode() tree.TraversalFunc
 }
 type Engine struct {
@@ -37,10 +37,9 @@ func (e Engine) GetRenderer() Renderer {
 }
 
 // Render contains the parsing and rendering steps
-func (e Engine) Render(node tree.NodeTraverser, templateFile string) ([]byte, error) {
+func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte, error) {
 	buff := bytes.NewBuffer([]byte{})
-
-	templater := template.New(templateFile)
+	templater := template.New(templateFilename)
 
 	templater.Funcs(templateFuncMap)
 
@@ -56,14 +55,18 @@ func (e Engine) Render(node tree.NodeTraverser, templateFile string) ([]byte, er
 		return nil, err
 	}
 
-	fmt.Printf("Rendering %s using %s\n", e.renderer.GetOutputFile(node), templateFile)
+	fmt.Printf("Rendering %s using %s\n", e.renderer.GetOutputFilename(node), templateFilename)
 
-	outputDirAbs := filepath.Dir(e.config.GetOutputFilepath())
+	outputDirAbs := filepath.Dir(e.config.GetOutputDir())
 	if _, err := os.Stat(outputDirAbs); errors.Is(err, os.ErrNotExist) {
 		_ = os.MkdirAll(outputDirAbs, 0755)
 	}
 
-	err = os.WriteFile(e.config.GetOutputFilepath(), buff.Bytes(), 0644)
+	if !*config.Dryrun {
+		fmt.Println(string(buff.Bytes()))
+	}
+	outPath := filepath.Join(e.config.GetOutputDir(), e.renderer.GetOutputFilename(node))
+	err = os.WriteFile(outPath, buff.Bytes(), 0644)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +95,7 @@ func (e Engine) BuildRenderNode() tree.TraversalFunc {
 			return node, nil
 		}
 
-		_, err := e.Render(node, templateFile)
+		_, err := e.render(node, templateFile)
 		if err != nil {
 			return node, err
 		}

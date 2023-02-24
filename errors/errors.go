@@ -12,5 +12,3 @@ func UndefinedBehaviour(function string) {
 func Unimplemented(function string) {
 	panic(fmt.Sprintf("%s ::: unimplemented", function))
 }
-
-var Debug bool

@@ -15,7 +15,7 @@ func TestConfig_Load(t *testing.T) {
 
 	if cfg.Generator.ModuleName != "github.com/test/api" ||
 		cfg.Generator.BasePackageName != "test" ||
-		cfg.Template.Name != "go-gin" ||
+		*cfg.Template.Name != "go-gin" ||
 		cfg.Template.Directory != "./templates/go-gin" ||
 		cfg.TemplatesDir != "../templates" ||
 		cfg.OpenAPIFile != "openapi/test/fixtures/validation_no_refs.yaml" ||
@@ -53,7 +53,7 @@ func TestConfig_validTemplateName(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			cfg.Template.Name = test.input
+			cfg.Template.Name = &test.input
 			got := cfg.validTemplateName()
 			if got != test.expected {
 				t.Fail()
@@ -65,7 +65,7 @@ func TestConfig_GetOpenAPIFilepath(t *testing.T) {
 	cfg := newTestConfig()
 	_ = cfg.Load()
 	absOpenApi, absOpenApiErr := filepath.Abs(cfg.OpenAPIFile)
-	absConfigPath, absConfigPathErr := filepath.Abs(cfg.ConfigPath)
+	absConfigPath, absConfigPathErr := filepath.Abs(*ConfigPath)
 
 	tests := []struct {
 		name           string
@@ -89,8 +89,8 @@ func TestConfig_GetOpenAPIFilepath(t *testing.T) {
 		{
 			name:           "working dir fallback",
 			openapifile:    cfg.OpenAPIFile,
-			configfilepath: cfg.ConfigPath,
-			workingdir:     cfg.workingDirectory,
+			configfilepath: *ConfigPath,
+			workingdir:     ProcWorkingDir,
 		},
 	}
 	for _, test := range tests {
@@ -103,10 +103,10 @@ func TestConfig_GetOpenAPIFilepath(t *testing.T) {
 				cfg.OpenAPIFile = test.openapifile
 			}
 			if test.configfilepath != "" {
-				cfg.ConfigPath = test.configfilepath
+				*ConfigPath = test.configfilepath
 			}
 			if test.workingdir != "" {
-				cfg.workingDirectory = test.workingdir
+				ProcWorkingDir = test.workingdir
 			}
 			// TODO figure out how to isolate test context from host filesystem for accurate testing
 			if cfg.GetOpenAPIFilepath() == "" {

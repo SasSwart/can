@@ -3,7 +3,6 @@ package config
 import (
 	"flag"
 	"fmt"
-	"github.com/sasswart/gin-in-a-can/errors"
 	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
@@ -11,6 +10,15 @@ import (
 
 // SemVer should be updated on any new release!!
 const SemVer = "0.0.6"
+
+var (
+	Output, Debug, Dryrun *bool
+	// ConfigPath is `.` if not set through the `-configFile` flag
+	ConfigPath *string
+
+	// ProcWorkingDir is set through calling os.Getwd()
+	ExePath, ProcWorkingDir string
+)
 
 // Data represents the config data used in the day-to-day running of can
 //
@@ -29,12 +37,6 @@ type Data struct {
 
 	OutputPath    string
 	absOutputPath string
-
-	// workingDirectory is set through calling os.Getwd()
-	workingDirectory string
-
-	// ConfigPath is `.` if not set through the `-configFile` flag
-	ConfigPath string
 }
 
 type Generator struct {
@@ -46,65 +48,56 @@ type Generator struct {
 
 // Template is populated based on it's Name variable set as a CLI flag
 type Template struct {
-	Name string
+	Name *string
 
 	// Directory should be ./templates/${Name} by default
 	Directory    string
 	absDirectory string
 }
 
-func (d *Data) Load() error {
-	wd, err := os.Getwd()
+func (d *Data) Load() (err error) {
+	// Setup config pre-unmarshalling. This assumes we don't change directory before this is executed
+	ProcWorkingDir, err = os.Getwd()
 	if err != nil {
 		return fmt.Errorf("Config.load:: could not determine working directory: %w\n", err)
 	}
-	var args *flag.FlagSet
-	var versionFlagSet bool
-
-	if errors.Debug {
-		// TODO verify that this is beneficial
-		fmt.Printf("[%s]:: continuing on error...\n", SemVer)
-		args = flag.NewFlagSet("can", flag.ContinueOnError)
-	} else {
-		args = flag.NewFlagSet("can", flag.ExitOnError)
+	ExePath, err = os.Executable()
+	if err != nil {
+		return fmt.Errorf("Config.load:: could not determine executable directory: %w\n", err)
 	}
+	var debug bool
 
 	// flags
-	cfgPath := args.String("configFile", ".", "Specify which config file to use")
-	templateName := args.String("template", "", "Specify which template set to use")
-	args.BoolVar(&errors.Debug, "debug", false, "Enable debug logging")
-	args.BoolVar(&versionFlagSet, "version", false, "Print Can version and exit")
-	err = args.Parse(os.Args[1:])
-	if err != nil {
-		return err
-	}
+	versionFlagSet := flag.Bool("version", false, "Print Can version and exit")
+	Debug = flag.Bool("debug", false, "Enable debug logging")
+	ConfigPath = flag.String("configFile", ".", "Specify which config file to use")
+	Dryrun = flag.Bool("dryrun", false,
+		"Toggles whether to perform a render without writing to disk."+
+			"This works particularly well in combination with -debug")
+	d.Template.Name = flag.String("template", "", "Specify which template set to use")
+	flag.Parse()
 
-	absCfgPath, err := filepath.Abs(*cfgPath)
+	absCfgPath, err := filepath.Abs(*ConfigPath)
 	if err != nil {
 		return fmt.Errorf("could not resolve relative config path: %w", err)
 	}
+	ConfigPath = &absCfgPath
 
-	d.ConfigPath = absCfgPath
-	d.Template.Name = *templateName
-
-	if versionFlagSet {
+	if *versionFlagSet {
 		fmt.Printf("Can Version: %s\n", SemVer)
 		os.Exit(0)
 	}
 
 	// config load
-	if errors.Debug {
-		fmt.Printf("[%s]::Using config file \"%s\".\n", SemVer, d.ConfigPath)
+	if debug {
+		fmt.Printf("[v%s]::Using config file \"%s\".\n", SemVer, *ConfigPath)
 	}
-	viper.SetConfigFile(d.ConfigPath)
+	viper.SetConfigFile(*ConfigPath)
 
 	err = viper.ReadInConfig()
 	if err != nil {
 		return fmt.Errorf("loadConfig:: could not read config file: %w\n", err)
 	}
-
-	// Setup config pre-unmarshalling
-	d.workingDirectory = wd
 
 	err = viper.Unmarshal(&d)
 	if err != nil {
@@ -113,7 +106,7 @@ func (d *Data) Load() error {
 
 	// This should always happen at the end of this function
 	// Handle Templates
-	if d.Template.Name == "" {
+	if *d.Template.Name == "" {
 		fmt.Printf("template is a required flag\nexiting...")
 		os.Exit(1)
 	}
@@ -145,19 +138,19 @@ func (d *Data) GetTemplateDir() (path string) {
 	}
 	switch true {
 	case filepath.IsAbs(d.TemplatesDir):
-		d.Template.absDirectory = filepath.Join(d.TemplatesDir, d.Template.Name)
+		d.Template.absDirectory = filepath.Join(d.TemplatesDir, *d.Template.Name)
 		return d.Template.absDirectory
-	case filepath.IsAbs(d.ConfigPath):
-		d.Template.absDirectory = filepath.Join(filepath.Dir(d.ConfigPath), d.TemplatesDir, d.Template.Name)
+	case filepath.IsAbs(*ConfigPath):
+		d.Template.absDirectory = filepath.Join(filepath.Dir(*ConfigPath), d.TemplatesDir, *d.Template.Name)
 		return d.Template.absDirectory
 	default:
-		d.Template.absDirectory = filepath.Join(d.workingDirectory, filepath.Dir(d.ConfigPath), d.TemplatesDir, d.Template.Name)
+		d.Template.absDirectory = filepath.Join(ProcWorkingDir, filepath.Dir(*ConfigPath), d.TemplatesDir, *d.Template.Name)
 		return d.Template.absDirectory
 	}
 }
 
-// GetOutputFilepath is used by the render engine to determine where rendered files will be written to
-func (d *Data) GetOutputFilepath() (path string) {
+// GetOutputDir is used by the render engine to determine where rendered files will be written to
+func (d *Data) GetOutputDir() (path string) {
 	if d.absOutputPath != "" {
 		return d.absOutputPath
 	}
@@ -165,16 +158,16 @@ func (d *Data) GetOutputFilepath() (path string) {
 	case filepath.IsAbs(d.OutputPath):
 		d.absOutputPath = d.OutputPath
 		return d.absOutputPath
-	case filepath.IsAbs(d.ConfigPath):
+	case filepath.IsAbs(*ConfigPath):
 		d.absOutputPath = filepath.Join(
-			filepath.Dir(d.ConfigPath),
+			filepath.Dir(*ConfigPath),
 			d.OutputPath,
 		)
 		return d.absOutputPath
 	default:
 		d.absOutputPath = filepath.Join(
-			d.workingDirectory,
-			filepath.Dir(d.ConfigPath),
+			ProcWorkingDir,
+			filepath.Dir(*ConfigPath),
 			d.OutputPath,
 		)
 		return d.absOutputPath
@@ -193,9 +186,9 @@ func (d *Data) GetOpenAPIFilepath() (path string) {
 		d.absOpenAPIPath = d.OpenAPIFile
 		return d.absOpenAPIPath
 	} else {
-		if filepath.IsAbs(d.ConfigPath) {
+		if filepath.IsAbs(*ConfigPath) {
 			d.absOpenAPIPath = filepath.Join(
-				filepath.Dir(d.ConfigPath),
+				filepath.Dir(*ConfigPath),
 				d.OpenAPIFile,
 			)
 			return d.absOpenAPIPath
@@ -203,8 +196,8 @@ func (d *Data) GetOpenAPIFilepath() (path string) {
 			d.absOpenAPIPath = filepath.Join(
 				// TODO test this
 				// not relative as per above comment
-				d.workingDirectory,
-				filepath.Dir(d.ConfigPath),
+				ProcWorkingDir,
+				filepath.Dir(*ConfigPath),
 				d.OpenAPIFile,
 			)
 			return d.absOpenAPIPath
@@ -219,7 +212,7 @@ func (d *Data) validTemplateName() bool {
 		return false
 	}
 	for _, dir := range dirs {
-		if dir == d.Template.Name {
+		if dir == *d.Template.Name {
 			return true
 		}
 	}
@@ -246,7 +239,7 @@ func (d *Data) resolveTemplateConfig() error {
 		d.TemplatesDir = filepath.Join(filepath.Dir(exe), "templates")
 	}
 	if d.Template.Directory == "" {
-		d.Template.Directory = "./templates/" + d.Template.Name
+		d.Template.Directory = "./templates/" + *d.Template.Name
 	}
 	return nil
 }

@@ -17,6 +17,10 @@ func TestOpenAPI_PathItem_GetAndSetName(t *testing.T) {
 	}
 }
 
+func Test_Path_GetPath(t *testing.T) {
+
+}
+
 func TestOpenAPI_PathItem_GetAndSetChildren(t *testing.T) {
 	i := path.Item{}
 	i.SetChild("post", &operation.Operation{})

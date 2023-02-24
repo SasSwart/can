@@ -12,7 +12,7 @@ type Renderer interface {
 	SanitiseName(string) string
 	SanitiseType(n tree.NodeTraverser) string
 
-	GetOutputFile(n tree.NodeTraverser) string
+	GetOutputFilename(n tree.NodeTraverser) string
 	//getName(n tree.NodeTraverser) string
 
 }

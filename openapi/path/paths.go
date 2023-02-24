@@ -35,22 +35,22 @@ func (p *Item) GetRef() string {
 }
 
 func (p *Item) GetPath() string {
-	name := p.GetName()
-	return name
+	return p.GetName()
 }
 
 func (p *Item) SetChild(i string, child tree.NodeTraverser) {
 	if t, ok := child.(*operation.Operation); ok {
-		p.operations()[i] = t
+		p.Operations()[i] = t
 		return
 	}
 	errors.CastFail("(o *Root) setChild", "NodeTraverser", "*schema.Schema")
 }
 func (p *Item) GetChildren() map[string]tree.NodeTraverser {
-	return p.operations()
+	return p.Operations()
 }
 
-func (p *Item) operations() map[string]tree.NodeTraverser {
+// Operations is public as it's called by the templater before rendering output
+func (p *Item) Operations() map[string]tree.NodeTraverser {
 	operations := map[string]tree.NodeTraverser{}
 	if p.Get != nil {
 		operations[Get] = p.Get
