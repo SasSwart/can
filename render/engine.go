@@ -44,7 +44,7 @@ func (e Engine) Render(node tree.NodeTraverser, templateFile string) ([]byte, er
 
 	templater.Funcs(templateFuncMap)
 
-	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", e.config.Template.AbsDirectory))
+	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", e.config.GetTemplateDir()))
 	if err != nil {
 		return nil, err
 	}
@@ -56,12 +56,12 @@ func (e Engine) Render(node tree.NodeTraverser, templateFile string) ([]byte, er
 
 	fmt.Printf("Rendering %s using %s\n", e.renderer.GetOutputFile(node), templateFile)
 
-	outputDirAbs := filepath.Dir(e.config.GetOutPath())
+	outputDirAbs := filepath.Dir(e.config.GetOutputFilepath())
 	if _, err := os.Stat(outputDirAbs); errors.Is(err, os.ErrNotExist) {
 		_ = os.MkdirAll(outputDirAbs, 0755)
 	}
 
-	err = os.WriteFile(e.config.GetOutPath(), buff.Bytes(), 0644)
+	err = os.WriteFile(e.config.GetOutputFilepath(), buff.Bytes(), 0644)
 	if err != nil {
 		return nil, err
 	}

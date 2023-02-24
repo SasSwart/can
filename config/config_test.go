@@ -44,7 +44,7 @@ func TestConfig_validTemplateName(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got := cfg.validTemplateName(test.input)
+			got := cfg.validTemplateName()
 			if got != test.expected {
 				t.Fail()
 			}
@@ -54,7 +54,7 @@ func TestConfig_validTemplateName(t *testing.T) {
 func TestConfig_absOpenAPIPaths(t *testing.T) {
 	cfg := newTestConfig()
 	absOpenApi, absOpenApiErr := filepath.Abs(cfg.OpenAPIFile)
-	absConfigPath, absConfigPathErr := filepath.Abs(cfg.FilePath)
+	absConfigPath, absConfigPathErr := filepath.Abs(*cfg.ConfigPath)
 
 	tests := []struct {
 		name           string
@@ -78,8 +78,8 @@ func TestConfig_absOpenAPIPaths(t *testing.T) {
 		{
 			name:           "working dir fallback",
 			openapifile:    cfg.OpenAPIFile,
-			configfilepath: cfg.FilePath,
-			workingdir:     cfg.WorkingDirectory,
+			configfilepath: *cfg.ConfigPath,
+			workingdir:     cfg.workingDirectory,
 		},
 		//{
 		//	name:        "should fail",
@@ -95,13 +95,13 @@ func TestConfig_absOpenAPIPaths(t *testing.T) {
 				cfg.OpenAPIFile = test.openapifile
 			}
 			if test.configfilepath != "" {
-				cfg.FilePath = test.configfilepath
+				cfg.ConfigPath = &test.configfilepath
 			}
 			if test.workingdir != "" {
-				cfg.WorkingDirectory = test.workingdir
+				cfg.workingDirectory = test.workingdir
 			}
-			cfg.absOpenAPIPaths()
-			if cfg.AbsOpenAPIPath == "" {
+			cfg.GetOpenAPIFilepath()
+			if cfg.absOpenAPIPath == "" {
 				t.Fail()
 			}
 		})
@@ -115,7 +115,7 @@ func TestConfig_absOutputFilepaths(t *testing.T) {
 }
 
 func newTestConfig() Data {
-	os.Args = []string{"can", "-configFile=../can.yaml", "-template=go-gin"}
+	os.Args = []string{"can", "-configFile=config_test.yaml", "-template=go-gin"}
 	return Data{
 		Generator: struct {
 			ModuleName      string
@@ -127,6 +127,5 @@ func newTestConfig() Data {
 		TemplatesDir: "../templates",
 		OpenAPIFile:  "../openapi/test/fixtures/validation_no_refs.yaml",
 		OutputPath:   ".",
-		FilePath:     "../can.yaml",
 	}
 }

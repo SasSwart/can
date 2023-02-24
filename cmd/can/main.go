@@ -19,8 +19,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("Reading API specification from \"%s\"\n", cfg.AbsOpenAPIPath)
-	apiSpec, err := openapi.LoadAPISpec(cfg.AbsOpenAPIPath)
+	fmt.Printf("Reading API specification from \"%s\"\n", cfg.GetOpenAPIFilepath())
+	apiSpec, err := openapi.LoadAPISpec(cfg.GetOpenAPIFilepath())
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
