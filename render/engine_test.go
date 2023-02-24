@@ -8,6 +8,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/request"
 	"github.com/sasswart/gin-in-a-can/render"
 	"github.com/sasswart/gin-in-a-can/tree"
+	"os"
 	"testing"
 )
 
@@ -31,20 +32,29 @@ var toRender = &openapi.OpenAPI{
 	}},
 }
 
-func resetTestRenderer() {
-	cfg := config.Data{}
+func resetTestRenderer(t *testing.T, cfg config.Data) {
 	err := cfg.Load()
 	if err != nil {
-		panic(err.Error())
+		t.Errorf(err.Error())
 	}
 	e = render.Engine{}.New(render.GinRenderer{}, cfg)
 }
 
 func Test_Render_Render(t *testing.T) {
-	resetTestRenderer()
-	templatePath := ""
-	_, err := e.Render(toRender, templatePath)
+	cfg := newTestConfig()
+	resetTestRenderer(t, cfg)
+	_, err := e.Render(toRender, cfg.GetTemplateDir())
 	if err != nil {
 		t.Errorf(err.Error())
+	}
+}
+func newTestConfig() config.Data {
+	os.Args = []string{"can", "-configFile=../config/config_test.yml", "-template=go-gin"}
+	return config.Data{
+		Generator:    config.Generator{},
+		Template:     config.Template{},
+		TemplatesDir: "../templates",
+		OpenAPIFile:  "../openapi/test/fixtures/validation_no_refs.yaml",
+		OutputPath:   ".",
 	}
 }
