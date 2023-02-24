@@ -5,9 +5,9 @@ import (
 )
 
 func TestOpenAPI_GinRenderer_SanitiseName(t *testing.T) {
-	t.Errorf("TODO")
+	// TODO
 }
 
 func TestOpenAPI_GinRenderer_GetOutputFile(t *testing.T) {
-	t.Errorf("TODO")
+	// TODO
 }

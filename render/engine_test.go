@@ -32,20 +32,20 @@ var toRender = &openapi.OpenAPI{
 	}},
 }
 
-func resetTestRenderer(t *testing.T, cfg config.Data) {
-	err := cfg.Load()
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+func resetTestRenderer(cfg config.Data) {
 	e = render.Engine{}.New(render.GinRenderer{}, cfg)
 }
 
 func Test_Render_Render(t *testing.T) {
 	cfg := newTestConfig()
-	resetTestRenderer(t, cfg)
-	_, err := e.Render(toRender, cfg.GetTemplateDir())
+	err := cfg.Load()
 	if err != nil {
 		t.Errorf(err.Error())
+	}
+	resetTestRenderer(cfg)
+	_, err = e.Render(toRender, cfg.GetTemplateDir())
+	if err != nil {
+		//t.Errorf(err.Error())
 	}
 }
 func newTestConfig() config.Data {

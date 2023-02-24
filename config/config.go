@@ -78,7 +78,13 @@ func (d *Data) Load() error {
 	if err != nil {
 		return err
 	}
-	d.ConfigPath = *cfgPath
+
+	absCfgPath, err := filepath.Abs(*cfgPath)
+	if err != nil {
+		return fmt.Errorf("could not resolve relative config path: %w", err)
+	}
+
+	d.ConfigPath = absCfgPath
 	d.Template.Name = *templateName
 
 	if versionFlagSet {
