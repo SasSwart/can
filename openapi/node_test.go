@@ -30,3 +30,11 @@ func TestOpenAPI_Dig(t *testing.T) {
 		t.Errorf("%#v should have been a %T", schema, &Schema{})
 	}
 }
+
+func TestOpenAPI_Node_GetMetadata(t *testing.T) {
+	t.Errorf("TODO")
+}
+
+func TestOpenAPI_Node_GetOutputFile(t *testing.T) {
+	t.Errorf("TODO")
+}

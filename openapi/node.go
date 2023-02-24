@@ -2,6 +2,7 @@ package openapi
 
 import "fmt"
 
+type Metadata map[string]string
 type Traversable interface {
 	// Tree Traversable
 	getChildren() map[string]Traversable
@@ -17,8 +18,8 @@ type Traversable interface {
 	setRenderer(r Renderer)
 	getRenderer() Renderer
 	GetOutputFile() string
-	GetMetadata() map[string]string
-	SetMetadata(metadata map[string]string)
+	GetMetadata() Metadata
+	SetMetadata(metadata Metadata)
 }
 
 type TraversalFunc func(key string, parent, child Traversable) (Traversable, error)
@@ -28,6 +29,7 @@ type node struct {
 	parent   Traversable
 	name     string
 	renderer Renderer
+	metadata Metadata
 }
 
 const (
@@ -35,14 +37,22 @@ const (
 	errCastFail       = " cast failed"
 )
 
-func (n *node) SetMetadata(metadata map[string]string) {
-	n.parent.SetMetadata(metadata)
+func (n *node) SetMetadata(metadata Metadata) {
+	if n.GetParent() == nil {
+		n.metadata = metadata
+		return
+	}
+	n.GetParent().SetMetadata(metadata)
+
 }
 
 var _ Traversable = &node{}
 
-func (n *node) GetMetadata() map[string]string {
-	return n.parent.GetMetadata()
+func (n *node) GetMetadata() Metadata {
+	if n.GetParent() == nil {
+		return n.metadata
+	}
+	return n.GetParent().GetMetadata()
 }
 
 func (n *node) getChildren() map[string]Traversable {
@@ -63,9 +73,13 @@ func (n *node) setParent(parent Traversable) {
 
 // getBasePath recurses up the parental ladder until it's overridden by the *OpenAPI method
 func (n *node) getBasePath() string {
-	return n.parent.getBasePath()
+	if n.parent == nil {
+		return n.basePath
+	}
+	return n.GetParent().getBasePath()
 }
 
+// TODO this function can do without it's overrides
 func (n *node) GetOutputFile() string {
 	return n.getRenderer().getOutputFile(n)
 }
@@ -85,10 +99,19 @@ func (n *node) setName(name string) {
 }
 
 func (n *node) setRenderer(r Renderer) {
-	n.renderer = r
+	if n.parent == nil {
+		n.renderer = r
+		return
+	}
+	if n.parent.getRenderer() == nil {
+		n.parent.setRenderer(r)
+	}
 }
 
 func (n *node) getRenderer() Renderer {
+	if n.parent == nil {
+		return n.renderer
+	}
 	return n.parent.getRenderer()
 }
 
@@ -124,12 +147,12 @@ func TraverseRecursor[T Traversable](node T, f TraversalFunc) (T, error) {
 // to the node.
 func Traverse[T Traversable](node T, f TraversalFunc) (T, error) {
 	if f == nil {
-		return node, nil
+		return node, fmt.Errorf("no traversal function supplied")
 	}
 
 	result, err := f("", nil, node)
 	if err != nil {
-		return node, err
+		return node, fmt.Errorf("traversal function[%#v] error: %w", f, err)
 	}
 
 	node, ok := result.(T)

@@ -2,7 +2,7 @@ package openapi
 
 import "testing"
 
-func TestResponse_GetName(t *testing.T) {
+func TestOpenAPI_Response_GetName(t *testing.T) {
 	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
 	SetRenderer(openapi, GinRenderer{})
 	post201 := "201"

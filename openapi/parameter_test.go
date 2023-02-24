@@ -16,3 +16,7 @@ func TestOpenAPILoadsParameterValidation(t *testing.T) {
 		t.Errorf("Expected id parameter->schema->format to contain `uuid`, not %v", IDParam.Schema.Format)
 	}
 }
+
+func TestOpenAPI_Parameter_getChildren(t *testing.T) {
+	t.Errorf("TODO")
+}

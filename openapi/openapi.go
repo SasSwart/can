@@ -19,7 +19,6 @@ type OpenAPI struct {
 	Servers    []Server
 	Paths      map[string]*PathItem
 	Components Components
-	metadata   map[string]string
 }
 
 func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
@@ -74,24 +73,8 @@ func SetRenderer(api *OpenAPI, renderer Renderer) error {
 	return err
 }
 
-func (o *OpenAPI) getRenderer() Renderer {
-	return o.renderer
-}
-
-func (o *OpenAPI) SetMetadata(metadata map[string]string) {
-	o.metadata = metadata
-}
-
-func (o *OpenAPI) GetMetadata() map[string]string {
-	return o.metadata
-}
-
 func (o *OpenAPI) getRef() string {
 	return ""
-}
-
-func (o *OpenAPI) getBasePath() string {
-	return o.node.basePath
 }
 
 func (o *OpenAPI) GetName() string {
@@ -100,6 +83,8 @@ func (o *OpenAPI) GetName() string {
 }
 
 func (o *OpenAPI) GetOutputFile() string {
+	// TODO passing in yourself seems like a smell
+	// TODO this override could be removed and handed by the node{} composable
 	fileName := o.getRenderer().getOutputFile(o)
 	return fileName
 }

@@ -5,13 +5,21 @@ import (
 	"testing"
 )
 
-var (
-	properties = map[string]*Schema{
+func (s *Schema) withProperties() *Schema {
+	s.Properties = map[string]*Schema{
 		"renderable":        {},
 		"anotherRenderable": {},
 	}
-	item = &Schema{}
-	p    = &MediaType{ // PARENT
+	return s
+}
+
+func (s *Schema) withItems() *Schema {
+	s.Items = &Schema{}
+	return s
+}
+
+func (s *Schema) withParent() *Schema {
+	s.parent = &MediaType{
 		node: node{},
 		name: "parentName",
 		Schema: &Schema{
@@ -22,76 +30,45 @@ var (
 			Type: "string",
 		},
 	}
-)
-
-func emptySchemaWith(childProperties, childItems, parent bool) *Schema {
-	mainNode := node{
-		parent: p, // PARENT POINT
-		name:   "mainModel",
-	}
-	switch {
-	case parent && !childProperties && !childItems:
-		return &Schema{ // BASE SCHEMA
-			node: mainNode,
-			Type: "string",
-		}
-	case !parent && childProperties && !childItems:
-		return &Schema{ // BASE SCHEMA
-			node:       mainNode,
-			Type:       "string",
-			Properties: properties, // CHILD POINT
-		}
-	case !parent && !childProperties && childItems:
-		return &Schema{ // BASE SCHEMA
-			node:  mainNode,
-			Type:  "string",
-			Items: item, // CHILD POINT
-		}
-	case !parent && childProperties && childItems:
-
-		return &Schema{ // BASE SCHEMA
-			node:       mainNode,
-			Type:       "string",
-			Properties: properties, // CHILD POINT
-			Items:      item,       // CHILD POINT
-		}
-	}
-	return &Schema{}
+	return s
 }
 
-func TestGetChildren(t *testing.T) {
+func TestOpenAPI_Schema_getChildren(t *testing.T) {
 	// Sanity Check
-	schemaWithChildren := emptySchemaWith(false, false, false)
-	shouldBeEmpty := schemaWithChildren.getChildren()
+	schema := new(Schema)
+	shouldBeEmpty := schema.getChildren()
 	s := &Schema{}
 	if !reflect.DeepEqual(shouldBeEmpty, s.getChildren()) {
 		t.Error("shouldBeEmpty is not empty")
 	}
-	schemaWithChildren = emptySchemaWith(true, true, false)
-	shouldBePropAndItemChildren := schemaWithChildren.getChildren()
-	if shouldBePropAndItemChildren == nil {
-		t.Error("shouldBePropAndItemChildren is nil")
+	schemaWithChildren := new(Schema).withProperties().withItems()
+	shouldBePropAndItems := schemaWithChildren.getChildren()
+	if shouldBePropAndItems == nil {
+		t.Error("shouldBePropAndItems is nil")
 	}
-	schemaWithChildren = emptySchemaWith(false, true, false)
+	schemaWithChildren = new(Schema).withItems()
 	shouldBeItemChildren := schemaWithChildren.getChildren()
 	if shouldBeItemChildren == nil {
 		t.Error("shouldBeItemChildren is nil")
 	}
-	schemaWithChildren = emptySchemaWith(true, false, false)
+	schemaWithChildren = new(Schema).withProperties()
 	shouldBePropChildren := schemaWithChildren.getChildren()
 	if shouldBePropChildren == nil {
 		t.Error("shouldBePropChildren is nil")
 	}
 }
 
-func TestSchema_ResolveRefs(t *testing.T) {
-	openapi, err := LoadOpenAPI(testAbsOpenAPI)
-	if err != nil {
-		t.Errorf(err.Error())
+func TestOpenAPI_Schema_IsRequired(t *testing.T) {
+	nilSchema := &Schema{
+		Required: nil,
 	}
-	if openapi == nil {
-		t.Errorf("openapi is nil")
+	schemaWithRequiredName := &Schema{
+		Required: []string{"name"},
 	}
-	// TODO
-	t.Error("TODO load refs through the use of the composed `node` struct and test against that")
+	if nilSchema.IsRequired("name") {
+		t.Fatalf("Name does not exist in nilSchema")
+	}
+	if !schemaWithRequiredName.IsRequired("name") {
+		t.Fatalf("Name does exist in schemaWithRequiredName and was not found")
+	}
 }

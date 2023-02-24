@@ -90,6 +90,7 @@ func loadConfig() (config.Config, error) {
 	args := flag.NewFlagSet("can", flag.ExitOnError)
 
 	var configFilePath = args.String("configFile", "", "Specify which config file to use")
+	args.BoolVar(&openapi.DEBUG, "debug", false, "Enable debug logging")
 	_ = args.Parse(os.Args[1:])
 
 	if configFilePath == nil {
