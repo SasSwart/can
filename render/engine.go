@@ -62,7 +62,7 @@ func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte
 		_ = os.MkdirAll(outputDirAbs, 0755)
 	}
 
-	if !*config.Dryrun {
+	if !*config.Runtime().Dryrun {
 		fmt.Println(string(buff.Bytes()))
 	}
 	outPath := filepath.Join(e.config.GetOutputDir(), e.renderer.GetOutputFilename(node))

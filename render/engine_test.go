@@ -14,30 +14,42 @@ import (
 
 var e *render.Engine
 var toRender = buildTestSpec()
+
 func buildTestSpec() *openapi.OpenAPI {
 	root := openapi.OpenAPI{
 		Node: tree.Node{Name: "openapi"},
 	}
-
-	requestBody := request.Body{
-		Node: tree.Node{Name: "requestbody"},
-	}
-
-	requestBody2 :=  request.Body{
-		Node: tree.Node{Name: "requestbody2"},
-	}
-
-	path := map[string]*path.Item{"/endpoint": {
+	p := path.Item{
 		Node: tree.Node{Name: "pathitem"},
 	}
+	root.SetChild("/endpoint", &p)
+	p.SetParent(&root)
 
 	get := operation.Operation{
 		Node: tree.Node{Name: "operation"},
 	}
-	post := &operation.Operation{
+	p.SetChild("get", &get)
+	get.SetParent(&p)
+
+	post := operation.Operation{
 		Node: tree.Node{Name: "pathitem2"},
 	}
-	return &openapi
+	p.SetChild("post", &post)
+	post.SetParent(&p)
+
+	requestBody := request.Body{
+		Node: tree.Node{Name: "requestbody"},
+	}
+	post.SetChild("Body", &requestBody)
+	requestBody.SetParent(&post)
+
+	requestBody2 := request.Body{
+		Node: tree.Node{Name: "requestbody2"},
+	}
+	get.SetChild("Body", &requestBody2)
+	requestBody2.SetParent(&get)
+
+	return &root
 }
 
 func resetTestRenderer(cfg config.Data) {

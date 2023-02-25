@@ -6,6 +6,8 @@ import (
 	"testing"
 )
 
+// FYI - if your tests are utilizing flags from os.Args, flags are likely to be redefined through the
+// config.Data{}.Load() method. This will cause test suites to panic!
 func TestConfig_Load(t *testing.T) {
 	cfg := newTestConfig()
 	err := cfg.Load()
@@ -25,6 +27,11 @@ func TestConfig_Load(t *testing.T) {
 }
 func TestConfig_validTemplateName(t *testing.T) {
 	cfg := newTestConfig()
+	var err error
+	r.ProcWorkingDir, err = os.Getwd()
+	if err != nil {
+		t.Fail()
+	}
 	tests := []struct {
 		name     string
 		input    string
@@ -63,9 +70,14 @@ func TestConfig_validTemplateName(t *testing.T) {
 }
 func TestConfig_GetOpenAPIFilepath(t *testing.T) {
 	cfg := newTestConfig()
-	_ = cfg.Load()
-	absOpenApi, absOpenApiErr := filepath.Abs(cfg.OpenAPIFile)
-	absConfigPath, absConfigPathErr := filepath.Abs(*ConfigPath)
+	err := cfg.Load()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	openAPIFilePath := "openapi/test/fixtures/validation_no_refs.yaml"
+	configFilePath := "config_test.yml"
+	absOpenApi, absOpenApiErr := filepath.Abs(openAPIFilePath)
+	absConfigPath, absConfigPathErr := filepath.Abs(configFilePath)
 
 	tests := []struct {
 		name           string
@@ -82,15 +94,15 @@ func TestConfig_GetOpenAPIFilepath(t *testing.T) {
 		},
 		{
 			name:           "config fallback",
-			openapifile:    cfg.OpenAPIFile,
+			openapifile:    openAPIFilePath,
 			configfilepath: absConfigPath,
 			setuperr:       absConfigPathErr,
 		},
 		{
 			name:           "working dir fallback",
-			openapifile:    cfg.OpenAPIFile,
-			configfilepath: *ConfigPath,
-			workingdir:     ProcWorkingDir,
+			openapifile:    openAPIFilePath,
+			configfilepath: configFilePath,
+			workingdir:     "../",
 		},
 	}
 	for _, test := range tests {
@@ -103,10 +115,10 @@ func TestConfig_GetOpenAPIFilepath(t *testing.T) {
 				cfg.OpenAPIFile = test.openapifile
 			}
 			if test.configfilepath != "" {
-				*ConfigPath = test.configfilepath
+				*r.ConfigPath = test.configfilepath
 			}
 			if test.workingdir != "" {
-				ProcWorkingDir = test.workingdir
+				r.ProcWorkingDir = test.workingdir
 			}
 			// TODO figure out how to isolate test context from host filesystem for accurate testing
 			if cfg.GetOpenAPIFilepath() == "" {
