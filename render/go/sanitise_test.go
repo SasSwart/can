@@ -1,83 +1,97 @@
-package golang
+package golang_test
 
 import (
-	"github.com/sasswart/gin-in-a-can/config"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/render"
+	golang "github.com/sasswart/gin-in-a-can/render/go"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"testing"
 )
 
+func TestGolang_SetTemplateFuncMap(t *testing.T) {
+	g := &golang.Renderer{Base: &render.Base{}}
+	g.SetTemplateFuncMap(nil)
+	if g.Base.TemplateFuncMapping == nil {
+		t.Errorf("TemplateFuncMapping error")
+	}
+	if g.GetTemplateFuncMap() == nil {
+		t.Errorf("GetTemplateFuncMap() error")
+	}
+}
+
 func TestGolang_SanitiseType(t *testing.T) {
+	arrayType := schema.Schema{
+		Type: "array",
+		Node: tree.Node{Name: "testname"}}
+	arrayType.SetChild("0", &schema.Schema{
+		Node: tree.Node{
+			Name: "testname",
+		},
+		Properties: map[string]*schema.Schema{
+			"0": {},
+		},
+	})
+
 	tests := []struct {
-		name       string
-		schemaType string
-		expected   string
-		properties *schema.Schema
+		name     string
+		expected string
+		schema   *schema.Schema
 	}{
 		{
-			name:       "boolean conversion",
-			schemaType: "boolean",
-			expected:   "bool",
+			name:     "boolean conversion",
+			schema:   &schema.Schema{Type: "boolean"},
+			expected: "bool",
 		},
 		{
-			name:       "array conversion",
-			schemaType: "array",
-			expected:   "[]testname",
-			properties: &schema.Schema{
-				Node: tree.Node{
-					Name: "testname",
-				},
-				Properties: map[string]*schema.Schema{
-					"0": {},
-				},
-			},
+			name:     "array conversion",
+			schema:   &arrayType,
+			expected: "[]testname",
 		},
 		{
-			name:       "object conversion",
-			schemaType: "object",
-			expected:   "struct",
+			name:     "object conversion",
+			schema:   &schema.Schema{Type: "object"},
+			expected: "struct",
 		},
 		{
-			name:       "other conversion",
-			schemaType: "somethingelse",
-			expected:   "somethingelse",
+			name:     "integer",
+			schema:   &schema.Schema{Type: "integer"},
+			expected: "int",
+		},
+		{
+			name:     "other conversion",
+			schema:   &schema.Schema{Type: "list"},
+			expected: "list",
 		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			e := render.Engine{}.New(Renderer{}, newTestConfig())
-			s := &schema.Schema{}
-			s.Type = test.schemaType
-			if test.properties != nil {
-				s.SetChild("0", test.properties)
-			}
+			renderer := &golang.Renderer{}
 			want := test.expected
-			got := e.GetRenderer().SanitiseType(s)
+			got := renderer.SanitiseType(test.schema)
 			if want != got {
 				t.Errorf("Wanted %s but got %s\n", want, got)
 			}
 		})
 	}
 }
-func TestGolang_clean(t *testing.T) {
+func TestGolang_CleanFunctionString(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string
 		expected string
 	}{
 		{
-			name:     "cleanFunctionString leading number",
+			name:     "leading number",
 			input:    "2functionname",
 			expected: "functionname",
 		},
 		{
-			name:     "cleanFunctionString spaces",
+			name:     "spaces",
 			input:    "function name",
 			expected: "functionname",
 		},
 		{
-			name:     "cleanFunctionString odd characters",
+			name:     "odd characters",
 			input:    "function &^%$#@!|'\"name",
 			expected: "functionname",
 		},
@@ -90,24 +104,10 @@ func TestGolang_clean(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got := cleanFunctionString(test.input)
+			got := golang.CleanFunctionString(test.input)
 			if got != test.expected {
 				t.Fail()
 			}
 		})
-	}
-}
-
-func newTestConfig() config.Data {
-	config.ConfigFilePath = "../config/config_test.yml"
-	config.Debug = true
-	return config.Data{
-		Generator: config.Generator{},
-		Template: config.Template{
-			Name: "go-gin",
-		},
-		TemplatesDir: "../templates",
-		OpenAPIFile:  "../openapi/test/fixtures/validation_no_refs.yaml",
-		OutputPath:   ".",
 	}
 }

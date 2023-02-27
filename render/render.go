@@ -5,38 +5,38 @@ import (
 	"text/template"
 )
 
-var _ Renderer = Base{}
+var _ Renderer = &Base{}
 
 type Renderer interface {
 	SanitiseName([]string) string
 	SanitiseType(n tree.NodeTraverser) string
 
 	GetOutputFilename(n tree.NodeTraverser) string
-	SetTemplateFuncMapping(template.FuncMap)
-	GetTemplateFuncMapping() template.FuncMap
+	SetTemplateFuncMap(*template.FuncMap)
+	GetTemplateFuncMap() *template.FuncMap
 }
 
 // Base defines the base render object. This should be used as a compositional base for specialising it's interface
 // towards a specific use case.
 type Base struct {
-	TemplateFuncMapping template.FuncMap
+	TemplateFuncMapping *template.FuncMap
 }
 
-func (b Base) SanitiseName(_ []string) string {
+func (b *Base) SanitiseName(_ []string) string {
 	panic("This should be overridden")
 }
 
-func (b Base) SanitiseType(_ tree.NodeTraverser) string {
+func (b *Base) SanitiseType(_ tree.NodeTraverser) string {
 	panic("This should be overridden")
 }
 
-func (b Base) GetOutputFilename(_ tree.NodeTraverser) string {
+func (b *Base) GetOutputFilename(_ tree.NodeTraverser) string {
 	panic("This should be overridden")
 }
 
-func (b Base) GetTemplateFuncMapping() template.FuncMap {
+func (b *Base) GetTemplateFuncMap() *template.FuncMap {
 	return b.TemplateFuncMapping
 }
-func (b Base) SetTemplateFuncMapping(funcMap template.FuncMap) {
+func (b *Base) SetTemplateFuncMap(funcMap *template.FuncMap) {
 	b.TemplateFuncMapping = funcMap
 }

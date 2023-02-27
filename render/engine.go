@@ -16,24 +16,24 @@ import (
 )
 
 type EngineInterface interface {
-	New(renderer Renderer, config config.Data) *Engine
-	GetRenderer() Renderer
+	With(renderer Renderer, config config.Data) *Engine
+	GetRenderer() *Renderer
 	BuildRenderNode() tree.TraversalFunc
 
 	render(data tree.NodeTraverser, templateFile string) ([]byte, error)
 }
 type Engine struct {
-	renderer Renderer
+	renderer *Renderer
 	config   config.Data
 }
 
 var _ EngineInterface = Engine{}
 
-func (e Engine) New(renderer Renderer, config config.Data) *Engine {
-	return &Engine{renderer: renderer, config: config}
+func (e Engine) With(renderer Renderer, config config.Data) *Engine {
+	return &Engine{renderer: &renderer, config: config}
 }
 
-func (e Engine) GetRenderer() Renderer {
+func (e Engine) GetRenderer() *Renderer {
 	return e.renderer
 }
 
@@ -70,10 +70,10 @@ func (e Engine) BuildRenderNode() tree.TraversalFunc {
 
 // Render contains the parsing and rendering steps
 func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte, error) {
+	r := *e.GetRenderer()
 	buff := bytes.NewBuffer([]byte{})
 	templater := template.New(templateFilename)
-
-	templater.Funcs(e.GetRenderer().GetTemplateFuncMapping())
+	templater.Funcs(*r.GetTemplateFuncMap())
 
 	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", e.config.GetTemplateDir()))
 	if err != nil {
@@ -85,7 +85,7 @@ func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte
 		return nil, err
 	}
 
-	fmt.Printf("Rendering %s using %s\n", e.renderer.GetOutputFilename(node), templateFilename)
+	fmt.Printf("Rendering %s using %s\n", r.GetOutputFilename(node), templateFilename)
 
 	outputDirAbs := filepath.Dir(e.config.GetOutputDir())
 	if _, err := os.Stat(outputDirAbs); errors.Is(err, os.ErrNotExist) {
@@ -95,7 +95,7 @@ func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte
 	if !config.Dryrun {
 		fmt.Println(string(buff.Bytes()))
 	}
-	outPath := filepath.Join(e.config.GetOutputDir(), e.renderer.GetOutputFilename(node))
+	outPath := filepath.Join(e.config.GetOutputDir(), r.GetOutputFilename(node))
 	err = os.WriteFile(outPath, buff.Bytes(), 0644)
 	if err != nil {
 		return nil, err

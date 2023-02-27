@@ -71,16 +71,16 @@ func Test_Render_Render(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 	cfg.OutputPath = tempFolder
-	e := render.Engine{}.New(golang.Renderer{}, cfg)
-	r := e.GetRenderer()
-	r.SetTemplateFuncMapping(template.FuncMap{
+	e := render.Engine{}.With(&golang.Renderer{Base: &render.Base{}}, cfg)
+	r := *e.GetRenderer()
+	r.SetTemplateFuncMap(&template.FuncMap{
 		"ToUpper": strings.ToUpper,
 		"ToTitle": func(s string) string {
 			caser := cases.Title(language.English)
 			return caser.String(s)
 		},
-		"SanitiseName": e.GetRenderer().SanitiseName,
-		"SanitiseType": e.GetRenderer().SanitiseType,
+		"SanitiseName": r.SanitiseName,
+		"SanitiseType": r.SanitiseType,
 	})
 	_, err = tree.Traverse(toRender, e.BuildRenderNode())
 	if err != nil {

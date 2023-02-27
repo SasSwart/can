@@ -10,13 +10,16 @@ const Key = "Model"
 
 var _ tree.NodeTraverser = &Schema{}
 
+// Properties uses numerical index values converted to the string type
+type Properties map[string]*Schema
+
 // Schema is a programmatic representation of the Schema object defined here: https://swagger.io/specification/#schema-object
 type Schema struct {
 	tree.Node
 	Ref                  string `yaml:"$ref"`
 	Description          string
 	Type                 string
-	Properties           map[string]*Schema
+	Properties           Properties
 	Items                *Schema
 	AdditionalProperties bool
 	MinLength            int `yaml:"minLength"`
@@ -44,7 +47,7 @@ func (s *Schema) SetChild(i string, t tree.NodeTraverser) {
 			s.Items = schema
 		} else {
 			if s.Properties == nil {
-				s.Properties = make(map[string]*Schema, 4)
+				s.Properties = make(Properties, 4)
 			}
 			s.Properties[i] = schema
 		}
