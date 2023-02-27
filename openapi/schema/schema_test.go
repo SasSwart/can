@@ -4,7 +4,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/parameter"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/tree"
-	"strings"
+	"path/filepath"
 	"testing"
 )
 
@@ -49,7 +49,8 @@ func TestOpenAPI_Schema_SetAndGetChildren(t *testing.T) {
 func TestOpenAPI_Schema_GetAndSetBasePath(t *testing.T) {
 	ref := "testRef/ref"
 	basePath := "/base/path/"
-	want := basePath + strings.Split(ref, "/")[0]
+	dir, _ := filepath.Split(ref)
+	want := filepath.Join(basePath, dir)
 	s := &schema.Schema{Ref: ref, Node: tree.Node{}}
 	p := parameter.Parameter{Schema: s}
 	s.SetParent(&p)
