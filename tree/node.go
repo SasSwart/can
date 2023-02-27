@@ -15,7 +15,7 @@ type Node struct {
 }
 type Noder interface {
 	SetName(name string)
-	GetName() string
+	GetName() []string
 
 	GetBasePath() string
 	SetBasePath(path string)
@@ -32,11 +32,11 @@ type Noder interface {
 func (n *Node) SetName(name string) {
 	n.Name = name
 }
-func (n *Node) GetName() string {
+func (n *Node) GetName() []string {
 	if n.GetParent() == nil {
-		return n.Name
+		return []string{n.Name}
 	}
-	return n.GetParent().GetName() + n.Name
+	return append(n.GetParent().GetName(), n.Name)
 }
 
 func (n *Node) SetBasePath(path string) {

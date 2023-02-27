@@ -30,11 +30,11 @@ func (p *Parameter) GetChildren() map[string]tree.NodeTraverser {
 		schema.Key: p.Schema,
 	}
 }
-func (p *Parameter) GetName() string {
+func (p *Parameter) GetName() []string {
 	if p.GetParent() == nil {
-		return p.Name + "Parameter"
+		return []string{p.Name + "Parameter"}
 	}
-	return p.GetParent().GetName() + p.Name + "Parameter"
+	return append(p.GetParent().GetName(), p.Name+"Parameter")
 }
 
 func (p *Parameter) SetChild(_ string, t tree.NodeTraverser) {

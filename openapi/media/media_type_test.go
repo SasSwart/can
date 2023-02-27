@@ -5,6 +5,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ func TestOpenAPI_MediaType_SetAndGetName(t *testing.T) {
 	want := "testName"
 	mt := media.Type{}
 	mt.SetName(want)
-	got := mt.GetName()
+	got := strings.Join(mt.GetName(), "")
 	if want != got {
 		t.Fail()
 	}

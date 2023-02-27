@@ -4,6 +4,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/operation"
 	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/tree"
+	"strings"
 	"testing"
 )
 
@@ -11,7 +12,7 @@ func TestOpenAPI_PathItem_GetAndSetName(t *testing.T) {
 	want := "testName"
 	i := path.Item{Node: tree.Node{Name: "this should be overwritten by a call to SetName()"}}
 	i.SetName(want)
-	got := i.GetName()
+	got := strings.Join(i.GetName(), "")
 	if got != want {
 		t.Fail()
 	}

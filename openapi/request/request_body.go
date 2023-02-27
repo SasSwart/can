@@ -19,14 +19,6 @@ type Body struct {
 	Required    bool
 }
 
-func (r *Body) GetName() string {
-	if r.GetParent() == nil {
-		return r.Name
-	}
-	name := r.GetParent().GetName() + r.Name
-	return name
-}
-
 func (r *Body) GetRef() string {
 	return r.Ref
 }

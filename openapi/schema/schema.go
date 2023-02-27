@@ -4,6 +4,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/errors"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"path/filepath"
+	"strings"
 )
 
 const Key = "Model"
@@ -74,7 +75,7 @@ func (s *Schema) GetType() string {
 	case "boolean":
 		return "bool"
 	case "array":
-		return "[]" + s.GetChildren()["0"].(*Schema).GetName()
+		return "[]" + strings.Join(s.GetChildren()["0"].(*Schema).GetName(), "")
 	case "integer":
 		return "int"
 	case "object":

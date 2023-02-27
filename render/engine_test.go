@@ -12,13 +12,18 @@ import (
 	"testing"
 )
 
-var e *render.Engine
-var toRender = buildTestSpec()
+var (
+	e        *render.Engine
+	md       = tree.Metadata{"package": "testPackage", "some": "metadata"}
+	toRender = buildTestSpec()
+)
 
 func buildTestSpec() *openapi.OpenAPI {
+
 	root := openapi.OpenAPI{
 		Node: tree.Node{Name: "openapi"},
 	}
+	root.SetMetadata(md)
 	p := path.Item{
 		Node: tree.Node{Name: "pathitem"},
 	}

@@ -8,6 +8,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/test"
 	"github.com/sasswart/gin-in-a-can/tree"
+	"strings"
 	"testing"
 )
 
@@ -45,7 +46,7 @@ func TestOpenAPI_RequestBody_SetAndGetName(t *testing.T) {
 	}}
 	want := "testName"
 	rb.SetName(want)
-	got := rb.GetName()
+	got := strings.Join(rb.GetName(), "")
 	if got != want {
 		t.Fail()
 	}

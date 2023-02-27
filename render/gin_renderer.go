@@ -66,8 +66,8 @@ func (g GinRenderer) SanitiseName(s string) string {
 func (g GinRenderer) GetOutputFilename(n tree.NodeTraverser) string {
 	switch n.(type) {
 	case *schema.Schema:
-		return g.SanitiseName("models/") + n.GetName()
+		return g.SanitiseName("models/") + strings.Join(n.GetName(), "")
 	default:
-		return g.SanitiseName(n.GetName()) + ".go"
+		return g.SanitiseName(strings.Join(n.GetName(), "")) + ".go"
 	}
 }

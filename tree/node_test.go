@@ -5,6 +5,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ func TestOpenAPI_Node_GetAndSetName(t *testing.T) {
 	want := "testname"
 	n := tree.Node{}
 	n.SetName(want)
-	got := n.GetName()
+	got := strings.Join(n.GetName(), "")
 	if got != want {
 		t.Fail()
 	}

@@ -7,6 +7,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/test"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -42,7 +43,7 @@ func TestOpenAPI_Parameter_SetAndGetName(t *testing.T) {
 	want := "testName"
 	p.SetName(want)
 	want += "Parameter" // This is done in GetName()
-	got := p.GetName()
+	got := strings.Join(p.GetName(), "")
 	if want != got {
 		t.Errorf("wanted %s but got %s", want, got)
 	}

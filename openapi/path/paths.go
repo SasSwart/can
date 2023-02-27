@@ -5,6 +5,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/operation"
 	"github.com/sasswart/gin-in-a-can/openapi/parameter"
 	"github.com/sasswart/gin-in-a-can/tree"
+	"strings"
 )
 
 // path method enum
@@ -35,7 +36,7 @@ func (p *Item) GetRef() string {
 }
 
 func (p *Item) GetPath() string {
-	return p.GetName()
+	return strings.Join(p.GetName(), "")
 }
 
 func (p *Item) SetChild(i string, child tree.NodeTraverser) {
