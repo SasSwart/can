@@ -99,7 +99,7 @@ func TestGolang_clean(t *testing.T) {
 }
 
 func newTestConfig() config.Data {
-	config.ConfigPath = "../config/config_test.yml"
+	config.ConfigFilePath = "../config/config_test.yml"
 	config.Debug = true
 	return config.Data{
 		Generator: config.Generator{},

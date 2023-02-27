@@ -7,14 +7,28 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"strings"
+	"text/template"
 )
 
 var _ render.Renderer = Renderer{}
 
-type Renderer struct{}
+type Renderer struct {
+	render.Base
+}
+
+// g.SetTemplateFuncMapping(funcMap)
+var FuncMap = template.FuncMap{
+	"ToUpper": strings.ToUpper,
+	"ToTitle": func(s string) string {
+		caser := cases.Title(language.English)
+		return caser.String(s)
+	},
+	//"SanitiseName": g.SanitiseName,
+	//"SanitiseType": g.SanitiseType,
+}
 
 // SanitiseType sanitizes the prepares the contents of the Type field of a schema for use by the renderer
-func (r Renderer) SanitiseType(n tree.NodeTraverser) string {
+func (g Renderer) SanitiseType(n tree.NodeTraverser) string {
 	if s, ok := n.(*schema.Schema); ok {
 		switch s.Type {
 		case "boolean":
@@ -32,19 +46,19 @@ func (r Renderer) SanitiseType(n tree.NodeTraverser) string {
 	return ""
 }
 
-func (r Renderer) GetOutputFilename(n tree.NodeTraverser) string {
+func (g Renderer) GetOutputFilename(n tree.NodeTraverser) string {
 	switch n.(type) {
 	case *schema.Schema:
-		return r.SanitiseName([]string{"models/"}) + strings.Join(n.GetName(), "")
+		return g.SanitiseName([]string{"models/"}) + strings.Join(n.GetName(), "")
 	default:
-		return r.SanitiseName(n.GetName()) + ".go"
+		return g.SanitiseName(n.GetName()) + ".go"
 	}
 }
 
 // SanitiseName should consume the result of an NodeTraverser's .GetName() function.
 // It creates a string array that is compliant to go function name restrictions and
 // joins the result before returning a single string.
-func (r Renderer) SanitiseName(s []string) string {
+func (g Renderer) SanitiseName(s []string) string {
 	caser := cases.Title(language.English)
 	var temp []string
 	for _, w := range s {

@@ -116,7 +116,7 @@ func TestConfig_GetOpenAPIFilepath(t *testing.T) {
 				cfg.OpenAPIFile = test.openapifile
 			}
 			if test.configfilepath != "" {
-				ConfigPath = test.configfilepath
+				ConfigFilePath = test.configfilepath
 			}
 			if test.workingdir != "" {
 				ProcWorkingDir = test.workingdir
@@ -136,7 +136,7 @@ func TestConfig_GetOutputFilepath(t *testing.T) {
 }
 
 func newTestConfig() Data {
-	ConfigPath = "config_test.yml"
+	ConfigFilePath = "config_test.yml"
 	return Data{
 		Generator: Generator{},
 		Template: Template{

@@ -9,8 +9,12 @@ import (
 	"github.com/sasswart/gin-in-a-can/render"
 	golang "github.com/sasswart/gin-in-a-can/render/go"
 	"github.com/sasswart/gin-in-a-can/tree"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"os"
+	"strings"
 	"testing"
+	"text/template"
 )
 
 var (
@@ -68,13 +72,23 @@ func Test_Render_Render(t *testing.T) {
 	}
 	cfg.OutputPath = tempFolder
 	e := render.Engine{}.New(golang.Renderer{}, cfg)
+	r := e.GetRenderer()
+	r.SetTemplateFuncMapping(template.FuncMap{
+		"ToUpper": strings.ToUpper,
+		"ToTitle": func(s string) string {
+			caser := cases.Title(language.English)
+			return caser.String(s)
+		},
+		"SanitiseName": e.GetRenderer().SanitiseName,
+		"SanitiseType": e.GetRenderer().SanitiseType,
+	})
 	_, err = tree.Traverse(toRender, e.BuildRenderNode())
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 }
 func newTestConfig() config.Data {
-	config.ConfigPath = "../config/config_test.yml"
+	config.ConfigFilePath = "../config/config_test.yml"
 	config.Debug = true
 	return config.Data{
 		Generator: config.Generator{},

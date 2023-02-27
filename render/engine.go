@@ -18,8 +18,9 @@ import (
 type EngineInterface interface {
 	New(renderer Renderer, config config.Data) *Engine
 	GetRenderer() Renderer
-	render(data tree.NodeTraverser, templateFile string) ([]byte, error)
 	BuildRenderNode() tree.TraversalFunc
+
+	render(data tree.NodeTraverser, templateFile string) ([]byte, error)
 }
 type Engine struct {
 	renderer Renderer
@@ -36,41 +37,6 @@ func (e Engine) GetRenderer() Renderer {
 	return e.renderer
 }
 
-// Render contains the parsing and rendering steps
-func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte, error) {
-	buff := bytes.NewBuffer([]byte{})
-	templater := template.New(templateFilename)
-
-	templater.Funcs(templateFuncMap)
-
-	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", e.config.GetTemplateDir()))
-	if err != nil {
-		return nil, err
-	}
-
-	err = parsedTemplate.Execute(buff, node)
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Printf("Rendering %s using %s\n", e.renderer.GetOutputFilename(node), templateFilename)
-
-	outputDirAbs := filepath.Dir(e.config.GetOutputDir())
-	if _, err := os.Stat(outputDirAbs); errors.Is(err, os.ErrNotExist) {
-		_ = os.MkdirAll(outputDirAbs, 0755)
-	}
-
-	if !config.Dryrun {
-		fmt.Println(string(buff.Bytes()))
-	}
-	outPath := filepath.Join(e.config.GetOutputDir(), e.renderer.GetOutputFilename(node))
-	err = os.WriteFile(outPath, buff.Bytes(), 0644)
-	if err != nil {
-		return nil, err
-	}
-
-	return buff.Bytes(), nil
-}
 func (e Engine) BuildRenderNode() tree.TraversalFunc {
 	return func(key string, parent, node tree.NodeTraverser) (tree.NodeTraverser, error) {
 		var templateFile string
@@ -100,4 +66,40 @@ func (e Engine) BuildRenderNode() tree.TraversalFunc {
 
 		return node, nil
 	}
+}
+
+// Render contains the parsing and rendering steps
+func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte, error) {
+	buff := bytes.NewBuffer([]byte{})
+	templater := template.New(templateFilename)
+
+	templater.Funcs(e.GetRenderer().GetTemplateFuncMapping())
+
+	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", e.config.GetTemplateDir()))
+	if err != nil {
+		return nil, err
+	}
+
+	err = parsedTemplate.Execute(buff, node)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("Rendering %s using %s\n", e.renderer.GetOutputFilename(node), templateFilename)
+
+	outputDirAbs := filepath.Dir(e.config.GetOutputDir())
+	if _, err := os.Stat(outputDirAbs); errors.Is(err, os.ErrNotExist) {
+		_ = os.MkdirAll(outputDirAbs, 0755)
+	}
+
+	if !config.Dryrun {
+		fmt.Println(string(buff.Bytes()))
+	}
+	outPath := filepath.Join(e.config.GetOutputDir(), e.renderer.GetOutputFilename(node))
+	err = os.WriteFile(outPath, buff.Bytes(), 0644)
+	if err != nil {
+		return nil, err
+	}
+
+	return buff.Bytes(), nil
 }

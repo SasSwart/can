@@ -11,14 +11,19 @@ import (
 // SemVer should be updated on any new release!!
 const SemVer = "0.0.6"
 
+// TODO set default template path to wd/templates if not set in config
+
 // r represents System level settings for flags and environmental context tracking
 var (
-	Output, Debug, Dryrun, VersionFlagSet bool
-	// ConfigPath is `.` if not set through the `-configFile` flag
-	ConfigPath string
+	Debug          bool
+	Dryrun         bool
+	VersionFlagSet bool
+	// ConfigFilePath is `.` if not set through the `-configFile` flag
+	ConfigFilePath string
 
 	// ProcWorkingDir is set through calling os.Getwd()
-	ExePath, ProcWorkingDir string
+	ProcWorkingDir string
+	ExePath        string
 )
 
 // Data represents the config data used in the day-to-day running of can
@@ -71,7 +76,7 @@ func (d *Data) Load() (err error) {
 	if !flag.Parsed() { // Sorts out buggy tests
 		flag.BoolVar(&VersionFlagSet, "version", false, "Print Can version and exit")
 		flag.BoolVar(&Debug, "debug", false, "Enable debug logging")
-		flag.StringVar(&ConfigPath, "configFile", ".", "Specify which config file to use")
+		flag.StringVar(&ConfigFilePath, "configFile", ".", "Specify which config file to use")
 		flag.BoolVar(&Dryrun, "dryrun", false,
 			"Toggles whether to perform a render without writing to disk."+
 				"This works particularly well in combination with -debug")
@@ -79,11 +84,11 @@ func (d *Data) Load() (err error) {
 		flag.Parse()
 	}
 
-	absCfgPath, err := filepath.Abs(ConfigPath)
+	absCfgPath, err := filepath.Abs(ConfigFilePath)
 	if err != nil {
 		return fmt.Errorf("could not resolve relative config path: %w", err)
 	}
-	ConfigPath = absCfgPath
+	ConfigFilePath = absCfgPath
 
 	if VersionFlagSet {
 		fmt.Printf("Can Version: %s\n", SemVer)
@@ -92,9 +97,9 @@ func (d *Data) Load() (err error) {
 
 	// config load
 	if Debug {
-		fmt.Printf("[v%s]::Using config file \"%s\".\n", SemVer, ConfigPath)
+		fmt.Printf("[v%s]::Using config file \"%s\".\n", SemVer, ConfigFilePath)
 	}
-	viper.SetConfigFile(ConfigPath)
+	viper.SetConfigFile(ConfigFilePath)
 
 	err = viper.ReadInConfig()
 	if err != nil {
@@ -142,11 +147,11 @@ func (d *Data) GetTemplateDir() (path string) {
 	case filepath.IsAbs(d.TemplatesDir):
 		d.Template.absDirectory = filepath.Join(d.TemplatesDir, d.Template.Name)
 		return d.Template.absDirectory
-	case filepath.IsAbs(ConfigPath):
-		d.Template.absDirectory = filepath.Join(filepath.Dir(ConfigPath), d.TemplatesDir, d.Template.Name)
+	case filepath.IsAbs(ConfigFilePath):
+		d.Template.absDirectory = filepath.Join(filepath.Dir(ConfigFilePath), d.TemplatesDir, d.Template.Name)
 		return d.Template.absDirectory
 	default:
-		d.Template.absDirectory = filepath.Join(ProcWorkingDir, filepath.Dir(ConfigPath), d.TemplatesDir, d.Template.Name)
+		d.Template.absDirectory = filepath.Join(ProcWorkingDir, filepath.Dir(ConfigFilePath), d.TemplatesDir, d.Template.Name)
 		return d.Template.absDirectory
 	}
 }
@@ -160,16 +165,16 @@ func (d *Data) GetOutputDir() (path string) {
 	case filepath.IsAbs(d.OutputPath):
 		d.absOutputPath = d.OutputPath
 		return d.absOutputPath
-	case filepath.IsAbs(ConfigPath):
+	case filepath.IsAbs(ConfigFilePath):
 		d.absOutputPath = filepath.Join(
-			filepath.Dir(ConfigPath),
+			filepath.Dir(ConfigFilePath),
 			d.OutputPath,
 		)
 		return d.absOutputPath
 	default:
 		d.absOutputPath = filepath.Join(
 			ProcWorkingDir,
-			filepath.Dir(ConfigPath),
+			filepath.Dir(ConfigFilePath),
 			d.OutputPath,
 		)
 		return d.absOutputPath
@@ -188,9 +193,9 @@ func (d *Data) GetOpenAPIFilepath() (path string) {
 		d.absOpenAPIPath = d.OpenAPIFile
 		return d.absOpenAPIPath
 	} else {
-		if filepath.IsAbs(ConfigPath) {
+		if filepath.IsAbs(ConfigFilePath) {
 			d.absOpenAPIPath = filepath.Join(
-				filepath.Dir(ConfigPath),
+				filepath.Dir(ConfigFilePath),
 				d.OpenAPIFile,
 			)
 			return d.absOpenAPIPath
@@ -199,7 +204,7 @@ func (d *Data) GetOpenAPIFilepath() (path string) {
 				// TODO test this
 				// not relative as per above comment
 				ProcWorkingDir,
-				filepath.Dir(ConfigPath),
+				filepath.Dir(ConfigFilePath),
 				d.OpenAPIFile,
 			)
 			return d.absOpenAPIPath
