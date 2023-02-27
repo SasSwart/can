@@ -9,7 +9,7 @@ import (
 )
 
 type Renderer interface {
-	SanitiseName(string) string
+	SanitiseName([]string) string
 	SanitiseType(n tree.NodeTraverser) string
 
 	GetOutputFilename(n tree.NodeTraverser) string

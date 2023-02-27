@@ -7,13 +7,13 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/openapi/request"
 	"github.com/sasswart/gin-in-a-can/render"
+	golang "github.com/sasswart/gin-in-a-can/render/go"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"os"
 	"testing"
 )
 
 var (
-	e        *render.Engine
 	md       = tree.Metadata{"package": "testPackage", "some": "metadata"}
 	toRender = buildTestSpec()
 )
@@ -57,10 +57,6 @@ func buildTestSpec() *openapi.OpenAPI {
 	return &root
 }
 
-func resetTestRenderer(cfg config.Data) {
-	e = render.Engine{}.New(render.GinRenderer{}, cfg)
-}
-
 func Test_Render_Render(t *testing.T) {
 	tempFolder, err := os.MkdirTemp(os.TempDir(), "CanTestArtifacts")
 	defer os.RemoveAll(tempFolder)
@@ -71,7 +67,7 @@ func Test_Render_Render(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 	cfg.OutputPath = tempFolder
-	resetTestRenderer(cfg)
+	e := render.Engine{}.New(golang.Renderer{}, cfg)
 	_, err = tree.Traverse(toRender, e.BuildRenderNode())
 	if err != nil {
 		t.Errorf(err.Error())

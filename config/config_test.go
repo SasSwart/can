@@ -49,8 +49,8 @@ func TestConfig_validTemplateName(t *testing.T) {
 			expected: true,
 		},
 		{
-			name:     "oas-3-0-0",
-			input:    "oas-3-0-0",
+			name:     "openapi-3",
+			input:    "openapi-3",
 			expected: true,
 		},
 		{

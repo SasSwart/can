@@ -48,8 +48,6 @@ func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte
 		return nil, err
 	}
 
-	// TODO figure out why parsedTemplate.Tree is nil
-
 	err = parsedTemplate.Execute(buff, node)
 	if err != nil {
 		return nil, err

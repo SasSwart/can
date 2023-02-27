@@ -4,7 +4,6 @@ import (
 	"github.com/sasswart/gin-in-a-can/errors"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"path/filepath"
-	"strings"
 )
 
 const Key = "Model"
@@ -65,24 +64,6 @@ func (s *Schema) GetBasePath() string {
 
 func (s *Schema) GetRef() string {
 	return s.Ref
-}
-
-// GetType sanitizes the prepares the contents of the Type field of a schema for use by the renderer
-//
-//	TODO this should be language agnostic and currently only caters for golang
-func (s *Schema) GetType() string {
-	switch s.Type {
-	case "boolean":
-		return "bool"
-	case "array":
-		return "[]" + strings.Join(s.GetChildren()["0"].(*Schema).GetName(), "")
-	case "integer":
-		return "int"
-	case "object":
-		return "struct"
-	default:
-		return s.Type
-	}
 }
 
 func (s *Schema) IsRequired(property string) bool {
