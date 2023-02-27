@@ -12,10 +12,7 @@ import (
 )
 
 func TestOpenAPI_LoadsRequestBodyValidation(t *testing.T) {
-	apiSpec, err := openapi.LoadAPISpec(test.OpenapiFile)
-	if err != nil {
-		t.Fail()
-	}
+	apiSpec, _ := openapi.LoadAPISpec("../../" + test.OpenapiFile)
 
 	traversable := test.Dig(apiSpec, test.Endpoint, path.Post, request.BodyKey, media.JSONKey, schema.Key, "name")
 	name := traversable.(*schema.Schema)

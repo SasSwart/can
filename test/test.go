@@ -10,7 +10,7 @@ import (
 // This file serves as a single source of truth for data drawn from in multiple places during testing
 
 const Endpoint = "/endpoint"
-const OpenapiFile = "../test/fixtures/validation.yaml"
+const OpenapiFile = "test/fixtures/validation.yaml"
 const Pattern = "^([a-zA-Z0-9])+([-_ @\\.]([a-zA-Z0-9])+)*$"
 
 // These are expected validation strings before they hit the renderer

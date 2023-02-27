@@ -11,7 +11,7 @@ import (
 )
 
 func TestOpenAPI_Dig(t *testing.T) {
-	apiSpec, _ := openapi.LoadAPISpec(OpenapiFile)
+	apiSpec, _ := openapi.LoadAPISpec("../" + OpenapiFile)
 	endpoint := Dig(apiSpec, Endpoint)
 	// TODO check for identity, not just type
 	if _, ok := endpoint.(*path.Item); !ok {

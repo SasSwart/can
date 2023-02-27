@@ -8,13 +8,12 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/test"
 	"github.com/sasswart/gin-in-a-can/tree"
-	"path/filepath"
 	"reflect"
 	"testing"
 )
 
 func TestOpenAPI_LoadOpenAPI(t *testing.T) {
-	specPath := filepath.Join("openapi/" + test.OpenapiFile)
+	specPath := "../" + test.OpenapiFile
 	apiSpec, err := openapi.LoadAPISpec(specPath)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -74,8 +73,7 @@ func TestOpenAPI_GetAndSetMetadata(t *testing.T) {
 }
 
 func TestOpenAPI_MetadataSetPoint(t *testing.T) {
-	specPath := filepath.Join("openapi/" + test.OpenapiFile)
-	apiSpec, _ := openapi.LoadAPISpec(specPath)
+	apiSpec, _ := openapi.LoadAPISpec("../" + test.OpenapiFile)
 	data := tree.Metadata{"this": "is", "some": "metadata"}
 	traversable := test.Dig(apiSpec, test.Endpoint, path.Post, request.BodyKey, media.JSONKey, schema.Key, "name")
 

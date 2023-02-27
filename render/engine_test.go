@@ -73,10 +73,13 @@ func Test_Render_Render(t *testing.T) {
 	}
 }
 func newTestConfig() config.Data {
-	os.Args = []string{"can", "-configFile=../config/config_test.yml", "-template=go-gin", "-debug=true"}
+	config.ConfigPath = "../config/config_test.yml"
+	config.Debug = true
 	return config.Data{
-		Generator:    config.Generator{},
-		Template:     config.Template{},
+		Generator: config.Generator{},
+		Template: config.Template{
+			Name: "go-gin",
+		},
 		TemplatesDir: "../templates",
 		OpenAPIFile:  "../openapi/test/fixtures/validation_no_refs.yaml",
 		OutputPath:   ".",

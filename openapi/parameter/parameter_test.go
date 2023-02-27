@@ -11,7 +11,7 @@ import (
 )
 
 func TestOpenAPILoadsParameterValidation(t *testing.T) {
-	apiSpec, _ := openapi.LoadAPISpec(test.AbsOpenAPI)
+	apiSpec, _ := openapi.LoadAPISpec("../../" + test.OpenapiFile)
 
 	IDParam := apiSpec.Paths["/endpoint"].Post.Parameters[0]
 	if IDParam.Required != true {
