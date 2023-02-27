@@ -1,3 +1,6 @@
+// Render shouldn't have to know about the implementations of it's base render package. It should simply
+// allow them to be pluggable through the use of the renderer interface.
+
 package render
 
 import (

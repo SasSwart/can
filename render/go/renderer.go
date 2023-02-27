@@ -1,3 +1,6 @@
+// Renderer implementations shouldn't have to know about the config package. They should simply plug into the
+// pre-configured engine instance created in main.go
+
 package golang
 
 import (
