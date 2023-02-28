@@ -18,9 +18,9 @@ func TestConfig_Load(t *testing.T) {
 	if cfg.Generator.ModuleName != "github.com/test/api" ||
 		cfg.Generator.BasePackageName != "test" ||
 		cfg.Template.Name != "go-gin" ||
-		cfg.Template.Directory != "../templates/go-gin" ||
-		cfg.TemplatesDir != "../templates" ||
-		cfg.OpenAPIFile != "openapi/test/fixtures/validation_no_refs.yaml" ||
+		cfg.Template.Directory != filepath.Clean("../templates/go-gin") ||
+		cfg.TemplatesDir != filepath.Clean("../templates") ||
+		cfg.OpenAPIFile != filepath.Clean("openapi/test/fixtures/validation_no_refs.yaml") ||
 		cfg.OutputPath != "." {
 		t.Fail()
 	}
