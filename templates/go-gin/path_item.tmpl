@@ -29,7 +29,7 @@ func (u {{ $pathItemStructName }}) InvalidRequest(c *gin.Context, err error) {
 func Register{{ .GetName | SanitiseName }}Path(e gin.IRouter, srv {{ .GetName | SanitiseName }}) {
 {{- range $name, $operation := .Operations }}
 	{{ $parent := .GetParent }}
-  e.{{ $name | ToUpper }}("{{ $parent.Name | ToTitle }}", func(c *gin.Context) {
+  e.{{ $name | ToUpper }}("{{ $parent.Name }}", func(c *gin.Context) {
   	params := &{{ $operation.GetName | SanitiseName }}Parameters{}
     {{- range $param := $operation.Parameters }}
 		params.{{ $param.GetParamName | SanitiseName }} =

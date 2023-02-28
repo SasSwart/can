@@ -58,6 +58,12 @@ func (o *Operation) GetChildren() map[string]tree.NodeTraverser {
 func (o *Operation) SetChild(i string, child tree.NodeTraverser) {
 	switch child.(type) {
 	case *parameter.Parameter:
+		for _, p := range o.Parameters {
+			// Check for parameters that have already been unmarshaled.
+			if p.ParamName == child.(*parameter.Parameter).ParamName {
+				return
+			}
+		}
 		o.Parameters = append(o.Parameters, *child.(*parameter.Parameter))
 		return
 	case *request.Body:

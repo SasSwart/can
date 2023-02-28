@@ -19,8 +19,9 @@ func main() {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-
-	fmt.Printf("Reading API specification from \"%s\"\n", cfg.GetOpenAPIFilepath())
+	if config.Debug {
+		fmt.Printf("Reading API specification from \"%s\"\n", cfg.GetOpenAPIFilepath())
+	}
 	apiSpec, err := openapi.LoadAPISpec(cfg.GetOpenAPIFilepath())
 	if err != nil {
 		fmt.Println(err.Error())
@@ -33,7 +34,6 @@ func main() {
 		e := render.Engine{}
 		r := &golang.Renderer{Base: &render.Base{}}
 		r.SetTemplateFuncMap(nil)
-
 		Renderer = e.With(r, cfg)
 	case "openapi-3":
 		fmt.Printf("Openapi-3 renderer not implemented yet")

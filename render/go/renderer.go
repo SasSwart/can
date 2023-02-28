@@ -50,7 +50,7 @@ func (g *Renderer) SanitiseType(n tree.NodeTraverser) string {
 		case "boolean":
 			return "bool"
 		case "array":
-			return "[]" + strings.Join(s.GetChildren()["0"].(*schema.Schema).GetName(), "")
+			return "[]" + g.SanitiseName(s.GetChildren()[schema.SubSchemaKey].(*schema.Schema).GetName())
 		case "integer":
 			return "int"
 		case "object":

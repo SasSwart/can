@@ -47,7 +47,7 @@ func TestOpenAPI_RequestBody_SetAndGetName(t *testing.T) {
 	want := "testName"
 	rb.SetName(want)
 	got := strings.Join(rb.GetName(), "")
-	if got != want {
+	if got != "Request"+want {
 		t.Fail()
 	}
 }

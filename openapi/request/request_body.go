@@ -23,6 +23,13 @@ func (r *Body) GetRef() string {
 	return r.Ref
 }
 
+func (r *Body) GetName() []string {
+	if r.GetParent() == nil {
+		return []string{"Request", r.Name}
+	}
+	return append(r.GetParent().GetName(), "Request", r.Name)
+}
+
 func (r *Body) GetChildren() map[string]tree.NodeTraverser {
 	children := map[string]tree.NodeTraverser{}
 	for name := range r.Content {

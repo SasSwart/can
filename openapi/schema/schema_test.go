@@ -28,13 +28,13 @@ func TestOpenAPI_Schema_SetAndGetChildren(t *testing.T) {
 			Name: "theOther",
 		},
 	}
-	s.SetChild("item", this)
+	s.SetChild(schema.SubSchemaKey, this)
 	s.SetChild("that", that)
 	s.SetChild("theOther", theOther)
 	children := s.GetChildren()
 
 	// Check Item
-	if children["item"].(*schema.Schema) != this {
+	if children[schema.SubSchemaKey].(*schema.Schema) != this {
 		t.Fail()
 	}
 	// Check Properties

@@ -7,6 +7,7 @@ import (
 )
 
 const Key = "Model"
+const SubSchemaKey = "item"
 
 var _ tree.NodeTraverser = &Schema{}
 
@@ -36,14 +37,14 @@ func (s *Schema) GetChildren() map[string]tree.NodeTraverser {
 		children[name] = property
 	}
 	if s.Items != nil {
-		children["item"] = s.Items
+		children[SubSchemaKey] = s.Items
 	}
 	return children
 }
 
 func (s *Schema) SetChild(i string, t tree.NodeTraverser) {
 	if schema, ok := t.(*Schema); ok {
-		if i == "item" {
+		if i == SubSchemaKey {
 			s.Items = schema
 		} else {
 			if s.Properties == nil {

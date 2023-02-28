@@ -54,6 +54,7 @@ func TestOpenAPI_Operation_SetAndGetChildren(t *testing.T) {
 	o.SetChild(paramKey, paramWant)
 	o.SetChild("", requestBodyWant)
 	o.SetChild(responseKey, responseWant)
+	childCount := 3
 
 	paramGot := o.GetChildren()[paramKey].(*parameter.Parameter)
 	if !reflect.DeepEqual(*paramGot, *paramWant) {
@@ -66,5 +67,8 @@ func TestOpenAPI_Operation_SetAndGetChildren(t *testing.T) {
 	responseGot := o.GetChildren()[responseKey].(*response.Response)
 	if !reflect.DeepEqual(*responseGot, *responseWant) {
 		t.Errorf("response fetched differs from response prepared")
+	}
+	if len(o.GetChildren()) != childCount {
+		t.Errorf("we allocated %d children but received %d children when checked\n", childCount, len(o.GetChildren()))
 	}
 }
