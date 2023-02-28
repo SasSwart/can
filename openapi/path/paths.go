@@ -11,6 +11,7 @@ import (
 
 // path method enum
 const (
+	// TODO replace these with http.Method___ constants
 	Get    = "get"
 	Post   = "post"
 	Patch  = "patch"

@@ -31,7 +31,10 @@ func main() {
 	switch cfg.Template.Name {
 	case "go-gin", "go-client":
 		e := render.Engine{}
-		Renderer = e.With(&golang.Renderer{}, cfg)
+		r := &golang.Renderer{Base: &render.Base{}}
+		r.SetTemplateFuncMap(nil)
+
+		Renderer = e.With(r, cfg)
 	case "openapi-3":
 		fmt.Printf("Openapi-3 renderer not implemented yet")
 		os.Exit(1)

@@ -19,7 +19,11 @@ type Renderer struct {
 	*render.Base
 }
 
-func (g *Renderer) SetTemplateFuncMap(_ *template.FuncMap) {
+func (g *Renderer) SetTemplateFuncMap(f *template.FuncMap) {
+	if f != nil {
+		g.Base.SetTemplateFuncMap(f)
+		return
+	}
 	g.Base.TemplateFuncMapping = &template.FuncMap{
 		"ToUpper": strings.ToUpper,
 		"ToTitle": func(s string) string {
@@ -31,8 +35,8 @@ func (g *Renderer) SetTemplateFuncMap(_ *template.FuncMap) {
 	}
 }
 
-func (g *Renderer) GetTemplateFuncMap() *template.FuncMap {
-	return g.TemplateFuncMapping
+func (g *Renderer) GetTemplateFuncMap() template.FuncMap {
+	return *g.TemplateFuncMapping
 }
 
 // SanitiseType sanitizes the prepares the contents of the Type field of a schema for use by the renderer

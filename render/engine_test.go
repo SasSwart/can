@@ -114,6 +114,9 @@ func Test_Render_Render(t *testing.T) {
 		"SanitiseName": r.SanitiseName,
 		"SanitiseType": r.SanitiseType,
 	})
+	if r.GetTemplateFuncMap() == nil {
+		t.Errorf("TemplateFuncMap should NOT be nil")
+	}
 	_, err = tree.Traverse(toRender, e.BuildRenderNode())
 	if err != nil {
 		t.Errorf(err.Error())
