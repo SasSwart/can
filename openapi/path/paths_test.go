@@ -1,6 +1,7 @@
 package path_test
 
 import (
+	"github.com/sasswart/gin-in-a-can/openapi"
 	"github.com/sasswart/gin-in-a-can/openapi/operation"
 	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/tree"
@@ -18,7 +19,22 @@ func TestOpenAPI_PathItem_GetAndSetName(t *testing.T) {
 	}
 }
 
-func Test_Path_GetPath(t *testing.T) {
+func Test_Path_GetBasePath(t *testing.T) {
+	i := path.Item{
+		Ref:  "./relative/reference/path.yaml",
+		Node: tree.Node{},
+	}
+	o := openapi.OpenAPI{
+		Node: tree.Node{},
+	}
+	o.SetBasePath("/this/base/path")
+	o.SetChild("/testEndpoint", &i)
+	i.SetParent(&o)
+	want := "/this/base/path/relative/reference"
+	got := i.GetBasePath()
+	if got != want {
+		t.Fail()
+	}
 
 }
 

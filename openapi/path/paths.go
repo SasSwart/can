@@ -5,6 +5,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/operation"
 	"github.com/sasswart/gin-in-a-can/openapi/parameter"
 	"github.com/sasswart/gin-in-a-can/tree"
+	"path/filepath"
 	"strings"
 )
 
@@ -66,4 +67,11 @@ func (p *Item) Operations() map[string]tree.NodeTraverser {
 		operations[Delete] = p.Delete
 	}
 	return operations
+}
+
+func (p *Item) GetBasePath() string {
+	if p.GetParent() == nil {
+		return p.Node.GetBasePath()
+	}
+	return filepath.Join(p.GetParent().GetBasePath(), filepath.Dir(p.Ref))
 }
