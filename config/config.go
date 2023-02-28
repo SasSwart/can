@@ -117,6 +117,9 @@ func (d *Data) Load() (err error) {
 		fmt.Printf("template is a required flag\nexiting...")
 		os.Exit(1)
 	}
+	if d.TemplatesDir == "" {
+		d.TemplatesDir = filepath.Join(ProcWorkingDir, "templates")
+	}
 	if !d.validTemplateName() {
 		fmt.Printf("%s does not exist in %s\nexiting...\n", d.Template.Name, d.TemplatesDir)
 		fmt.Println("Valid template names are:")
