@@ -5,6 +5,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/operation"
 	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/tree"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -20,17 +21,20 @@ func TestOpenAPI_PathItem_GetAndSetName(t *testing.T) {
 }
 
 func Test_Path_GetBasePath(t *testing.T) {
+	piPath := filepath.Clean("./relative/reference/path.yaml")
+	oaPath := filepath.Clean("/this/base/path")
+
 	i := path.Item{
-		Ref:  "./relative/reference/path.yaml",
+		Ref:  piPath,
 		Node: tree.Node{},
 	}
 	o := openapi.OpenAPI{
 		Node: tree.Node{},
 	}
-	o.SetBasePath("/this/base/path")
+	o.SetBasePath(oaPath)
 	o.SetChild("/testEndpoint", &i)
 	i.SetParent(&o)
-	want := "/this/base/path/relative/reference"
+	want := filepath.Dir(filepath.Join(oaPath, piPath))
 	got := i.GetBasePath()
 	if got != want {
 		t.Fail()
