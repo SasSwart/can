@@ -3,9 +3,11 @@ package render_test
 import (
 	"github.com/sasswart/gin-in-a-can/config"
 	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/openapi/media"
 	"github.com/sasswart/gin-in-a-can/openapi/operation"
 	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/openapi/request"
+	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/render"
 	golang "github.com/sasswart/gin-in-a-can/render/go"
 	"github.com/sasswart/gin-in-a-can/tree"
@@ -34,39 +36,69 @@ func buildTestSpec() *openapi.OpenAPI {
 	root.SetChild("/endpoint", &p)
 	p.SetParent(&root)
 
-	get := operation.Operation{
-		Node: tree.Node{Name: "operation"},
-	}
-	p.SetChild("get", &get)
-	get.SetParent(&p)
-
 	post := operation.Operation{
 		Node: tree.Node{Name: "pathitem2"},
 	}
 	p.SetChild("post", &post)
 	post.SetParent(&p)
 
-	requestBody := request.Body{
+	requestBody1 := request.Body{
 		Node: tree.Node{Name: "requestbody"},
 	}
-	post.SetChild("Body", &requestBody)
-	requestBody.SetParent(&post)
+	post.SetChild("Body", &requestBody1)
+	requestBody1.SetParent(&post)
+
+	mt1 := media.Type{
+		Node: tree.Node{
+			Name: "Media.Type1",
+		},
+	}
+	requestBody1.SetChild(media.JSONKey, &mt1)
+	mt1.SetParent(&requestBody1)
+
+	schema1 := schema.Schema{Node: tree.Node{
+		Name: "schema1",
+	}}
+	mt1.SetChild(schema.Key, &schema1)
+	schema1.SetParent(&mt1)
+
+	// ------------------//
 
 	requestBody2 := request.Body{
 		Node: tree.Node{Name: "requestbody2"},
 	}
+	get := operation.Operation{
+		Node: tree.Node{Name: "operation"},
+	}
+	p.SetChild("get", &get)
+	get.SetParent(&p)
+
 	get.SetChild("Body", &requestBody2)
 	requestBody2.SetParent(&get)
+
+	mt2 := media.Type{
+		Node: tree.Node{
+			Name: "Media.Type1",
+		},
+	}
+	requestBody2.SetChild(media.JSONKey, &mt2)
+	mt2.SetParent(&requestBody2)
+
+	schema2 := schema.Schema{Node: tree.Node{
+		Name: "schema1",
+	}}
+	mt2.SetChild(schema.Key, &schema2)
+	schema2.SetParent(&mt1)
 
 	return &root
 }
 
 func Test_Render_Render(t *testing.T) {
-	tempFolder, err := os.MkdirTemp(os.TempDir(), "CanTestArtifacts")
+	tempFolder, _ := os.MkdirTemp(os.TempDir(), "CanTestArtifacts")
 	defer os.RemoveAll(tempFolder)
 
 	cfg := newTestConfig()
-	err = cfg.Load()
+	err := cfg.Load()
 	if err != nil {
 		t.Errorf(err.Error())
 	}

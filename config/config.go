@@ -69,7 +69,7 @@ func (d *Data) Load() (err error) {
 	}
 	ExePath, err = os.Executable()
 	if err != nil {
-		return fmt.Errorf("Config.load:: could not determine executable directory: %w\n", err)
+		return fmt.Errorf("Config.load:: could not determine executable path: %w\n", err)
 	}
 
 	// flags
@@ -117,9 +117,11 @@ func (d *Data) Load() (err error) {
 		fmt.Printf("template is a required flag\nexiting...")
 		os.Exit(1)
 	}
-	if d.TemplatesDir == "" {
-		d.TemplatesDir = filepath.Join(ProcWorkingDir, "templates")
+	err = d.resolveTemplateConfig()
+	if err != nil {
+		return err
 	}
+
 	if !d.validTemplateName() {
 		fmt.Printf("%s does not exist in %s\nexiting...\n", d.Template.Name, d.TemplatesDir)
 		fmt.Println("Valid template names are:")
@@ -134,11 +136,6 @@ func (d *Data) Load() (err error) {
 	}
 
 	// resolve paths
-	err = d.resolveTemplateConfig()
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -241,15 +238,36 @@ func (d *Data) validTemplates() (templates []string, err error) {
 	return templates, nil
 }
 func (d *Data) resolveTemplateConfig() error {
-	exe, err := os.Executable()
+	pwdDirs, err := os.ReadDir(ProcWorkingDir)
+	if err != nil {
+		return err
+	}
+	exeDirs, err := os.ReadDir(filepath.Dir(ExePath))
 	if err != nil {
 		return err
 	}
 	if d.TemplatesDir == "" {
-		d.TemplatesDir = filepath.Join(filepath.Dir(exe), "templates")
+		for _, dirEnt := range pwdDirs {
+			if dirEnt.Name() == "templates" {
+				templateDir := filepath.Join(ProcWorkingDir, "templates")
+				d.TemplatesDir = templateDir
+				fmt.Printf("No template directory specified, defaulting to %s\n", templateDir)
+				break
+			}
+		}
+		if d.TemplatesDir == "" {
+			for _, dirEnt := range exeDirs {
+				if dirEnt.Name() == "templates" {
+					templateDir := filepath.Join(filepath.Dir(ExePath), "templates")
+					d.TemplatesDir = templateDir
+					fmt.Printf("No template directory specified, defaulting to %s\n", templateDir)
+					break
+				}
+			}
+		}
 	}
 	if d.Template.Directory == "" {
-		d.Template.Directory = "./templates/" + d.Template.Name
+		d.Template.Directory = filepath.Join(d.TemplatesDir, d.Template.Name)
 	}
 	return nil
 }
