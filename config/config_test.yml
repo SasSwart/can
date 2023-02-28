@@ -2,6 +2,5 @@ generator:
   moduleName: github.com/test/api
   basePackageName: test
 templatesDir: ../templates
-renderer:
 openAPIFile: openapi/test/fixtures/validation_no_refs.yaml
 outputPath: .
