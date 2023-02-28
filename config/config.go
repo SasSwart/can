@@ -134,8 +134,6 @@ func (d *Data) Load() (err error) {
 		}
 		os.Exit(1)
 	}
-
-	// resolve paths
 	return nil
 }
 
@@ -150,6 +148,8 @@ func (d *Data) GetTemplateDir() (path string) {
 	case filepath.IsAbs(ConfigFilePath):
 		d.Template.absDirectory = filepath.Join(filepath.Dir(ConfigFilePath), d.TemplatesDir, d.Template.Name)
 		return d.Template.absDirectory
+
+	// No absolute dir provided. Let's build one
 	default:
 		d.Template.absDirectory = filepath.Join(ProcWorkingDir, filepath.Dir(ConfigFilePath), d.TemplatesDir, d.Template.Name)
 		return d.Template.absDirectory
@@ -171,6 +171,8 @@ func (d *Data) GetOutputDir() (path string) {
 			d.OutputPath,
 		)
 		return d.absOutputPath
+
+	// No absolute dir provided. Let's build one
 	default:
 		d.absOutputPath = filepath.Join(
 			ProcWorkingDir,
