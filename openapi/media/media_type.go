@@ -22,6 +22,12 @@ type Type struct {
 func (m *Type) GetRef() string {
 	return ""
 }
+func (m *Type) GetName() []string {
+	if m.GetParent() == nil {
+		return []string{}
+	}
+	return append(m.GetParent().GetName())
+}
 
 func (m *Type) GetChildren() map[string]tree.NodeTraverser {
 	return map[string]tree.NodeTraverser{

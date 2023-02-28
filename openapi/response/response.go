@@ -25,6 +25,13 @@ func (r *Response) GetRef() string {
 	return r.Ref
 }
 
+func (r *Response) GetName() []string {
+	if r.GetParent() == nil {
+		return []string{r.Name, "Response"}
+	}
+	return append(r.GetParent().GetName(), r.Name, "Response")
+}
+
 func (r *Response) GetChildren() map[string]tree.NodeTraverser {
 	responses := map[string]tree.NodeTraverser{} // Where string is either `default` or an HTTP status code
 	for name, mediaType := range r.Content {

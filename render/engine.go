@@ -107,6 +107,9 @@ func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte
 		if err != nil {
 			return nil, err
 		}
+		if config.Debug {
+			fmt.Printf("written %d bytes to %s\n", buff.Len(), outPath)
+		}
 	}
 	return buff.Bytes(), nil
 }

@@ -10,9 +10,9 @@ import (
 )
 
 func TestOpenAPI_MediaType_SetAndGetName(t *testing.T) {
-	want := "testName"
+	want := ""
 	mt := media.Type{}
-	mt.SetName(want)
+	mt.SetName("testName")
 	got := strings.Join(mt.GetName(), "")
 	if want != got {
 		t.Fail()

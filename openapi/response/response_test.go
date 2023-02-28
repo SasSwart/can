@@ -14,7 +14,7 @@ func TestOpenAPI_Response_GetAndSetName(t *testing.T) {
 	r := response.Response{}
 	r.SetName(want)
 	got := strings.Join(r.GetName(), "")
-	if got != want {
+	if got != want+"Response" {
 		t.Fail()
 	}
 }

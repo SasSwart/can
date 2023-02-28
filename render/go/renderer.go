@@ -9,6 +9,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/tree"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"strconv"
 	"strings"
 	"text/template"
 )
@@ -39,8 +40,11 @@ func (g *Renderer) GetTemplateFuncMap() template.FuncMap {
 	return *g.TemplateFuncMapping
 }
 
-// SanitiseType sanitizes the prepares the contents of the Type field of a schema for use by the renderer
+// SanitiseType sanitizes the prepares the contents of the Type field of a node for use by the renderer
 func (g *Renderer) SanitiseType(n tree.NodeTraverser) string {
+	if n == nil {
+		return ""
+	}
 	if s, ok := n.(*schema.Schema); ok {
 		switch s.Type {
 		case "boolean":
@@ -61,7 +65,7 @@ func (g *Renderer) SanitiseType(n tree.NodeTraverser) string {
 func (g *Renderer) GetOutputFilename(n tree.NodeTraverser) string {
 	switch n.(type) {
 	case *schema.Schema:
-		return g.SanitiseName([]string{"models/"}) + strings.Join(n.GetName(), "")
+		return g.SanitiseName(n.GetName()) + ".go"
 	default:
 		return g.SanitiseName(n.GetName()) + ".go"
 	}
@@ -74,14 +78,34 @@ func (g *Renderer) SanitiseName(s []string) string {
 	caser := cases.Title(language.English)
 	var temp []string
 	for _, w := range s {
-		temp = append(temp, caser.String(CleanFunctionString(w)))
+		switch true {
+		case isHttpStatusCode(w):
+			temp = append(temp, w)
+			continue
+		case strings.Contains(w, "/"):
+			for _, split := range strings.Split(w, "/") {
+				temp = append(temp, caser.String(CreateGoFunctionString(split)))
+			}
+			continue
+		case strings.Contains(w, " "):
+			for _, split := range strings.Split(w, " ") {
+				temp = append(temp, caser.String(CreateGoFunctionString(split)))
+			}
+			continue
+		case strings.Contains(w, "_"):
+			for _, split := range strings.Split(w, "_") {
+				temp = append(temp, caser.String(CreateGoFunctionString(split)))
+			}
+			continue
+		}
+		temp = append(temp, caser.String(CreateGoFunctionString(w)))
 	}
 	return strings.Join(temp, "")
 }
 
-// CleanFunctionString strips a string of any leading non-alphabetical chars, and all non-alphabetical and non-numerical
+// CreateGoFunctionString strips a string of any leading non-alphabetical chars, and all non-alphabetical and non-numerical
 // characters that follow.
-func CleanFunctionString(s string) (ret string) {
+func CreateGoFunctionString(s string) (ret string) {
 	for i, char := range []rune(s) {
 		if i == 0 {
 			if ('A' <= char && char <= 'Z') || ('a' <= char && char <= 'z') {
@@ -94,4 +118,13 @@ func CleanFunctionString(s string) (ret string) {
 		}
 	}
 	return ret
+}
+
+func isHttpStatusCode(s string) bool {
+	if code, err := strconv.Atoi(s); err == nil {
+		if 100 <= code && code <= 599 {
+			return true
+		}
+	}
+	return false
 }

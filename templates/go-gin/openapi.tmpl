@@ -6,19 +6,19 @@ import "github.com/gin-gonic/gin"
 
 type API interface {
 {{- range $name, $pathItem := .Paths }}
-  {{ $pathItem.GetName }}
+  {{ $pathItem.GetName | SanitiseName }}
 {{- end }}
 }
 
 func RegisterAPI(e gin.IRouter, srv API) {
 {{- range $name, $pathItem := .Paths }}
-  Register{{ $pathItem.GetName }}Path(e, srv)
+  Register{{ $pathItem.GetName | SanitiseName }}Path(e, srv)
 {{- end }}
 }
 
 type UnimplementedServer struct {
 {{- range $name, $pathItem := .Paths }}
-  Unimplemented{{ $pathItem.GetName }}
+  Unimplemented{{ $pathItem.GetName | SanitiseName }}
 {{- end }}
 }
 

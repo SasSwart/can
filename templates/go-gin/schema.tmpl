@@ -15,21 +15,21 @@ package {{ index .GetMetadata "package" }}
 
 // GENERATED MODEL. DO NOT EDIT
 {{ if ne .Description "" }}
-// {{ .GetName }} description:
+// {{ .GetName | SanitiseName }} description:
 // {{ .Description }}
 {{- end }}
-type {{ .GetName }} {{ .GetType }}
+type {{ .GetName | SanitiseName }} {{ . | SanitiseType }}
 {{- if eq "object" .Type }} {
 	{{- range $name, $schema := .Properties }}
-        {{ if eq $schema.GetType "struct" -}}
-            {{ $name | ToTitle }} {{ $schema.GetName }}
+        {{ if eq ($schema | SanitiseType) "struct" -}}
+            {{ $name | ToTitle }} {{ $schema.GetName | SanitiseName }}
         {{- else -}}
-            {{ $name | ToTitle }} {{ $schema.GetType }} `json:"{{ $name }}"`
+            {{ $name | ToTitle }} {{ $schema | SanitiseType }} `json:"{{ $name }}"`
         {{- end }}
 	{{- end }}
 }
 
-func (p *{{ .GetName }}) IsValid() (bool, error) {
+func (p *{{ .GetName | SanitiseName }}) IsValid() (bool, error) {
 	{{- range $name, $property := .Properties }}
 	{{- if ne $property.MinLength 0 }}
 	if len(p.{{ $name | ToTitle }}) < {{ $property.MinLength }} {
