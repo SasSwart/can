@@ -95,14 +95,15 @@ func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte
 		fmt.Printf("Rendering %s using %s\n", r.GetOutputFilename(node), templateFilename)
 		fmt.Println(string(buff.Bytes()))
 	}
-	if _, err := os.Stat(e.config.GetOutputDir()); errors.Is(err, os.ErrNotExist) {
-		err = os.MkdirAll(e.config.GetOutputDir(), 0755)
-		if err != nil {
-			return nil, err
-		}
-	}
+
 	outPath := filepath.Join(e.config.GetOutputDir(), r.GetOutputFilename(node))
 	if !config.Dryrun {
+		if _, err := os.Stat(filepath.Dir(outPath)); errors.Is(err, os.ErrNotExist) {
+			err = os.MkdirAll(filepath.Dir(outPath), 0755)
+			if err != nil {
+				return nil, err
+			}
+		}
 		err = os.WriteFile(outPath, buff.Bytes(), 0644)
 		if err != nil {
 			return nil, err
