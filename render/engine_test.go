@@ -7,88 +7,133 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/operation"
 	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/openapi/request"
+	"github.com/sasswart/gin-in-a-can/openapi/response"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/render"
 	golang "github.com/sasswart/gin-in-a-can/render/go"
+	"github.com/sasswart/gin-in-a-can/test"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"net/http"
 	"os"
 	"strings"
 	"testing"
 	"text/template"
 )
 
-var (
-	md       = tree.Metadata{"package": "testPackage", "some": "metadata"}
-	toRender = buildTestSpec()
-)
+var md = tree.Metadata{"package": "testPackage", "some": "metadata"}
 
 func buildTestSpec() *openapi.OpenAPI {
-
 	root := openapi.OpenAPI{
-		Node: tree.Node{Name: "openapi"},
+		Node: tree.Node{Name: "root"},
 	}
 	root.SetMetadata(md)
 	p := path.Item{
-		Node: tree.Node{Name: "pathitem"},
+		Node: tree.Node{Name: "Path Item"},
 	}
 	root.SetChild("/endpoint", &p)
 	p.SetParent(&root)
 
 	post := operation.Operation{
-		Node: tree.Node{Name: "pathitem2"},
+		Node: tree.Node{Name: "post"},
 	}
-	p.SetChild("post", &post)
+	p.SetChild(http.MethodPost, &post)
 	post.SetParent(&p)
 
-	requestBody1 := request.Body{
-		Node: tree.Node{Name: "requestbody"},
+	postRequestBody := request.Body{
+		Node: tree.Node{Name: "postRequestBody"},
 	}
-	post.SetChild("Body", &requestBody1)
-	requestBody1.SetParent(&post)
+	post.SetChild(request.BodyKey, &postRequestBody)
+	postRequestBody.SetParent(&post)
 
-	mt1 := media.Type{
+	postMt := media.Type{
 		Node: tree.Node{
-			Name: "Media.Type1",
+			Name: "postMt",
 		},
 	}
-	requestBody1.SetChild(media.JSONKey, &mt1)
-	mt1.SetParent(&requestBody1)
+	postRequestBody.SetChild(media.JSONKey, &postMt)
+	postMt.SetParent(&postRequestBody)
 
-	schema1 := schema.Schema{Node: tree.Node{
-		Name: "schema1",
+	postSchema := schema.Schema{Node: tree.Node{
+		Name: "postSchema",
 	}}
-	mt1.SetChild(schema.Key, &schema1)
-	schema1.SetParent(&mt1)
+	postMt.SetChild(schema.Key, &postSchema)
+	postSchema.SetParent(&postMt)
 
 	// ------------------//
 
-	requestBody2 := request.Body{
-		Node: tree.Node{Name: "requestbody2"},
-	}
 	get := operation.Operation{
 		Node: tree.Node{Name: "operation"},
 	}
-	p.SetChild("get", &get)
+	p.SetChild(http.MethodGet, &get)
 	get.SetParent(&p)
 
-	get.SetChild("Body", &requestBody2)
-	requestBody2.SetParent(&get)
+	getRequestBody := request.Body{
+		Node: tree.Node{Name: "getRequestBody"},
+	}
+	get.SetChild(request.BodyKey, &getRequestBody)
+	getRequestBody.SetParent(&get)
 
-	mt2 := media.Type{
+	getMt := media.Type{
 		Node: tree.Node{
-			Name: "Media.Type1",
+			Name: "getMt",
 		},
 	}
-	requestBody2.SetChild(media.JSONKey, &mt2)
-	mt2.SetParent(&requestBody2)
+	getRequestBody.SetChild(media.JSONKey, &getMt)
+	getMt.SetParent(&getRequestBody)
 
-	schema2 := schema.Schema{Node: tree.Node{
-		Name: "schema1",
+	getSchema := schema.Schema{Node: tree.Node{
+		Name: "getSchema",
 	}}
-	mt2.SetChild(schema.Key, &schema2)
-	schema2.SetParent(&mt1)
+	getMt.SetChild(schema.Key, &getSchema)
+	getSchema.SetParent(&getMt)
+
+	getResponse200 := response.Response{
+		Content: map[string]media.Type{},
+		Node: tree.Node{
+			Name: "getResponse200",
+		},
+	}
+	getResponse204 := response.Response{
+		Content: map[string]media.Type{},
+		Node: tree.Node{
+			Name: "getResponse204",
+		},
+	}
+	getResponse200.SetParent(&get)
+	getResponse204.SetParent(&get)
+	get.SetChild("200", &getResponse200)
+	get.SetChild("204", &getResponse204)
+
+	get200Mt := media.Type{
+		Node: tree.Node{
+			Name: "get200Mt",
+		},
+		Schema: &schema.Schema{
+			Properties:  schema.Properties{},
+			Items:       &schema.Schema{},
+			Description: "turn something on or off",
+			Type:        "boolean",
+		},
+	}
+	get204Mt := media.Type{
+		Node: tree.Node{
+			Name: "get204Mt",
+		},
+		Schema: &schema.Schema{
+			Properties: schema.Properties{},
+			Items:      &schema.Schema{},
+		},
+	}
+	getResponse200.SetChild(media.JSONKey, &get200Mt)
+	getResponse204.SetChild(media.JSONKey, &get204Mt)
+
+	// sanity assertions
+	notNil := test.Dig(&root, "/endpoint", http.MethodGet, "204", media.JSONKey, schema.Key)
+	if notNil == nil {
+		panic("BORKED")
+	}
 
 	return &root
 }
@@ -117,10 +162,12 @@ func Test_Render_Render(t *testing.T) {
 	if r.GetTemplateFuncMap() == nil {
 		t.Errorf("TemplateFuncMap should NOT be nil")
 	}
-	_, err = tree.Traverse(toRender, e.BuildRenderNode())
+	_, err = tree.Traverse(buildTestSpec(), e.BuildRenderNode())
 	if err != nil {
 		t.Errorf(err.Error())
 	}
+	// TODO What dictates whether or not the schema type is rendered to file?
+	// 	We're not currently rendering any 204 response schemas
 }
 func newTestConfig() config.Data {
 	config.ConfigFilePath = "../config/config_test.yml"

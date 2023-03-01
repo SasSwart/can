@@ -9,6 +9,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/tree"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"text/template"
@@ -65,7 +66,7 @@ func (g *Renderer) SanitiseType(n tree.NodeTraverser) string {
 func (g *Renderer) GetOutputFilename(n tree.NodeTraverser) string {
 	switch n.(type) {
 	case *schema.Schema:
-		return g.SanitiseName(n.GetName()) + ".go"
+		return filepath.Join("models", g.SanitiseName(n.GetName())+".go")
 	default:
 		return g.SanitiseName(n.GetName()) + ".go"
 	}

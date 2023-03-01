@@ -7,6 +7,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/openapi/request"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
+	"net/http"
 	"testing"
 )
 
@@ -18,7 +19,7 @@ func TestOpenAPI_Dig(t *testing.T) {
 		t.Errorf("%#v should have been a %T", endpoint, &path.Item{})
 	}
 
-	method := Dig(endpoint, path.Post)
+	method := Dig(endpoint, http.MethodPost)
 	if _, ok := method.(*operation.Operation); !ok {
 		t.Errorf("%#v should have been a %T", method, &operation.Operation{})
 	}

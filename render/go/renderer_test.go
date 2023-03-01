@@ -3,13 +3,13 @@ package golang_test
 import (
 	"github.com/sasswart/gin-in-a-can/openapi"
 	"github.com/sasswart/gin-in-a-can/openapi/media"
-	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/openapi/request"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/render"
 	golang "github.com/sasswart/gin-in-a-can/render/go"
 	"github.com/sasswart/gin-in-a-can/test"
 	"github.com/sasswart/gin-in-a-can/tree"
+	"net/http"
 	"testing"
 )
 
@@ -46,33 +46,33 @@ func TestGolang_SanitiseName(t *testing.T) {
 		},
 		{
 			name:     "testopenapi pathitem",
-			node:     test.Dig(apiSpec, test.Endpoint, path.Post),
+			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost),
 			expected: "ValidationFixtureEndpointPost",
 		},
 		{
 			// TODO check that this is creating param names properly
 			name:     "testopenapi parameter",
-			node:     test.Dig(apiSpec, test.Endpoint, path.Post, "0"),
+			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost, "0"),
 			expected: "Parameter",
 		},
 		{
 			name:     "testopenapi requestbody",
-			node:     test.Dig(apiSpec, test.Endpoint, path.Post, request.BodyKey),
+			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey),
 			expected: "ValidationFixtureEndpointPostRequestBody",
 		},
 		{
 			name:     "testopenapi json mediaitem",
-			node:     test.Dig(apiSpec, test.Endpoint, path.Post, request.BodyKey, media.JSONKey),
+			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey),
 			expected: "ValidationFixtureEndpointPostRequestBody",
 		},
 		{
 			name:     "testopenapi schema",
-			node:     test.Dig(apiSpec, test.Endpoint, path.Post, request.BodyKey, media.JSONKey, schema.Key),
+			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.Key),
 			expected: "ValidationFixtureEndpointPostRequestBodyModel",
 		},
 		{
 			name:     "testopenapi property",
-			node:     test.Dig(apiSpec, test.Endpoint, path.Post, request.BodyKey, media.JSONKey, schema.Key, "name"),
+			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.Key, "name"),
 			expected: "ValidationFixtureEndpointPostRequestBodyModelName",
 		},
 	}

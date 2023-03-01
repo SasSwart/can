@@ -5,17 +5,9 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/operation"
 	"github.com/sasswart/gin-in-a-can/openapi/parameter"
 	"github.com/sasswart/gin-in-a-can/tree"
+	"net/http"
 	"path/filepath"
 	"strings"
-)
-
-// path method enum
-const (
-	// TODO replace these with http.Method___ constants
-	Get    = "get"
-	Post   = "post"
-	Patch  = "patch"
-	Delete = "delete"
 )
 
 var _ tree.NodeTraverser = &Item{}
@@ -42,8 +34,17 @@ func (p *Item) GetPath() string {
 }
 
 func (p *Item) SetChild(i string, child tree.NodeTraverser) {
-	if t, ok := child.(*operation.Operation); ok {
-		p.Operations()[i] = t
+	if n, ok := child.(*operation.Operation); ok {
+		switch strings.ToUpper(i) {
+		case http.MethodGet:
+			p.Get = n
+		case http.MethodPost:
+			p.Post = n
+		case http.MethodPatch:
+			p.Patch = n
+		case http.MethodDelete:
+			p.Delete = n
+		}
 		return
 	}
 	errors.CastFail("(o *Root) setChild", "NodeTraverser", "*schema.Schema")
@@ -56,16 +57,16 @@ func (p *Item) GetChildren() map[string]tree.NodeTraverser {
 func (p *Item) Operations() map[string]tree.NodeTraverser {
 	operations := map[string]tree.NodeTraverser{}
 	if p.Get != nil {
-		operations[Get] = p.Get
+		operations[http.MethodGet] = p.Get
 	}
 	if p.Post != nil {
-		operations[Post] = p.Post
+		operations[http.MethodPost] = p.Post
 	}
 	if p.Patch != nil {
-		operations[Patch] = p.Patch
+		operations[http.MethodPatch] = p.Patch
 	}
 	if p.Delete != nil {
-		operations[Delete] = p.Delete
+		operations[http.MethodDelete] = p.Delete
 	}
 	return operations
 }

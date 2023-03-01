@@ -8,6 +8,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/test"
 	"github.com/sasswart/gin-in-a-can/tree"
+	"net/http"
 	"reflect"
 	"strings"
 	"testing"
@@ -76,7 +77,7 @@ func TestOpenAPI_GetAndSetMetadata(t *testing.T) {
 func TestOpenAPI_MetadataSetPoint(t *testing.T) {
 	apiSpec, _ := openapi.LoadAPISpec("../" + test.OpenapiFile)
 	data := tree.Metadata{"this": "is", "some": "metadata"}
-	traversable := test.Dig(apiSpec, test.Endpoint, path.Post, request.BodyKey, media.JSONKey, schema.Key, "name")
+	traversable := test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.Key, "name")
 
 	traversable.SetMetadata(data)
 	if !reflect.DeepEqual(apiSpec.GetMetadata(), data) {
