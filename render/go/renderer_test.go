@@ -50,7 +50,6 @@ func TestGolang_SanitiseName(t *testing.T) {
 			expected: "ValidationFixtureEndpointPost",
 		},
 		{
-			// TODO check that this is creating param names properly
 			name:     "testopenapi parameter",
 			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost, "0"),
 			expected: "Parameter",

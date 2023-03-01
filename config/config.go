@@ -11,8 +11,6 @@ import (
 // SemVer should be updated on any new release!!
 const SemVer = "0.0.6"
 
-// TODO set default template path to wd/templates if not set in config
-
 // r represents System level settings for flags and environmental context tracking
 var (
 	Debug          bool
@@ -29,7 +27,6 @@ var (
 // Data represents the config data used in the day-to-day running of can
 //
 //	TODO this may be vague in definition for the sake of its legibility in use
-//	TODO check for redundancy
 type Data struct {
 	Generator
 	Template
@@ -203,7 +200,6 @@ func (d *Data) GetOpenAPIFilepath() (path string) {
 			return d.absOpenAPIPath
 		} else {
 			d.absOpenAPIPath = filepath.Join(
-				// TODO test this
 				// not relative as per above comment
 				ProcWorkingDir,
 				filepath.Dir(ConfigFilePath),

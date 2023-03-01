@@ -48,7 +48,6 @@ func main() {
 	}
 
 	apiSpec.SetMetadata(tree.Metadata{
-		// TODO this doesn't look right
 		"package": cfg.Generator.BasePackageName,
 	})
 

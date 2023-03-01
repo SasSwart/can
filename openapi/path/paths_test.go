@@ -5,6 +5,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/operation"
 	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/tree"
+	"net/http"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -44,21 +45,32 @@ func Test_Path_GetBasePath(t *testing.T) {
 
 func TestOpenAPI_PathItem_GetAndSetChildren(t *testing.T) {
 	i := path.Item{}
-	i.SetChild("post", &operation.Operation{})
-	i.SetChild("get", &operation.Operation{})
-	i.SetChild("patch", &operation.Operation{})
-	i.SetChild("delete", &operation.Operation{})
+	i.SetChild(http.MethodPost, &operation.Operation{Node: tree.Node{
+		Name: http.MethodPost,
+	}})
+	i.SetChild(http.MethodGet, &operation.Operation{Node: tree.Node{
+		Name: http.MethodGet,
+	}})
+	i.SetChild(http.MethodPatch, &operation.Operation{Node: tree.Node{
+		Name: http.MethodPatch,
+	}})
+	i.SetChild(http.MethodDelete, &operation.Operation{Node: tree.Node{
+		Name: http.MethodDelete,
+	}})
 	for method, op := range i.GetChildren() {
 		switch method {
-		case "post":
-		case "get":
-		case "patch":
-		case "delete":
+		case http.MethodGet:
+			fallthrough
+		case http.MethodDelete:
+			fallthrough
+		case http.MethodPost:
+			fallthrough
+		case http.MethodPatch:
 			o, ok := op.(*operation.Operation)
 			if !ok {
 				t.Errorf("PathItem.operations() is not successfully returning *operations")
 			}
-			t.Logf(o.OperationId)
+			t.Logf("%v\n", o.GetName())
 		}
 	}
 }

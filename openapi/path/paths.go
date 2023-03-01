@@ -71,9 +71,6 @@ func (p *Item) Operations() map[string]tree.NodeTraverser {
 	return operations
 }
 
-// GetBasePath
-// TODO implement this appropriately for every other struct containing a Ref attribute.
-// TODO setup E2E tests for this functionality
 func (p *Item) GetBasePath() string {
 	if p.GetParent() == nil {
 		return p.Node.GetBasePath()

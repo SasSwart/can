@@ -24,7 +24,7 @@ type Operation struct {
 	OperationId string `yaml:"operationId"`
 
 	// TODO this will cause an import cycle
-	//ExternalDocs root.ExternalDocs
+	//ExternalDocs openapi.ExternalDocs
 }
 
 func (o *Operation) GetRef() string {
