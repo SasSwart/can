@@ -5,8 +5,6 @@ import (
 	"text/template"
 )
 
-var _ Renderer = &Base{}
-
 type Renderer interface {
 	SanitiseName([]string) string
 	SanitiseType(n tree.NodeTraverser) string
@@ -20,18 +18,6 @@ type Renderer interface {
 // towards a specific use case.
 type Base struct {
 	TemplateFuncMapping *template.FuncMap
-}
-
-func (b *Base) SanitiseName(_ []string) string {
-	panic("This should be overridden")
-}
-
-func (b *Base) SanitiseType(_ tree.NodeTraverser) string {
-	panic("This should be overridden")
-}
-
-func (b *Base) GetOutputFilename(_ tree.NodeTraverser) string {
-	panic("This should be overridden")
 }
 
 func (b *Base) GetTemplateFuncMap() template.FuncMap {

@@ -1,11 +1,5 @@
 package tree
 
-import (
-	"github.com/sasswart/gin-in-a-can/errors"
-)
-
-var _ NodeTraverser = &Node{}
-
 type Metadata map[string]string
 type Node struct {
 	basePath string
@@ -54,11 +48,6 @@ func (n *Node) GetBasePath() string {
 	return n.GetParent().GetBasePath()
 }
 
-func (n *Node) GetRef() string {
-	errors.Unimplemented("(n *Node) GetRef()")
-	return ""
-}
-
 // SetMetadata sets metadata for the root node of the tree
 func (n *Node) SetMetadata(metadata Metadata) {
 	if n.metadata == nil {
@@ -82,15 +71,6 @@ func (n *Node) GetMetadata() Metadata {
 //
 //// Traverser Functions
 //
-
-func (n *Node) GetChildren() map[string]NodeTraverser {
-	errors.Unimplemented("(n *Node) GetChildren()")
-	return nil
-}
-
-func (n *Node) SetChild(_ string, _ NodeTraverser) {
-	errors.Unimplemented("(n *Node) SetChild()")
-}
 
 func (n *Node) GetParent() NodeTraverser {
 	return n.parent
