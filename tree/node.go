@@ -50,10 +50,10 @@ func (n *Node) GetBasePath() string {
 
 // SetMetadata sets metadata for the root node of the tree
 func (n *Node) SetMetadata(metadata Metadata) {
-	if n.metadata == nil {
-		n.metadata = make(Metadata, 2)
-	}
 	if n.GetParent() == nil {
+		if n.metadata == nil {
+			n.metadata = make(Metadata, 2)
+		}
 		n.metadata = metadata
 		return
 	}
