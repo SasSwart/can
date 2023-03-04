@@ -15,7 +15,6 @@ var _ tree.NodeTraverser = &Type{}
 // Type is a programmatic representation of the Type object defined here: https://swagger.io/specification/#media-type-object
 type Type struct {
 	tree.Node
-	//name   string // not sure if this is necessary
 	Schema *schema.Schema
 }
 
@@ -31,7 +30,7 @@ func (m *Type) GetName() []string {
 
 func (m *Type) GetChildren() map[string]tree.NodeTraverser {
 	return map[string]tree.NodeTraverser{
-		schema.Key: m.Schema,
+		schema.PropertyKey: m.Schema,
 	}
 }
 

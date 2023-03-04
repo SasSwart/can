@@ -15,7 +15,7 @@ import (
 func TestOpenAPI_LoadsRequestBodyValidation(t *testing.T) {
 	apiSpec, _ := openapi.LoadAPISpec("../../" + test.OpenapiFile)
 
-	traversable := test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.Key, "name")
+	traversable := test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.PropertyKey, "name")
 	name := traversable.(*schema.Schema)
 	if name.MinLength != 1 {
 		t.Errorf("got minLength %v, wanted %v", name.MinLength, 1)

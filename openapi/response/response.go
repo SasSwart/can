@@ -48,13 +48,10 @@ func (r *Response) SetChild(i string, t tree.NodeTraverser) {
 	if r.Content == nil {
 		r.Content = make(map[string]media.Type, 4)
 	}
-	if _, err := strconv.Atoi(i); err != nil || i == "default" {
-		mediaType, ok := t.(*media.Type)
-		if !ok {
-			errors.CastFail("(r *Response) SetChild()", "NodeTraverser", "*media_type.Type")
-		}
+	if mediaType, ok := t.(*media.Type); ok {
 		r.Content[i] = *mediaType
 		return
 	}
-	errors.UndefinedBehaviour("(r *Response) SetChild()")
+	errors.CastFail("(r *Response) SetChild()", "NodeTraverser", "*media_type.Type")
+	return
 }

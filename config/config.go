@@ -11,7 +11,6 @@ import (
 // SemVer should be updated on any new release!!
 const SemVer = "0.0.6"
 
-// r represents System level settings for flags and environmental context tracking
 var (
 	Debug          bool
 	Dryrun         bool
@@ -28,7 +27,6 @@ var (
 //
 //	TODO this may be vague in definition for the sake of its legibility in use
 type Data struct {
-	Generator
 	Template
 
 	// left public due to it's need to be unmarshalled by Data.Load()
@@ -42,20 +40,16 @@ type Data struct {
 	absOutputPath string
 }
 
-type Generator struct {
+// Template's fields are dependant on there being a defined templated name in the CLI arguments or config file.
+type Template struct {
+	Name string
+
+	absDirectory string
+
 	ModuleName string
 
 	// BasePackageName represents the
 	BasePackageName string
-}
-
-// Template is populated based on it's Name variable set as a CLI flag
-type Template struct {
-	Name string
-
-	// Directory should be ./templates/${Name} by default
-	Directory    string
-	absDirectory string
 }
 
 func (d *Data) Load() (err error) {
@@ -103,17 +97,19 @@ func (d *Data) Load() (err error) {
 		return fmt.Errorf("loadConfig:: could not read config file: %w\n", err)
 	}
 
+	// Handle Template name
+	if d.Template.Name == "" {
+		fmt.Printf("template not set via command line. Expecting field to be set in config file\n")
+	}
+
 	err = viper.Unmarshal(&d)
 	if err != nil {
 		return fmt.Errorf("loadConfig:: could not parse config file: %w\n", err)
 	}
-
-	// This should always happen at the end of this function
-	// Handle Templates
 	if d.Template.Name == "" {
-		fmt.Printf("template is a required flag\nexiting...")
-		os.Exit(1)
+		fmt.Printf("template not set via config file either\nexiting...")
 	}
+
 	err = d.resolveTemplateConfig()
 	if err != nil {
 		return err
@@ -245,6 +241,7 @@ func (d *Data) resolveTemplateConfig() error {
 		return err
 	}
 	if d.TemplatesDir == "" {
+		// First we look in the process directory
 		for _, dirEnt := range pwdDirs {
 			if dirEnt.Name() == "templates" {
 				templateDir := filepath.Join(ProcWorkingDir, "templates")
@@ -253,6 +250,7 @@ func (d *Data) resolveTemplateConfig() error {
 				break
 			}
 		}
+		// Then we look in the executable directory
 		if d.TemplatesDir == "" {
 			for _, dirEnt := range exeDirs {
 				if dirEnt.Name() == "templates" {
@@ -263,9 +261,6 @@ func (d *Data) resolveTemplateConfig() error {
 				}
 			}
 		}
-	}
-	if d.Template.Directory == "" {
-		d.Template.Directory = filepath.Join(d.TemplatesDir, d.Template.Name)
 	}
 	return nil
 }

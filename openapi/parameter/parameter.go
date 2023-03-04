@@ -30,7 +30,7 @@ func (p *Parameter) GetParamName() []string {
 }
 func (p *Parameter) GetChildren() map[string]tree.NodeTraverser {
 	return map[string]tree.NodeTraverser{
-		schema.Key: p.Schema,
+		schema.PropertyKey: p.Schema,
 	}
 }
 func (p *Parameter) GetName() []string {
