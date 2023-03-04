@@ -6,19 +6,19 @@ import (
 
 // GENERATED INTERFACE. DO NOT EDIT
 
-type {{ .GetName }} interface {
+type {{ .GetName | SanitiseName }} interface {
 {{- range $name, $operation := .Operations }}
-  {{ $operation.GetName }}(*gin.Context, *{{ $operation.GetName }}Parameters, *{{ $operation.RequestBody.GetName }}) {{ $operation.GetName }}Response
+  {{ $operation.GetName | SanitiseName }}(*gin.Context, *{{ $operation.GetName | SanitiseName }}Parameters, *{{ $operation.RequestBody.GetName | SanitiseName }}) {{ $operation.GetName | SanitiseName }}Response
 {{- end }}
 	InvalidRequest(*gin.Context, error)
 }
 
-{{ $pathItemStructName := printf "Unimplemented%s" .GetName -}}
+{{ $pathItemStructName := printf "Unimplemented%s" (.GetName | SanitiseName) -}}
 type {{ $pathItemStructName }} struct {}
 
 {{- range $name, $operation := .Operations }}
-func (u {{ $pathItemStructName }}) {{ $operation.GetName }}(*gin.Context, *{{ $operation.GetName }}Parameters, *{{ $operation.RequestBody.GetName }}) {{ $operation.GetName }}Response {
-	return {{ $operation.GetName }}405Response{}
+func (u {{ $pathItemStructName }}) {{ $operation.GetName | SanitiseName }}(*gin.Context, *{{ $operation.GetName | SanitiseName }}Parameters, *{{ $operation.RequestBody.GetName | SanitiseName }}) {{ $operation.GetName | SanitiseName }}Response {
+	return {{ $operation.GetName | SanitiseName }}405Response{}
 }
 {{- end }}
 func (u {{ $pathItemStructName }}) InvalidRequest(c *gin.Context, err error) {
@@ -26,15 +26,15 @@ func (u {{ $pathItemStructName }}) InvalidRequest(c *gin.Context, err error) {
 	c.Abort()
 }
 
-func Register{{ .GetName }}Path(e gin.IRouter, srv {{ .GetName }}) {
+func Register{{ .GetName | SanitiseName }}Path(e gin.IRouter, srv {{ .GetName | SanitiseName }}) {
 {{- range $name, $operation := .Operations }}
 	{{ $parent := .GetParent }}
-  e.{{ $name | ToUpper }}("{{ $parent.GetPath }}", func(c *gin.Context) {
-  	params := &{{ $operation.GetName }}Parameters{}
+  e.{{ $name | ToUpper }}("{{ $parent.Name }}", func(c *gin.Context) {
+  	params := &{{ $operation.GetName | SanitiseName }}Parameters{}
     {{- range $param := $operation.Parameters }}
-		params.{{ $param.Name | ToTitle }} =
-			{{- if eq $param.In "path" }} c.Param("{{ $param.Name }}") {{- end -}}
-			{{- if eq $param.In "query" }} c.Query("{{ $param.Name }}") {{- end }}
+		params.{{ $param.GetParamName | SanitiseName }} =
+			{{- if eq $param.In "path" }} c.Param("{{ $param.ParamName }}") {{- end -}}
+			{{- if eq $param.In "query" }} c.Query("{{ $param.ParamName }}") {{- end }}
   	{{- end }}
 
 		if valid, err := params.IsValid(); !valid {
@@ -42,9 +42,9 @@ func Register{{ .GetName }}Path(e gin.IRouter, srv {{ .GetName }}) {
 			return
 		}
 
-  	var body *{{ $operation.RequestBody.GetName }}
+  	var body *{{ $operation.RequestBody.GetName | SanitiseName }}
   	{{- if ne (index $operation.RequestBody.Content "application/json") nil}}
-		body = &{{ $operation.RequestBody.GetName }}{}
+		body = &{{ $operation.RequestBody.GetName | SanitiseName }}{}
 		err := c.ShouldBindJSON(body)
 		if err != nil {
 			srv.InvalidRequest(c, err)
@@ -56,29 +56,29 @@ func Register{{ .GetName }}Path(e gin.IRouter, srv {{ .GetName }}) {
 			srv.InvalidRequest(c, err)
 			return
     }
-    response := srv.{{ $operation.GetName }}(c, params, body)
+    response := srv.{{ $operation.GetName | SanitiseName }}(c, params, body)
     c.JSON(response.GetStatus(), response)
   })
 {{- end }}
 }
 
 {{- range $name, $operation := .Operations }}
-type {{ $operation.GetName }}Response interface {
+type {{ $operation.GetName | SanitiseName }}Response interface {
 	GetStatus() int
 }
 
 {{- range $name, $response := .Responses }}
 {{ $statusCode := $name }}
 {{- range $name, $content := $response.Content }}
-type {{ $response.GetName }} {{ $content.Schema.GetName }}
+type {{ $response.GetName | SanitiseName }} {{ $content.Schema.GetName | SanitiseName }}
 
-func ({{ $response.GetName }}) GetStatus() int {
+func ({{ $response.GetName | SanitiseName }}) GetStatus() int {
 	return {{ $statusCode }}
 }
 {{- end }}
 {{- end }}
-type {{ $operation.GetName }}405Response struct {}
-func ({{ $operation.GetName }}405Response) GetStatus() int {
+type {{ $operation.GetName | SanitiseName }}405Response struct {}
+func ({{ $operation.GetName | SanitiseName }}405Response) GetStatus() int {
 	return 405
 }
 

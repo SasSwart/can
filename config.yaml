@@ -1,7 +1,5 @@
-# render:
-#   moduleName: github.com/<account>/<repository>
-#   basePackageName: api
-# openapi:
-#   openAPIFile: ./docs/openapi.yml
-# outputPath: .
-# templateDirectory: ./templates
+#generator:
+#  moduleName: github.com/test/api
+#  basePackageName: test
+#openAPIFile: openapi/test/fixtures/validation_no_refs.yaml
+#outputPath: .

@@ -1,98 +1,28 @@
 package render
 
 import (
-	"bytes"
-	"errors"
-	"fmt"
-	"github.com/sasswart/gin-in-a-can/config"
-	"github.com/sasswart/gin-in-a-can/openapi"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
-	"os"
-	"path/filepath"
-	"strings"
+	"github.com/sasswart/gin-in-a-can/tree"
 	"text/template"
 )
 
-// Render is the main parsing and rendering steps within the render library
-func Render(config config.Config, data openapi.Traversable, templateFile string) ([]byte, error) {
-	var absoluteTemplateDirectory string
-	switch true {
-	case filepath.IsAbs(config.Generator.TemplateDirectory):
-		absoluteTemplateDirectory = filepath.Join(
-			config.Generator.TemplateDirectory,
-			config.Generator.TemplateName,
-		)
-	case filepath.IsAbs(config.ConfigFilePath):
-		absoluteTemplateDirectory = filepath.Join(
-			filepath.Dir(config.ConfigFilePath),
-			config.Generator.TemplateDirectory,
-			config.Generator.TemplateName,
-		)
-	default:
-		absoluteTemplateDirectory = filepath.Join(
-			config.WorkingDirectory,
-			filepath.Dir(config.ConfigFilePath),
-			config.Generator.TemplateDirectory,
-			config.Generator.TemplateName,
-		)
-	}
+type Renderer interface {
+	SanitiseName([]string) string
+	SanitiseType(n tree.NodeTraverser) string
 
-	var absoluteOutputFile string
-	switch true {
-	case filepath.IsAbs(config.OutputPath):
-		absoluteOutputFile = config.OutputPath
-	case filepath.IsAbs(config.ConfigFilePath):
-		absoluteOutputFile = filepath.Join(
-			filepath.Dir(config.ConfigFilePath),
-			config.OutputPath,
-		)
-	default:
-		absoluteOutputFile = filepath.Join(
-			config.WorkingDirectory,
-			filepath.Dir(config.ConfigFilePath),
-			config.OutputPath,
-		)
-	}
-	absoluteOutputFile = filepath.Join(absoluteOutputFile, data.GetOutputFile())
-
-	buff := bytes.NewBuffer([]byte{})
-
-	templater := template.New(templateFile)
-
-	templater.Funcs(templateFuncMap)
-
-	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", absoluteTemplateDirectory))
-	if err != nil {
-		return nil, err
-	}
-
-	err = parsedTemplate.Execute(buff, data)
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Printf("Rendering %s using %s\n", data.GetOutputFile(), templateFile)
-
-	outputDirectory := filepath.Dir(absoluteOutputFile)
-	if _, err := os.Stat(outputDirectory); errors.Is(err, os.ErrNotExist) {
-		_ = os.MkdirAll(outputDirectory, 0755)
-	}
-
-	err = os.WriteFile(absoluteOutputFile, buff.Bytes(), 0644)
-	if err != nil {
-		return nil, err
-	}
-
-	return buff.Bytes(), nil
+	GetOutputFilename(n tree.NodeTraverser) string
+	SetTemplateFuncMap(*template.FuncMap)
+	GetTemplateFuncMap() template.FuncMap
 }
 
-var templateFuncMap = template.FuncMap{
-	"ToUpper": strings.ToUpper,
-	"ToTitle": toTitleCase,
+// Base defines the base render object. This should be used as a compositional base for specialising it's interface
+// towards a specific use case.
+type Base struct {
+	TemplateFuncMapping *template.FuncMap
 }
 
-func toTitleCase(s string) string {
-	caser := cases.Title(language.English)
-	return caser.String(s)
+func (b *Base) GetTemplateFuncMap() template.FuncMap {
+	return *b.TemplateFuncMapping
+}
+func (b *Base) SetTemplateFuncMap(funcMap *template.FuncMap) {
+	b.TemplateFuncMapping = funcMap
 }

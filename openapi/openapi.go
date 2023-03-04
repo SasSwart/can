@@ -2,130 +2,94 @@ package openapi
 
 import (
 	"fmt"
+	"github.com/sasswart/gin-in-a-can/errors"
+	"github.com/sasswart/gin-in-a-can/openapi/components"
+	"github.com/sasswart/gin-in-a-can/openapi/info"
+	"github.com/sasswart/gin-in-a-can/openapi/path"
+	"github.com/sasswart/gin-in-a-can/openapi/servers"
+	"github.com/sasswart/gin-in-a-can/tree"
 	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
 )
 
-type Config struct {
-	OpenAPIFile string
+var _ tree.NodeTraverser = &OpenAPI{}
+
+// ExternalDocs is a programmatic representation of the External Docs object defined here: https://swagger.io/specification/#external-documentation-object
+type ExternalDocs struct {
+	Description string `yaml:"description"`
+	Url         string `yaml:"url"`
 }
 
 // OpenAPI is a programmatic representation of the OpenApi Document object defined here: https://swagger.io/specification/#openapi-object
 type OpenAPI struct {
-	node
-	OpenAPI    string `yaml:"openapi"`
-	Info       Info
-	Servers    []Server
-	Paths      map[string]*PathItem
-	Components Components
+	tree.Node
+	OpenAPI    string `yaml:"openapi"` // TODO it's unclear what this refers to
+	Info       info.Info
+	Servers    []servers.Server
+	Paths      map[string]*path.Item
+	Components components.Components
 }
 
-func LoadOpenAPI(openAPIFile string) (*OpenAPI, error) {
+func (o *OpenAPI) GetRef() string {
+	return ""
+}
+
+func (o *OpenAPI) GetChildren() map[string]tree.NodeTraverser {
+	traversables := map[string]tree.NodeTraverser{}
+	for s := range o.Paths {
+		p := o.Paths[s]
+		traversables[s] = p
+	}
+	return traversables
+}
+
+func (o *OpenAPI) SetChild(i string, child tree.NodeTraverser) {
+	if o.Paths == nil {
+		o.Paths = make(map[string]*path.Item, 4)
+	}
+	if c, ok := child.(*path.Item); ok {
+		o.Paths[i] = c
+		return
+	}
+	errors.CastFail("(o *OpenAPI) setChild", "NodeTraverser", "*schema.Schema")
+}
+
+func LoadAPISpec(openAPIFile string) (*OpenAPI, error) {
 	// skeleton
 	absPath, err := filepath.Abs(openAPIFile)
 	if err != nil {
 		return nil, err
 	}
 	api := OpenAPI{
-		node: node{
-			basePath: filepath.Dir(absPath),
+		Node: tree.Node{},
+		Components: components.Components{
+			Schemas: nil,
 		},
-		Components: Components{
-			Schemas: map[string]Schema{},
-		},
-		Paths: map[string]*PathItem{},
+		Info:  info.Info{},
+		Paths: map[string]*path.Item{},
 	}
+	api.SetBasePath(filepath.Dir(absPath))
 
 	// Read yaml file
 	content, err := os.ReadFile(openAPIFile)
 	if err != nil {
-		return nil, fmt.Errorf("unable to read file \"%s\": %w", openAPIFile, err)
+		return nil, fmt.Errorf("LoadAPISpec:: unable to read file \"%s\": %w", openAPIFile, err)
 	}
 
 	err = yaml.Unmarshal(content, &api)
 	if err != nil {
-		return nil, fmt.Errorf("yaml unmarshalling error: %w", err)
+		return nil, fmt.Errorf("LoadAPISpec:: yaml unmarshalling error: %w", err)
 	}
 
-	api.setName(api.Info.Title)
+	api.SetName(api.Info.Title)
 
 	// Resolve references
-	newApi, err := Traverse(&api, resolveRefs)
+	newApi, err := tree.Traverse(&api, tree.ResolveRefs)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("LoadAPISpec:: tree traversal error: %w", err)
 	}
 
 	return newApi, err
-}
-
-func SetRenderer(api *OpenAPI, renderer Renderer) error {
-	_, err := Traverse(api, func(_ string, _, child Traversable) (Traversable, error) {
-		child.setRenderer(renderer)
-		parent := child.GetParent()
-		if parent != nil {
-			parent.setRenderer(renderer)
-		}
-
-		return child, nil
-	})
-	return err
-}
-
-func (o *OpenAPI) getRef() string {
-	return ""
-}
-
-func (o *OpenAPI) GetName() string {
-	name := o.getRenderer().sanitiseName(o.name)
-	return name
-}
-
-func (o *OpenAPI) GetOutputFile() string {
-	// TODO passing in yourself seems like a smell
-	// TODO this override could be removed and handed by the node{} composable
-	fileName := o.getRenderer().getOutputFile(o)
-	return fileName
-}
-
-func (o *OpenAPI) getChildren() map[string]Traversable {
-	traversables := map[string]Traversable{}
-	for s := range o.Paths {
-		path := o.Paths[s]
-		traversables[s] = path
-	}
-	return traversables
-}
-
-func (o *OpenAPI) setChild(i string, child Traversable) {
-	if c, ok := child.(*PathItem); ok {
-		o.Paths[i] = c
-		return
-	}
-	panic("(o *OpenAPI) setChild:" + errCastFail)
-}
-
-// resolveRefs calls readRef on references with the ref path modified appropriately for it's use
-func resolveRefs(key string, parent, node Traversable) (Traversable, error) {
-	node.setParent(parent)
-	if _, ok := node.(*OpenAPI); !ok {
-		node.setName(key) // Don't set the root name as that's already been done by this point
-	}
-	nodeRef := node.getRef()
-	if nodeRef != "" {
-		openapiBasePath := node.getBasePath()
-		ref := filepath.Base(node.getRef())
-		err := readRef(filepath.Join(openapiBasePath, ref), node)
-		if err != nil {
-			return nil, fmt.Errorf("Unable to read reference:\n%w", err)
-		}
-	}
-	return node, nil
-}
-
-// ExternalDocs is a programmatic representation of the External Docs object defined here: https://swagger.io/specification/#external-documentation-object
-type ExternalDocs struct {
-	Description string `yaml:"description"`
-	Url         string `yaml:"url"`
 }

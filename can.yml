@@ -1,7 +1,6 @@
 generator:
-  templateDirectory: ./templates/go-client
   moduleName: github.com/sasswart/gin-in-a-can/cmd/test_api
   basePackageName: api
-openAPI:
-  openAPIFile: ./openapi/fixtures/validation_no_refs.yaml
+templatesDir: ./templates
+openAPIFile: ./openapi/test/fixtures/validation_no_refs.yaml
 outputPath: .

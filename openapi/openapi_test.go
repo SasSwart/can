@@ -1,127 +1,86 @@
-package openapi
+package openapi_test
 
 import (
-	"os"
-	"path/filepath"
+	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/openapi/media"
+	"github.com/sasswart/gin-in-a-can/openapi/path"
+	"github.com/sasswart/gin-in-a-can/openapi/request"
+	"github.com/sasswart/gin-in-a-can/openapi/schema"
+	"github.com/sasswart/gin-in-a-can/test"
+	"github.com/sasswart/gin-in-a-can/tree"
+	"net/http"
 	"reflect"
+	"strings"
 	"testing"
-
-	"gopkg.in/yaml.v3"
 )
 
 func TestOpenAPI_LoadOpenAPI(t *testing.T) {
-	openapi, err := LoadOpenAPI(testAbsOpenAPI)
+	specPath := "../" + test.OpenapiFile
+	apiSpec, err := openapi.LoadAPISpec(specPath)
 	if err != nil {
-		t.Errorf("could not load file %s:%s", testOpenapiFile, err.Error())
+		t.Errorf(err.Error())
 	}
-	if openapi == nil {
-		t.Errorf("could not load file %s:%s", testOpenapiFile, err.Error())
-	}
-}
-
-func TestOpenAPI_SetRenderer(t *testing.T) {
-	apiSpec, _ := LoadOpenAPI(testAbsOpenAPI)
-	want := GinRenderer{}
-	_ = SetRenderer(apiSpec, want)
-	leaf := Dig(apiSpec, testEndpoint, testMethod, testReqBody, testMediaType, testSchema, "name")
-
-	got := leaf.getRenderer()
-	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("new metadata did not populate to root of tree. wanted %v, got %v", want, got)
+	if apiSpec == nil {
+		t.Errorf("could not load file %s:::%s", specPath, err.Error())
 	}
 }
 
-func TestOpenAPI_GetBasePath(t *testing.T) {
-	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
-	wanted := filepath.Dir(testAbsOpenAPI)
-	if openapi.getBasePath() != wanted {
-		t.Errorf("could not get basePath %s, got %s", wanted, openapi.basePath)
+func TestOpenAPI_GetAndSetBasePath(t *testing.T) {
+	want := "test/Base/Path"
+	o := openapi.OpenAPI{}
+	o.SetBasePath(want)
+	got := o.GetBasePath()
+	if got != want {
+		t.Fail()
 	}
 }
 
 func TestOpenAPI_GetParent(t *testing.T) {
-	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
-	p := openapi.GetParent()
+	o := openapi.OpenAPI{}
+	p := o.GetParent()
 	if p != nil {
-		t.Errorf("the root openapi file found a parent: %v", p)
+		t.Fail()
 	}
 }
 
-func TestGetOpenAPI_GetChildren(t *testing.T) {
-	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
-	paths := openapi.getChildren()
-	if len(paths) == 0 {
-		t.Errorf("error occured or test yaml file has no paths to get")
-	}
-	for k, v := range paths {
-		if k == testEndpoint {
-			if _, ok := v.(*PathItem); ok {
-				return // test that it's a *PathItem
-			}
-		}
-	}
-	t.Errorf("could not find a valid child in openapi file")
-}
-
-func TestOpenAPI_SetChild(t *testing.T) {
-	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
-	pathKey := "new"
-	p := PathItem{
-		Description: "new path item",
-	}
-	openapi.setChild(pathKey, &p)
-
-	paths := openapi.getChildren()
-	for k, v := range paths {
-		if k == pathKey {
-			path, ok := v.(*PathItem) // test that it's a *PathItem
-			if !ok {
-				t.Errorf("Non-valid pathItem found")
-			}
-			if !reflect.DeepEqual(*path, p) {
-				t.Errorf("path item set is not equivalent to path item retrieved")
-			}
-		}
+func TestGetOpenAPI_GetAndSetChildren(t *testing.T) {
+	pathName := "/path"
+	want := path.Item{Node: tree.Node{}}
+	o := openapi.OpenAPI{Node: tree.Node{}}
+	o.SetChild(pathName, &want)
+	got := o.GetChildren()[pathName].(*path.Item)
+	if !reflect.DeepEqual(&want, got) {
+		t.Fail()
 	}
 }
 
-func TestOpenAPI_GetName(t *testing.T) {
-	openapi, _ := LoadOpenAPI(testAbsOpenAPI)
-	_ = SetRenderer(openapi, GinRenderer{})
-	name := openapi.GetName()
-	if name != testGinRenderedOpenAPIName {
-		t.Errorf("wanted %s, got %s", testGinRenderedOpenAPIName, name)
+func TestOpenAPI_GetAndSetName(t *testing.T) {
+	want := "testName"
+	o := openapi.OpenAPI{}
+	o.SetName(want)
+	got := strings.Join(o.GetName(), "")
+	if got != want {
+		t.Fail()
 	}
 }
 
-func TestOpenAPI_ResolveRefs(t *testing.T) {
-	api := OpenAPI{
-		node: node{
-			basePath: filepath.Dir(testAbsOpenAPI),
-		},
-		Components: Components{},
-		Paths:      map[string]*PathItem{},
-	}
-	content, _ := os.ReadFile(testAbsOpenAPI)
-	_ = yaml.Unmarshal(content, &api)
-
-	newApi, err := Traverse(&api, resolveRefs)
-
-	if err != nil {
-		t.Errorf(err.Error()) // just bubbling up is enough here
-	}
-	if newApi == nil {
-		t.Errorf("%s resulted in a nil api tree", testOpenapiFile)
+func TestOpenAPI_GetAndSetMetadata(t *testing.T) {
+	want := tree.Metadata{"key": "value"}
+	o := openapi.OpenAPI{}
+	o.SetMetadata(want)
+	got := o.GetMetadata()
+	if !reflect.DeepEqual(want, got) {
+		t.Fail()
 	}
 }
 
-func TestOpenAPI_SetMetadata(t *testing.T) {
-	apiSpec, _ := LoadOpenAPI(testAbsOpenAPI)
-	data := Metadata{"this": "is", "some": "metadata"}
-	traversable := Dig(apiSpec, testEndpoint, testMethod, testReqBody, testMediaType, testSchema, "name")
+func TestOpenAPI_MetadataSetPoint(t *testing.T) {
+	apiSpec, _ := openapi.LoadAPISpec("../" + test.OpenapiFile)
+	data := tree.Metadata{"this": "is", "some": "metadata"}
+	traversable := test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.Key, "name")
 
 	traversable.SetMetadata(data)
-	if !reflect.DeepEqual(apiSpec.metadata, data) {
-		t.Fatalf("new metadata did not populate to root of tree. wanted %v, got %v", data, apiSpec.metadata)
+	if !reflect.DeepEqual(apiSpec.GetMetadata(), data) {
+		t.Fatalf("new metadata did not populate to root of tree. wanted %v, got %v", data, apiSpec.GetMetadata())
 	}
 }
