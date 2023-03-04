@@ -28,13 +28,13 @@ func TestOpenAPI_Schema_SetAndGetChildren(t *testing.T) {
 			Name: "theOther",
 		},
 	}
-	s.SetChild(schema.SubSchemaKey, this)
+	s.SetChild(schema.ItemsKey, this)
 	s.SetChild("that", that)
 	s.SetChild("theOther", theOther)
 	children := s.GetChildren()
 
 	// Check Item
-	if children[schema.SubSchemaKey].(*schema.Schema) != this {
+	if children[schema.ItemsKey].(*schema.Schema) != this {
 		t.Fail()
 	}
 	// Check Properties
@@ -55,8 +55,8 @@ func TestOpenAPI_Schema_GetAndSetBasePath(t *testing.T) {
 	p := parameter.Parameter{Schema: s}
 	s.SetParent(&p)
 
-	p.GetChildren()[schema.Key].(*schema.Schema).SetBasePath(basePath)
-	got := p.GetChildren()[schema.Key].(*schema.Schema).GetBasePath()
+	p.GetChildren()[schema.PropertyKey].(*schema.Schema).SetBasePath(basePath)
+	got := p.GetChildren()[schema.PropertyKey].(*schema.Schema).GetBasePath()
 	if want != got {
 		t.Fail()
 	}

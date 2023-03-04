@@ -34,7 +34,7 @@ func TestOpenAPI_Dig(t *testing.T) {
 		t.Errorf("%#v should have been a %T", mediaType, &media.Type{})
 	}
 
-	s := Dig(mediaType, schema.Key)
+	s := Dig(mediaType, schema.PropertyKey)
 	if _, ok := s.(*schema.Schema); !ok {
 		t.Errorf("%#v should have been a %T", s, &schema.Schema{})
 	}

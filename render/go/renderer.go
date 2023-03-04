@@ -1,5 +1,5 @@
-// Renderer implementations shouldn't have to know about the config package. They should simply plug into the
-// pre-configured engine instance created in main.go
+// Renderer implementations shouldn't have to know about the config package as the preparatory configuration needed for
+// a renderer instance is handled when setRenderStrategy() is called in main.go
 
 package golang
 
@@ -51,7 +51,7 @@ func (g *Renderer) SanitiseType(n tree.NodeTraverser) string {
 		case "boolean":
 			return "bool"
 		case "array":
-			return "[]" + g.SanitiseName(s.GetChildren()[schema.SubSchemaKey].(*schema.Schema).GetName())
+			return "[]" + g.SanitiseName(s.GetChildren()[schema.ItemsKey].(*schema.Schema).GetName())
 		case "integer":
 			return "int"
 		case "object":

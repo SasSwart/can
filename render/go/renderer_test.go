@@ -66,12 +66,12 @@ func TestGolang_SanitiseName(t *testing.T) {
 		},
 		{
 			name:     "testopenapi schema",
-			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.Key),
+			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.PropertyKey),
 			expected: "ValidationFixtureEndpointPostRequestBodyModel",
 		},
 		{
 			name:     "testopenapi property",
-			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.Key, "name"),
+			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.PropertyKey, "name"),
 			expected: "ValidationFixtureEndpointPostRequestBodyModelName",
 		},
 	}
@@ -91,7 +91,7 @@ func TestGolang_SanitiseType(t *testing.T) {
 	arrayType := schema.Schema{
 		Type: "array",
 		Node: tree.Node{Name: "testname"}}
-	arrayType.SetChild(schema.SubSchemaKey, &schema.Schema{
+	arrayType.SetChild(schema.ItemsKey, &schema.Schema{
 		Node: tree.Node{
 			Name: "testname",
 		},

@@ -58,7 +58,7 @@ func buildTestSpec() *openapi.OpenAPI {
 	postSchema := schema.Schema{Node: tree.Node{
 		Name: "postSchema",
 	}}
-	postMt.SetChild(schema.Key, &postSchema)
+	postMt.SetChild(schema.PropertyKey, &postSchema)
 	postSchema.SetParent(&postMt)
 
 	// ------------------//
@@ -86,7 +86,7 @@ func buildTestSpec() *openapi.OpenAPI {
 	getSchema := schema.Schema{Node: tree.Node{
 		Name: "getSchema",
 	}}
-	getMt.SetChild(schema.Key, &getSchema)
+	getMt.SetChild(schema.PropertyKey, &getSchema)
 	getSchema.SetParent(&getMt)
 
 	getResponse200 := response.Response{
@@ -130,7 +130,7 @@ func buildTestSpec() *openapi.OpenAPI {
 	getResponse204.SetChild(media.JSONKey, &get204Mt)
 
 	// sanity assertions
-	notNil := test.Dig(&root, "/endpoint", http.MethodGet, "204", media.JSONKey, schema.Key)
+	notNil := test.Dig(&root, "/endpoint", http.MethodGet, "204", media.JSONKey, schema.PropertyKey)
 	if notNil == nil {
 		panic("BORKED")
 	}
@@ -173,7 +173,6 @@ func newTestConfig() config.Data {
 	config.ConfigFilePath = "../config/config_test.yml"
 	config.Debug = true
 	return config.Data{
-		Generator: config.Generator{},
 		Template: config.Template{
 			Name: "go-gin",
 		},

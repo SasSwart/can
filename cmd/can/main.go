@@ -28,32 +28,35 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Setup appropriate renderer
-	switch cfg.Template.Name {
-	case "go-gin", "go-client":
-		e := render.Engine{}
-		r := &golang.Renderer{Base: &render.Base{}}
-		r.SetTemplateFuncMap(nil)
-		Renderer = e.With(r, cfg)
-	case "openapi-3":
-		fmt.Printf("Openapi-3 renderer not implemented yet")
-		os.Exit(1)
-	default:
-		fmt.Printf("%s is not a valid template name. Could not instantiate renderer", cfg.Template.Name)
-		os.Exit(1)
-	}
+	// Setup appropriate renderer via the `strategy` design pattern
+	err = setRenderStrategy(cfg)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
 	apiSpec.SetMetadata(tree.Metadata{
-		"package": cfg.Generator.BasePackageName,
+		"package": cfg.Template.BasePackageName,
 	})
 
 	_, err = tree.Traverse(apiSpec, Renderer.BuildRenderNode())
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
+	}
+}
+
+func setRenderStrategy(cfg config.Data) error {
+	switch cfg.Template.Name {
+	case "go-gin", "go-client":
+		e := render.Engine{}
+		r := &golang.Renderer{Base: &render.Base{}}
+		r.SetTemplateFuncMap(nil)
+		Renderer = e.With(r, cfg)
+		return nil
+	case "openapi-3":
+		return fmt.Errorf("openapi-3 renderer not implemented yet")
+	default:
+		return fmt.Errorf("%s is not a valid template name. Could not instantiate renderer", cfg.Template.Name)
 	}
 }
