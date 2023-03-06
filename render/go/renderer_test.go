@@ -183,7 +183,21 @@ func TestGolang_ToTitle(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{},
+		{
+			name:     "handle snake case",
+			input:    "domain_id",
+			expected: "DomainId",
+		},
+		{
+			name:     "handle adjacent symbols",
+			input:    "this/:domain_id",
+			expected: "ThisDomainId",
+		},
+		{
+			name:     "handle chaotic naming",
+			input:    "#$this/:domain^&_id*(Is INCREDIBLY()chaotic",
+			expected: "ThisDomainIdIsIncrediblyChaotic",
+		},
 	}
 	for _, testCase := range tests {
 		t.Run(testCase.name, func(t *testing.T) {
