@@ -6,8 +6,10 @@ import (
 	"path/filepath"
 )
 
-const PropertyKey = "Model"
-const ItemsKey = "9dce7025-4caf-415b-a4fd-e74e54d098cb"
+const (
+	PropertyKey = "5be9ff96-96ae-47b9-b878-1340b357f202"
+	ItemsKey    = "9dce7025-4caf-415b-a4fd-e74e54d098cb"
+)
 
 var _ tree.NodeTraverser = &Schema{}
 
@@ -81,4 +83,22 @@ func (s *Schema) IsRequired(property string) bool {
 		}
 	}
 	return false
+}
+func (s *Schema) GetName() []string {
+	switch s.Name {
+	case PropertyKey:
+		if s.GetParent() == nil {
+			return []string{s.Name}
+		}
+		return append(s.GetParent().GetName(), "Model")
+	case ItemsKey:
+		if s.GetParent() == nil {
+			return []string{s.Name}
+		}
+		return append(s.GetParent().GetName(), "Item")
+	}
+	if s.GetParent() == nil {
+		return []string{s.Name}
+	}
+	return append(s.GetParent().GetName(), s.Name)
 }

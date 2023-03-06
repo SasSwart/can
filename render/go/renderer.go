@@ -10,7 +10,6 @@ import (
 	"github.com/sasswart/gin-in-a-can/tree"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"text/template"
@@ -65,12 +64,7 @@ func (g *Renderer) SanitiseType(n tree.NodeTraverser) string {
 }
 
 func (g *Renderer) GetOutputFilename(n tree.NodeTraverser) string {
-	switch n.(type) {
-	case *schema.Schema:
-		return filepath.Join("models", g.SanitiseName(n.GetName())+".go")
-	default:
-		return g.SanitiseName(n.GetName()) + ".go"
-	}
+	return g.SanitiseName(n.GetName()) + ".go"
 }
 
 // SanitiseName should consume the result of an NodeTraverser's .GetName() function.
@@ -110,12 +104,13 @@ func (g *Renderer) SanitiseName(s []string) string {
 func CreateGoFunctionString(s string) (ret string) {
 	for i, char := range []rune(s) {
 		if i == 0 {
-			if ('A' <= char && char <= 'Z') || ('a' <= char && char <= 'z') {
+			// function names must start with alphabetical characters in go
+			if isAlpha(char) {
 				ret += string(char)
 			}
 			continue
 		}
-		if ('A' <= char && char <= 'Z') || ('a' <= char && char <= 'z') || ('0' <= char && char <= '9') {
+		if isAlphaNum(char) {
 			ret += string(char)
 		}
 	}
@@ -142,4 +137,30 @@ func NewTestRenderConfig() config.Data {
 		OpenAPIFile:  "../openapi/test/fixtures/validation_no_refs.yaml",
 		OutputPath:   ".",
 	}
+}
+
+func isAlpha(r rune) bool {
+	return ('A' <= r && r <= 'Z') || ('a' <= r && r <= 'z')
+}
+func isAlphaNum(r rune) bool {
+	return ('A' <= r && r <= 'Z') || ('a' <= r && r <= 'z') || ('0' <= r && r <= '9')
+}
+
+// TODO Fix and test for robustness. Make sure this doesn't infringe on logic dealt with elsewhere
+func ToTitle(s string) (ret string) {
+	caser := cases.Title(language.English)
+	var splitBy []rune
+	for _, r := range []rune(s) {
+		if isAlphaNum(r) {
+			splitBy = append(splitBy, r)
+		}
+	}
+	buf := []string{s}
+	for 0 < len(splitBy) {
+		for _, word := range buf {
+			buf = strings.Split(word, string(splitBy[0]))
+			splitBy = splitBy[1:]
+		}
+	}
+	return caser.String(ret)
 }

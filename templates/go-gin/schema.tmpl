@@ -19,7 +19,7 @@ package {{ index .GetMetadata "package" }}
 // {{ .Description }}
 {{- end }}
 type {{ .GetName | SanitiseName }} {{ . | SanitiseType }}
-{{- if eq "object" .Type }} {
+{{- if eq ( . | SanitiseType) "struct" }} {
 	{{- range $name, $schema := .Properties }}
         {{ if eq ($schema | SanitiseType) "struct" -}}
             {{ $name | ToTitle }} {{ $schema.GetName | SanitiseName }}

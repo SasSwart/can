@@ -179,3 +179,22 @@ func TestGolang_CleanFunctionString(t *testing.T) {
 		})
 	}
 }
+
+func TestGolang_ToTitle(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{},
+	}
+	for _, testCase := range tests {
+		t.Run(testCase.name, func(t *testing.T) {
+			want := testCase.expected
+			got := golang.ToTitle(testCase.input)
+			if want != got {
+				t.Errorf("Wanted %s but got %s\n", want, got)
+			}
+		})
+	}
+}
