@@ -1,19 +1,20 @@
-package render_test
+package test
 
 import (
+	"github.com/sasswart/gin-in-a-can/openapi"
 	"github.com/sasswart/gin-in-a-can/render"
 	golang "github.com/sasswart/gin-in-a-can/render/go"
-	"github.com/sasswart/gin-in-a-can/test"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"text/template"
 )
 
-func Test_Render_Render(t *testing.T) {
+func TestGolang_Renderer(t *testing.T) {
 	tempFolder, _ := os.MkdirTemp(os.TempDir(), "CanTestArtifacts")
 	defer os.RemoveAll(tempFolder)
 
@@ -37,10 +38,18 @@ func Test_Render_Render(t *testing.T) {
 	if r.GetTemplateFuncMap() == nil {
 		t.Errorf("TemplateFuncMap should NOT be nil")
 	}
-	_, err = tree.Traverse(test.OpenAPITree(), e.BuildRenderNode())
+
+	// We have to pop the first element off the path constant
+	apiTree, err := openapi.LoadAPISpec(filepath.Join(strings.Split(OpenapiFile, "/")[1:]...))
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	// TODO What dictates whether or not the schema type is rendered to file?
-	// 	We're not currently rendering any 204 response schemas
+
+	apiTree.SetMetadata(tree.Metadata{
+		"package": cfg.Template.BasePackageName,
+	})
+	_, err = tree.Traverse(apiTree, e.BuildRenderNode())
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 }

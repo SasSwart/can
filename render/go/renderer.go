@@ -4,6 +4,7 @@
 package golang
 
 import (
+	"github.com/sasswart/gin-in-a-can/config"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/render"
 	"github.com/sasswart/gin-in-a-can/tree"
@@ -128,4 +129,17 @@ func isHttpStatusCode(s string) bool {
 		}
 	}
 	return false
+}
+
+func NewTestRenderConfig() config.Data {
+	config.ConfigFilePath = "../config/config_test.yml"
+	config.Debug = true
+	return config.Data{
+		Template: config.Template{
+			Name: "go-gin",
+		},
+		TemplatesDir: "../templates",
+		OpenAPIFile:  "../openapi/test/fixtures/validation_no_refs.yaml",
+		OutputPath:   ".",
+	}
 }
