@@ -127,6 +127,32 @@ func isHttpStatusCode(s string) bool {
 	return false
 }
 
+func isAlpha(r rune) bool {
+	return ('A' <= r && r <= 'Z') || ('a' <= r && r <= 'z')
+}
+func isAlphaNum(r rune) bool {
+	return isAlpha(r) || ('0' <= r && r <= '9')
+}
+
+// TODO Fix and test for robustness. Make sure this doesn't infringe on logic dealt with elsewhere
+func ToGoTitle(s string) (ret string) {
+	caser := cases.Title(language.English)
+	var splitBy []rune
+	for _, r := range []rune(s) {
+		if isAlphaNum(r) {
+			splitBy = append(splitBy, r)
+		}
+	}
+	buf := []string{s}
+	for 0 < len(splitBy) {
+		for _, word := range buf {
+			buf = strings.Split(word, string(splitBy[0]))
+			splitBy = splitBy[1:]
+		}
+	}
+	return caser.String(ret)
+}
+
 func NewGinServerTestConfig() config.Data {
 	config.ConfigFilePath = "../render/go/config_goginserver_test.yml"
 	config.Debug = true
@@ -148,30 +174,4 @@ func NewGoClientTestConfig() config.Data {
 		OpenAPIFile: "../openapi/test/fixtures/validation_no_refs.yaml",
 		OutputPath:  ".",
 	}
-}
-
-func isAlpha(r rune) bool {
-	return ('A' <= r && r <= 'Z') || ('a' <= r && r <= 'z')
-}
-func isAlphaNum(r rune) bool {
-	return ('A' <= r && r <= 'Z') || ('a' <= r && r <= 'z') || ('0' <= r && r <= '9')
-}
-
-// TODO Fix and test for robustness. Make sure this doesn't infringe on logic dealt with elsewhere
-func ToTitle(s string) (ret string) {
-	caser := cases.Title(language.English)
-	var splitBy []rune
-	for _, r := range []rune(s) {
-		if isAlphaNum(r) {
-			splitBy = append(splitBy, r)
-		}
-	}
-	buf := []string{s}
-	for 0 < len(splitBy) {
-		for _, word := range buf {
-			buf = strings.Split(word, string(splitBy[0]))
-			splitBy = splitBy[1:]
-		}
-	}
-	return caser.String(ret)
 }

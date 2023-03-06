@@ -177,7 +177,7 @@ func TestGolang_CleanFunctionString(t *testing.T) {
 	}
 }
 
-func TestGolang_ToTitle(t *testing.T) {
+func TestGolang_ToGoTitle(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string
@@ -188,7 +188,7 @@ func TestGolang_ToTitle(t *testing.T) {
 	for _, testCase := range tests {
 		t.Run(testCase.name, func(t *testing.T) {
 			want := testCase.expected
-			got := golang.ToTitle(testCase.input)
+			got := golang.ToGoTitle(testCase.input)
 			if want != got {
 				t.Errorf("Wanted %s but got %s\n", want, got)
 			}
