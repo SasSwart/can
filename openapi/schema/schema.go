@@ -6,8 +6,12 @@ import (
 	"path/filepath"
 )
 
-const PropertyKey = "Model"
-const ItemsKey = "9dce7025-4caf-415b-a4fd-e74e54d098cb"
+// We use these UUIDs as unique keys for schema Properties and schema Items. This allows us to avoid potential
+// clashes with other names used in the map created when getting and setting schema children in this package and media
+const (
+	PropertyKey = "5be9ff96-96ae-47b9-b878-1340b357f202"
+	ItemsKey    = "9dce7025-4caf-415b-a4fd-e74e54d098cb"
+)
 
 var _ tree.NodeTraverser = &Schema{}
 
@@ -81,4 +85,16 @@ func (s *Schema) IsRequired(property string) bool {
 		}
 	}
 	return false
+}
+func (s *Schema) GetName() []string {
+	if s.GetParent() == nil {
+		return []string{s.Name}
+	}
+	switch s.Name {
+	case PropertyKey:
+		return append(s.GetParent().GetName(), "Model")
+	case ItemsKey:
+		return append(s.GetParent().GetName(), "Item")
+	}
+	return append(s.GetParent().GetName(), s.Name)
 }

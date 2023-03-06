@@ -8,7 +8,7 @@ import (
 )
 
 {{- range $name, $operation := .Operations }}
-func {{ $operation.GetName }}(config ApiConfig, params *{{ $operation.GetName }}Parameters, body *{{ $operation.RequestBody.GetName }}) {
+func {{ $operation.GetName | SanitiseName }}(config ApiConfig, params *{{ $operation.GetName | SanitiseName }}Parameters, body *{{ $operation.RequestBody.GetName | SanitiseName }}) {
 	requestURL := fmt.Sprintf("%s://%s:%d", config.Protocol, config.Host, config.Port)
 	req, err := http.NewRequest(http.Method{{ $name | ToTitle }}, requestURL, nil)
 	if err != nil {

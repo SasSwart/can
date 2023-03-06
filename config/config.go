@@ -9,7 +9,7 @@ import (
 )
 
 // SemVer should be updated on any new release!!
-const SemVer = "0.0.6"
+const SemVer = "0.0.7"
 
 var (
 	Debug          bool
@@ -82,7 +82,7 @@ func (d *Data) Load() (err error) {
 	ConfigFilePath = absCfgPath
 
 	if VersionFlagSet {
-		fmt.Printf("Can Version: %s\n", SemVer)
+		fmt.Printf("Can: v%s\n", SemVer)
 		os.Exit(0)
 	}
 
@@ -130,7 +130,7 @@ func (d *Data) Load() (err error) {
 	return nil
 }
 
-func (d *Data) GetTemplateDir() (path string) {
+func (d *Data) GetTemplateFilesDir() (path string) {
 	if d.Template.absDirectory != "" {
 		return d.Template.absDirectory
 	}
@@ -260,6 +260,12 @@ func (d *Data) resolveTemplateConfig() error {
 					break
 				}
 			}
+		}
+	}
+	if !filepath.IsAbs(d.TemplatesDir) {
+		d.TemplatesDir, err = filepath.Abs(d.TemplatesDir)
+		if err != nil {
+			return err
 		}
 	}
 	return nil

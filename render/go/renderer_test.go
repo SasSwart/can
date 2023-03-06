@@ -16,9 +16,6 @@ import (
 func TestGolang_SetTemplateFuncMap(t *testing.T) {
 	g := &golang.Renderer{Base: &render.Base{}}
 	g.SetTemplateFuncMap(nil)
-	if g.Base.TemplateFuncMapping == nil {
-		t.Errorf("TemplateFuncMapping error")
-	}
 	if g.GetTemplateFuncMap() == nil {
 		t.Errorf("GetTemplateFuncMap() error")
 	}
@@ -172,9 +169,42 @@ func TestGolang_CleanFunctionString(t *testing.T) {
 
 	for _, testCase := range tests {
 		t.Run(testCase.name, func(t *testing.T) {
-			got := golang.CreateGoFunctionString(testCase.input)
+			got := golang.CreateFunctionString(testCase.input)
 			if got != testCase.expected {
 				t.Fail()
+			}
+		})
+	}
+}
+
+func TestGolang_ToTitle(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "handle snake case",
+			input:    "domain_id",
+			expected: "DomainId",
+		},
+		{
+			name:     "handle adjacent symbols",
+			input:    "this/:domain_id",
+			expected: "ThisDomainId",
+		},
+		{
+			name:     "handle chaotic naming",
+			input:    "#$this/:domain^&_id*(Is INCREDIBLY()chaotic",
+			expected: "ThisDomainIdIsIncrediblyChaotic",
+		},
+	}
+	for _, testCase := range tests {
+		t.Run(testCase.name, func(t *testing.T) {
+			want := testCase.expected
+			got := golang.ToTitle(testCase.input)
+			if want != got {
+				t.Errorf("Wanted %s but got %s\n", want, got)
 			}
 		})
 	}

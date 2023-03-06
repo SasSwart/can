@@ -4,7 +4,6 @@ import (
 	"github.com/sasswart/gin-in-a-can/errors"
 	"github.com/sasswart/gin-in-a-can/openapi/media"
 	"github.com/sasswart/gin-in-a-can/tree"
-	"strconv"
 )
 
 var _ tree.NodeTraverser = &Response{}
@@ -35,23 +34,18 @@ func (r *Response) GetName() []string {
 func (r *Response) GetChildren() map[string]tree.NodeTraverser {
 	responses := map[string]tree.NodeTraverser{} // Where string is either `default` or an HTTP status code
 	for name, mediaType := range r.Content {
-		if _, err := strconv.Atoi(name); err != nil || name == "default" {
-			responses[name] = &mediaType
-		} else {
-			errors.UndefinedBehaviour("(r *Response) GetChildren()")
-		}
+		responses[name] = &mediaType
 	}
 	return responses
 }
 
 func (r *Response) SetChild(i string, t tree.NodeTraverser) {
-	if r.Content == nil {
-		r.Content = make(map[string]media.Type, 4)
-	}
 	if mediaType, ok := t.(*media.Type); ok {
+		if r.Content == nil {
+			r.Content = make(map[string]media.Type, 4)
+		}
 		r.Content[i] = *mediaType
 		return
 	}
 	errors.CastFail("(r *Response) SetChild()", "NodeTraverser", "*media_type.Type")
-	return
 }

@@ -2,5 +2,5 @@ template:
   moduleName: github.com/test/api
   basePackageName: test
 templatesDir: ../templates
-openAPIFile: openapi/test/fixtures/validation_no_refs.yaml
+openAPIFile: openapi/test/fixtures/validation.yaml
 outputPath: .

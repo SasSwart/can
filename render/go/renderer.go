@@ -4,12 +4,12 @@
 package golang
 
 import (
+	"github.com/sasswart/gin-in-a-can/config"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/render"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"text/template"
@@ -26,19 +26,17 @@ func (g *Renderer) SetTemplateFuncMap(f *template.FuncMap) {
 		g.Base.SetTemplateFuncMap(f)
 		return
 	}
-	g.Base.TemplateFuncMapping = &template.FuncMap{
+	g.Base.SetTemplateFuncMap(&template.FuncMap{
 		"ToUpper": strings.ToUpper,
-		"ToTitle": func(s string) string {
-			caser := cases.Title(language.English)
-			return caser.String(s)
-		},
+		"ToTitle": ToTitle,
+		// TODO this should NOT be self-referential
 		"SanitiseName": g.SanitiseName,
 		"SanitiseType": g.SanitiseType,
-	}
+	})
 }
 
-func (g *Renderer) GetTemplateFuncMap() template.FuncMap {
-	return *g.TemplateFuncMapping
+func (g *Renderer) GetTemplateFuncMap() *template.FuncMap {
+	return g.Base.GetTemplateFuncMap()
 }
 
 // SanitiseType sanitizes the prepares the contents of the Type field of a node for use by the renderer
@@ -64,12 +62,7 @@ func (g *Renderer) SanitiseType(n tree.NodeTraverser) string {
 }
 
 func (g *Renderer) GetOutputFilename(n tree.NodeTraverser) string {
-	switch n.(type) {
-	case *schema.Schema:
-		return filepath.Join("models", g.SanitiseName(n.GetName())+".go")
-	default:
-		return g.SanitiseName(n.GetName()) + ".go"
-	}
+	return g.SanitiseName(n.GetName()) + ".go"
 }
 
 // SanitiseName should consume the result of an NodeTraverser's .GetName() function.
@@ -85,36 +78,37 @@ func (g *Renderer) SanitiseName(s []string) string {
 			continue
 		case strings.Contains(w, "/"):
 			for _, split := range strings.Split(w, "/") {
-				temp = append(temp, caser.String(CreateGoFunctionString(split)))
+				temp = append(temp, caser.String(CreateFunctionString(split)))
 			}
 			continue
 		case strings.Contains(w, " "):
 			for _, split := range strings.Split(w, " ") {
-				temp = append(temp, caser.String(CreateGoFunctionString(split)))
+				temp = append(temp, caser.String(CreateFunctionString(split)))
 			}
 			continue
 		case strings.Contains(w, "_"):
 			for _, split := range strings.Split(w, "_") {
-				temp = append(temp, caser.String(CreateGoFunctionString(split)))
+				temp = append(temp, caser.String(CreateFunctionString(split)))
 			}
 			continue
 		}
-		temp = append(temp, caser.String(CreateGoFunctionString(w)))
+		temp = append(temp, caser.String(CreateFunctionString(w)))
 	}
 	return strings.Join(temp, "")
 }
 
-// CreateGoFunctionString strips a string of any leading non-alphabetical chars, and all non-alphabetical and non-numerical
+// CreateFunctionString strips a string of any leading non-alphabetical chars, and all non-alphabetical and non-numerical
 // characters that follow.
-func CreateGoFunctionString(s string) (ret string) {
+func CreateFunctionString(s string) (ret string) {
 	for i, char := range []rune(s) {
 		if i == 0 {
-			if ('A' <= char && char <= 'Z') || ('a' <= char && char <= 'z') {
+			// function names must start with alphabetical characters in go
+			if isAlpha(char) {
 				ret += string(char)
 			}
 			continue
 		}
-		if ('A' <= char && char <= 'Z') || ('a' <= char && char <= 'z') || ('0' <= char && char <= '9') {
+		if isAlphaNum(char) {
 			ret += string(char)
 		}
 	}
@@ -128,4 +122,71 @@ func isHttpStatusCode(s string) bool {
 		}
 	}
 	return false
+}
+
+func isAlpha(r rune) bool {
+	return ('A' <= r && r <= 'Z') || ('a' <= r && r <= 'z')
+}
+func isAlphaNum(r rune) bool {
+	return isAlpha(r) || ('0' <= r && r <= '9')
+}
+
+func ToTitle(s string) (ret string) {
+	caser := cases.Title(language.English)
+	var splitBy []rune
+	for _, r := range []rune(s) {
+		if !isAlphaNum(r) {
+			splitBy = append(splitBy, r)
+		}
+	}
+	buf := []string{s}
+	for 0 < len(splitBy) {
+		for i, word := range buf {
+			if strings.HasPrefix(word, string(splitBy[0])) {
+				buf[i] = strings.TrimPrefix(word, string(splitBy[0]))
+				splitBy = splitBy[1:]
+				continue
+			}
+			if strings.HasSuffix(word, string(splitBy[0])) {
+				buf[i] = strings.TrimSuffix(word, string(splitBy[0]))
+				splitBy = splitBy[1:]
+				continue
+			}
+			if strings.Contains(word, string(splitBy[0])) {
+				if len(buf) == 1 {
+					buf = strings.Split(word, string(splitBy[0]))
+				} else {
+					buf = append(buf[:i], strings.Split(word, string(splitBy[0]))...)
+				}
+				splitBy = splitBy[1:]
+			}
+		}
+	}
+	for _, word := range buf {
+		ret += caser.String(word)
+	}
+	return ret
+}
+
+func NewGinServerTestConfig() config.Data {
+	config.ConfigFilePath = "../render/go/config_goginserver_test.yml"
+	config.Debug = true
+	return config.Data{
+		Template: config.Template{
+			Name: "go-gin",
+		},
+		OpenAPIFile: "../openapi/test/fixtures/validation_no_refs.yaml",
+		OutputPath:  ".",
+	}
+}
+func NewGoClientTestConfig() config.Data {
+	config.ConfigFilePath = "../render/go/config_goclient_test.yml"
+	config.Debug = true
+	return config.Data{
+		Template: config.Template{
+			Name: "go-client",
+		},
+		OpenAPIFile: "../openapi/test/fixtures/validation_no_refs.yaml",
+		OutputPath:  ".",
+	}
 }
