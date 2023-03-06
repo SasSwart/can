@@ -81,28 +81,28 @@ func (g *Renderer) SanitiseName(s []string) string {
 			continue
 		case strings.Contains(w, "/"):
 			for _, split := range strings.Split(w, "/") {
-				temp = append(temp, caser.String(CreateGoFunctionString(split)))
+				temp = append(temp, caser.String(CreateFunctionString(split)))
 			}
 			continue
 		case strings.Contains(w, " "):
 			for _, split := range strings.Split(w, " ") {
-				temp = append(temp, caser.String(CreateGoFunctionString(split)))
+				temp = append(temp, caser.String(CreateFunctionString(split)))
 			}
 			continue
 		case strings.Contains(w, "_"):
 			for _, split := range strings.Split(w, "_") {
-				temp = append(temp, caser.String(CreateGoFunctionString(split)))
+				temp = append(temp, caser.String(CreateFunctionString(split)))
 			}
 			continue
 		}
-		temp = append(temp, caser.String(CreateGoFunctionString(w)))
+		temp = append(temp, caser.String(CreateFunctionString(w)))
 	}
 	return strings.Join(temp, "")
 }
 
-// CreateGoFunctionString strips a string of any leading non-alphabetical chars, and all non-alphabetical and non-numerical
+// CreateFunctionString strips a string of any leading non-alphabetical chars, and all non-alphabetical and non-numerical
 // characters that follow.
-func CreateGoFunctionString(s string) (ret string) {
+func CreateFunctionString(s string) (ret string) {
 	for i, char := range []rune(s) {
 		if i == 0 {
 			// function names must start with alphabetical characters in go
@@ -135,11 +135,11 @@ func isAlphaNum(r rune) bool {
 }
 
 // TODO Fix and test for robustness. Make sure this doesn't infringe on logic dealt with elsewhere
-func ToGoTitle(s string) (ret string) {
+func ToTitle(s string) (ret string) {
 	caser := cases.Title(language.English)
 	var splitBy []rune
 	for _, r := range []rune(s) {
-		if isAlphaNum(r) {
+		if !isAlphaNum(r) {
 			splitBy = append(splitBy, r)
 		}
 	}
