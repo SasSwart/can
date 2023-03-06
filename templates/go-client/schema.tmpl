@@ -5,13 +5,13 @@ package {{ index .GetMetadata "package" }}
 // {{ .GetName }} description:
 // {{ .Description }}
 {{- end }}
-type {{ .GetName }} {{ .GetType }}
+type {{ .GetName | SanitiseName }} {{ . | SanitiseType }}
 {{- if eq "object" .Type }} {
 {{- range $name, $schema := .Properties }}
-	{{ if eq $schema.GetType "struct" -}}
-	{{ $name | ToTitle }} {{ $schema.GetName }}
+	{{ if eq ($schema | SanitiseType) "struct" -}}
+	{{ $name | ToTitle }} {{ $schema.GetName | SanitiseName }}
 	{{- else -}}
-	{{ $name | ToTitle }} {{ $schema.GetType }}
+	{{ $name | ToTitle }} {{ $schema | SanitiseType }}
 	{{- end }}
 {{- end }}
 }

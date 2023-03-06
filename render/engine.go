@@ -79,9 +79,9 @@ func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte
 	}
 	buff := bytes.NewBuffer([]byte{})
 	templater := template.New(templateFilename)
-	templater.Funcs(r.GetTemplateFuncMap())
+	templater.Funcs(*r.GetTemplateFuncMap())
 
-	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", e.config.GetTemplateDir()))
+	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", e.config.GetTemplateFilesDir()))
 	if err != nil {
 		return nil, err
 	}

@@ -1,3 +1,5 @@
+// config_test should not test any of the config packages functions in a way that relies on other packages within can.
+// This statement is being transgressed if any other local import is seen in the import block below.
 package config
 
 import (
@@ -9,24 +11,30 @@ import (
 // FYI - if your tests are utilizing flags from os.Args, flags are likely to be redefined through the
 // config.Data{}.Load() method. This will cause test suites to panic!
 func TestConfig_Load(t *testing.T) {
+	absTestTemplateDir, err := filepath.Abs(filepath.Join("../", testTemplateDir))
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 	cfg := newTestConfig()
-	err := cfg.Load()
+	err = cfg.Load()
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 
-	if cfg.Template.ModuleName != "github.com/test/api" ||
-		cfg.Template.BasePackageName != "test" ||
-		cfg.Template.Name != "go-gin" ||
-		cfg.TemplatesDir != filepath.Clean("../templates") ||
-		cfg.OpenAPIFile != filepath.Clean("openapi/test/fixtures/validation_no_refs.yaml") ||
-		cfg.OutputPath != "." {
+	if cfg.Template.ModuleName != testModuleName ||
+		cfg.Template.BasePackageName != testBasePackageName ||
+		// will fail if the defined template name does not exist in the templates directory
+		cfg.Template.Name != testTemplateName ||
+		cfg.TemplatesDir != absTestTemplateDir ||
+		cfg.OpenAPIFile != filepath.Join("../", testOpenAPIDefinition) ||
+		cfg.OutputPath != testOutputDir {
 		t.Fail()
 	}
 }
 
 func TestConfig_validTemplateName(t *testing.T) {
 	cfg := newTestConfig()
+	t.Logf("using template directory " + cfg.TemplatesDir + " for testing")
 	var err error
 	ProcWorkingDir, err = os.Getwd()
 	if err != nil {
@@ -81,44 +89,44 @@ func TestConfig_GetOpenAPIFilepath(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		openapifile    string
-		configfilepath string
-		workingdir     string
+		openapiFile    string
+		configFilepath string
+		workingDir     string
 		expected       bool
-		setuperr       error
+		setupErr       error
 	}{
 		{
 			name:        "absolute path",
-			openapifile: absOpenApi,
-			setuperr:    absOpenApiErr,
+			openapiFile: absOpenApi,
+			setupErr:    absOpenApiErr,
 		},
 		{
 			name:           "config fallback",
-			openapifile:    openAPIFilePath,
-			configfilepath: absConfigPath,
-			setuperr:       absConfigPathErr,
+			openapiFile:    openAPIFilePath,
+			configFilepath: absConfigPath,
+			setupErr:       absConfigPathErr,
 		},
 		{
 			name:           "working dir fallback",
-			openapifile:    openAPIFilePath,
-			configfilepath: configFilePath,
-			workingdir:     "../",
+			openapiFile:    openAPIFilePath,
+			configFilepath: configFilePath,
+			workingDir:     "../",
 		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			if test.setuperr != nil {
-				t.Skipf("Skipping %s due to %s", test.name, test.setuperr.Error())
+			if test.setupErr != nil {
+				t.Skipf("Skipping %s due to %s", test.name, test.setupErr.Error())
 			}
 			cfg := Data{}
-			if test.openapifile != "" {
-				cfg.OpenAPIFile = test.openapifile
+			if test.openapiFile != "" {
+				cfg.OpenAPIFile = test.openapiFile
 			}
-			if test.configfilepath != "" {
-				ConfigFilePath = test.configfilepath
+			if test.configFilepath != "" {
+				ConfigFilePath = test.configFilepath
 			}
-			if test.workingdir != "" {
-				ProcWorkingDir = test.workingdir
+			if test.workingDir != "" {
+				ProcWorkingDir = test.workingDir
 			}
 			// TODO figure out how to isolate test context from host filesystem for accurate testing
 			if cfg.GetOpenAPIFilepath() == "" {
@@ -134,15 +142,28 @@ func TestConfig_GetOutputFilepath(t *testing.T) {
 	// TODO see TestConfig_GetOpenAPIFilepath
 }
 
+// Constants needed for sane testing. These are consciously intended to be agnostic of language and framework.
+const (
+	testTemplateDir       = "templates"
+	testTemplateName      = "openapi-3"
+	testModuleName        = "testModuleName"
+	testBasePackageName   = "testBasePackageName"
+	testConfigPath        = "test_config.yaml"
+	testOpenAPIDefinition = "openapi/test/fixtures/validation_no_refs.yaml"
+	testOutputDir         = "."
+)
+
 func newTestConfig() Data {
-	ConfigFilePath = "config_test.yml"
+	ConfigFilePath = testConfigPath
 	return Data{
 		Template: Template{
-			Name: "go-gin",
+			Name:            testTemplateName,
+			BasePackageName: testBasePackageName,
+			ModuleName:      testModuleName,
 		},
-		TemplatesDir: "../templates",
-		OpenAPIFile:  "../openapi/test/fixtures/validation_no_refs.yaml",
-		OutputPath:   ".",
+		TemplatesDir: filepath.Join("../", testTemplateDir),
+		OpenAPIFile:  filepath.Join("../", testOpenAPIDefinition),
+		OutputPath:   testOutputDir,
 	}
 
 }

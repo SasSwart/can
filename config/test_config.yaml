@@ -1,0 +1,4 @@
+template:
+  moduleName: testModuleName
+  basePackageName: testBasePackageName
+outputPath: .

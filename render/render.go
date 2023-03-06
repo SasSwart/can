@@ -11,18 +11,18 @@ type Renderer interface {
 
 	GetOutputFilename(n tree.NodeTraverser) string
 	SetTemplateFuncMap(*template.FuncMap)
-	GetTemplateFuncMap() template.FuncMap
+	GetTemplateFuncMap() *template.FuncMap
 }
 
 // Base defines the base render object. This should be used as a compositional base for specialising it's interface
 // towards a specific use case.
 type Base struct {
-	TemplateFuncMapping *template.FuncMap
+	templateFuncMapping *template.FuncMap
 }
 
-func (b *Base) GetTemplateFuncMap() template.FuncMap {
-	return *b.TemplateFuncMapping
+func (b *Base) GetTemplateFuncMap() *template.FuncMap {
+	return b.templateFuncMapping
 }
 func (b *Base) SetTemplateFuncMap(funcMap *template.FuncMap) {
-	b.TemplateFuncMapping = funcMap
+	b.templateFuncMapping = funcMap
 }

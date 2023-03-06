@@ -15,9 +15,15 @@ import (
 
 func Test_Render_Render(t *testing.T) {
 	tempFolder, _ := os.MkdirTemp(os.TempDir(), "CanTestArtifacts")
-	defer os.RemoveAll(tempFolder)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+	}(tempFolder)
 
-	cfg := golang.NewTestRenderConfig()
+	// TODO test this in a language agnostic way or move to E2E testing suite
+	cfg := golang.NewGinServerTestConfig()
 	err := cfg.Load()
 	if err != nil {
 		t.Errorf(err.Error())

@@ -16,9 +16,6 @@ import (
 func TestGolang_SetTemplateFuncMap(t *testing.T) {
 	g := &golang.Renderer{Base: &render.Base{}}
 	g.SetTemplateFuncMap(nil)
-	if g.Base.TemplateFuncMapping == nil {
-		t.Errorf("TemplateFuncMapping error")
-	}
 	if g.GetTemplateFuncMap() == nil {
 		t.Errorf("GetTemplateFuncMap() error")
 	}

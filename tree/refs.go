@@ -13,7 +13,7 @@ import (
 func readRef(absFilename string, n NodeTraverser) error {
 
 	if config.Debug { // this can be a particularly noisy Printf call
-		fmt.Printf("[%s]::Reading reference: %s\n", config.SemVer, absFilename)
+		fmt.Printf("[v%s]::Reading reference: %s\n", config.SemVer, absFilename)
 	}
 	content, err := os.ReadFile(absFilename)
 	if err != nil {

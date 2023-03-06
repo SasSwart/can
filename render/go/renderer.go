@@ -26,19 +26,20 @@ func (g *Renderer) SetTemplateFuncMap(f *template.FuncMap) {
 		g.Base.SetTemplateFuncMap(f)
 		return
 	}
-	g.Base.TemplateFuncMapping = &template.FuncMap{
+	g.Base.SetTemplateFuncMap(&template.FuncMap{
 		"ToUpper": strings.ToUpper,
 		"ToTitle": func(s string) string {
 			caser := cases.Title(language.English)
 			return caser.String(s)
 		},
+		// TODO this should NOT be self-referential
 		"SanitiseName": g.SanitiseName,
 		"SanitiseType": g.SanitiseType,
-	}
+	})
 }
 
-func (g *Renderer) GetTemplateFuncMap() template.FuncMap {
-	return *g.TemplateFuncMapping
+func (g *Renderer) GetTemplateFuncMap() *template.FuncMap {
+	return g.Base.GetTemplateFuncMap()
 }
 
 // SanitiseType sanitizes the prepares the contents of the Type field of a node for use by the renderer
@@ -126,16 +127,26 @@ func isHttpStatusCode(s string) bool {
 	return false
 }
 
-func NewTestRenderConfig() config.Data {
-	config.ConfigFilePath = "../config/config_test.yml"
+func NewGinServerTestConfig() config.Data {
+	config.ConfigFilePath = "../render/go/config_goginserver_test.yml"
 	config.Debug = true
 	return config.Data{
 		Template: config.Template{
 			Name: "go-gin",
 		},
-		TemplatesDir: "../templates",
-		OpenAPIFile:  "../openapi/test/fixtures/validation_no_refs.yaml",
-		OutputPath:   ".",
+		OpenAPIFile: "../openapi/test/fixtures/validation_no_refs.yaml",
+		OutputPath:  ".",
+	}
+}
+func NewGoClientTestConfig() config.Data {
+	config.ConfigFilePath = "../render/go/config_goclient_test.yml"
+	config.Debug = true
+	return config.Data{
+		Template: config.Template{
+			Name: "go-client",
+		},
+		OpenAPIFile: "../openapi/test/fixtures/validation_no_refs.yaml",
+		OutputPath:  ".",
 	}
 }
 
