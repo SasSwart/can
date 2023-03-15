@@ -94,6 +94,9 @@ func (d *Data) Load() (err error) {
 		fmt.Printf("[v%s]::Using config file \"%s\".\n", SemVer, ConfigFilePath)
 	}
 	err = d.setOverridesAndLoadConfig()
+	if err != nil {
+		return err
+	}
 
 	err = d.resolveTemplateConfig()
 	if err != nil {
