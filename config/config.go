@@ -268,7 +268,7 @@ func (d *Data) setOverridesAndLoadConfig() error {
 	// Handle Template name
 	err = viper.Unmarshal(&d)
 	if err != nil {
-		return fmt.Errorf("setOverridesAndLoadConfig:: could not unmarsha; config file: %w\n", err)
+		return fmt.Errorf("setOverridesAndLoadConfig:: could not unmarshal config file: %w\n", err)
 	}
 	// Handle empty config fields
 	if d.Template.Name == "" {
