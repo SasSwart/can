@@ -17,10 +17,13 @@ var (
 	VersionFlagSet bool
 	// ConfigFilePath is `.` if not set through the `-configFile` flag
 	ConfigFilePath string
-
 	// ProcWorkingDir is set through calling os.Getwd()
 	ProcWorkingDir string
 	ExePath        string
+
+	// for package use only
+	outputPathFlag   string
+	templateNameFlag string
 )
 
 // Data represents the config data used in the day-to-day running of can
@@ -42,14 +45,12 @@ type Data struct {
 
 // Template's fields are dependant on there being a defined templated name in the CLI arguments or config file.
 type Template struct {
-	Name string
-
-	absDirectory string
-
+	Name       string
 	ModuleName string
-
 	// BasePackageName represents the
 	BasePackageName string
+
+	absDirectory string
 }
 
 func (d *Data) Load() (err error) {
@@ -71,7 +72,9 @@ func (d *Data) Load() (err error) {
 		flag.BoolVar(&Dryrun, "dryrun", false,
 			"Toggles whether to perform a render without writing to disk."+
 				"This works particularly well in combination with -debug")
-		flag.StringVar(&d.Template.Name, "template", "", "Specify which template set to use")
+		flag.StringVar(&templateNameFlag, "template", "", "Specify which template set to use")
+		// TODO should we support stdout as an option here?
+		flag.StringVar(&outputPathFlag, "outputPath", "", "Specify where to write output to")
 		flag.Parse()
 	}
 
@@ -90,25 +93,7 @@ func (d *Data) Load() (err error) {
 	if Debug {
 		fmt.Printf("[v%s]::Using config file \"%s\".\n", SemVer, ConfigFilePath)
 	}
-	viper.SetConfigFile(ConfigFilePath)
-
-	err = viper.ReadInConfig()
-	if err != nil {
-		return fmt.Errorf("loadConfig:: could not read config file: %w\n", err)
-	}
-
-	// Handle Template name
-	if d.Template.Name == "" {
-		fmt.Printf("template not set via command line. Expecting field to be set in config file\n")
-	}
-
-	err = viper.Unmarshal(&d)
-	if err != nil {
-		return fmt.Errorf("loadConfig:: could not parse config file: %w\n", err)
-	}
-	if d.Template.Name == "" {
-		fmt.Printf("template not set via config file either\nexiting...")
-	}
+	err = d.setOverridesAndLoadConfig()
 
 	err = d.resolveTemplateConfig()
 	if err != nil {
@@ -267,6 +252,35 @@ func (d *Data) resolveTemplateConfig() error {
 		if err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func (d *Data) setOverridesAndLoadConfig() error {
+	viper.SetConfigFile(ConfigFilePath)
+	err := viper.ReadInConfig()
+	if err != nil {
+		return fmt.Errorf("setOverridesAndLoadConfig:: could not read config file: %w\n", err)
+	}
+	// Handle Template name
+	err = viper.Unmarshal(&d)
+	if err != nil {
+		return fmt.Errorf("setOverridesAndLoadConfig:: could not unmarsha; config file: %w\n", err)
+	}
+	// Handle empty config fields
+	if d.Template.Name == "" {
+		fmt.Printf("template not set via config file. Expecting field to be set via command line\n")
+		if templateNameFlag == "" {
+			return fmt.Errorf("template not set via cli flags either\nexiting...")
+		}
+		d.Template.Name = templateNameFlag
+	}
+	if d.OutputPath == "" {
+		fmt.Printf("outputPath not set via config file. Expecting field to be set via command line\n")
+		if outputPathFlag == "" {
+			return fmt.Errorf("outputPath not set via cli flags either\nexiting...")
+		}
+		d.OutputPath = outputPathFlag
 	}
 	return nil
 }
