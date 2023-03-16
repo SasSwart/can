@@ -9,13 +9,14 @@ import (
 	"github.com/sasswart/gin-in-a-can/test"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"net/http"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
 )
 
 func TestOpenAPI_LoadOpenAPI(t *testing.T) {
-	specPath := "../" + test.OpenapiFile
+	specPath := filepath.Join("../" + test.OpenapiFile)
 	apiSpec, err := openapi.LoadAPISpec(specPath)
 	if err != nil {
 		t.Errorf(err.Error())

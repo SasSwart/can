@@ -16,6 +16,7 @@ import (
 	"os"
 	"path/filepath"
 	"text/template"
+	"time"
 )
 
 type EngineInterface interface {
@@ -42,6 +43,13 @@ func (e Engine) GetRenderer() *Renderer {
 
 func (e Engine) BuildRenderNode() tree.TraversalFunc {
 	return func(key string, parent, node tree.NodeTraverser) (tree.NodeTraverser, error) {
+		if config.Debug {
+			t := time.Now()
+			fmt.Println("BuildRenderNode timer start")
+			fmt.Printf("BuildRenderNode state::: %#v\n", node)
+			defer fmt.Println("BuildRenderNode" + time.Since(t).String())
+		}
+
 		var templateFile string
 		switch node.(type) {
 		case *openapi.OpenAPI:

@@ -1,6 +1,10 @@
 package tree
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/sasswart/gin-in-a-can/config"
+	"time"
+)
 
 type Traverser interface {
 	GetChildren() map[string]NodeTraverser
@@ -15,6 +19,11 @@ type TraversalFunc func(key string, parent, child NodeTraverser) (NodeTraverser,
 // traverseRecursor is an auxiliary function to Traverse that initiates a recursive loop over a tree of NodeTraverser
 // structs, applying a given function at every step.
 func traverseRecursor[T NodeTraverser](node T, f TraversalFunc) (T, error) {
+	if config.Debug {
+		t := time.Now()
+		fmt.Println("traverseRecursor timer start")
+		defer fmt.Println("traverseRecursor" + time.Since(t).String())
+	}
 	children := node.GetChildren()
 	for i := range children {
 		child := children[i]
@@ -43,6 +52,11 @@ func traverseRecursor[T NodeTraverser](node T, f TraversalFunc) (T, error) {
 // Traverse takes a NodeTraverser Node and enters into a recursive loop (traverseRecursor) that applies a given function
 // to the Node.
 func Traverse[T NodeTraverser](node T, f TraversalFunc) (T, error) {
+	if config.Debug {
+		t := time.Now()
+		fmt.Println("Traverse timer start")
+		defer fmt.Println("Traverse" + time.Since(t).String())
+	}
 	if f == nil {
 		return node, fmt.Errorf("`Traverse`:: no traversal function supplied")
 	}
@@ -56,6 +70,10 @@ func Traverse[T NodeTraverser](node T, f TraversalFunc) (T, error) {
 	if !ok {
 		return node, fmt.Errorf("`Traverse`:: function parameter f should return the same type that is was given")
 	}
-
-	return traverseRecursor(node, f) // An error is being swallowed here
+	// TODO An error is being swallowed here
+	rec, err := traverseRecursor(node, f)
+	if err != nil {
+		return node, err
+	}
+	return rec, nil
 }

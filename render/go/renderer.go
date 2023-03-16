@@ -167,6 +167,15 @@ func ToTitle(s string) (ret string) {
 	return ret
 }
 
+func NewGinServerTestConfigStratus() config.Data {
+	config.ConfigFilePath = "SET ME"
+	config.Debug = true
+	config.Dryrun = true
+	cfg := config.Data{}
+	cfg.TemplatesDir = "SET ME"
+	return cfg
+}
+
 func NewGinServerTestConfig() config.Data {
 	config.ConfigFilePath = "../render/go/config_goginserver_test.yml"
 	config.Debug = true
