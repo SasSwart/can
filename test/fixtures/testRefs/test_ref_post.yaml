@@ -1,5 +1,7 @@
 type: object
 properties:
+  go-properties-with-dashes:
+    type: string
   enabled:
     type: boolean
   name:
