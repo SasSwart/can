@@ -72,27 +72,26 @@ func (g *Renderer) SanitiseName(s []string) string {
 	caser := cases.Title(language.English)
 	var temp []string
 	for _, w := range s {
+		var delim string
 		switch true {
 		case isHttpStatusCode(w):
 			temp = append(temp, w)
 			continue
 		case strings.Contains(w, "/"):
-			for _, split := range strings.Split(w, "/") {
-				temp = append(temp, caser.String(CreateFunctionString(split)))
-			}
-			continue
+			delim = "/"
 		case strings.Contains(w, " "):
-			for _, split := range strings.Split(w, " ") {
-				temp = append(temp, caser.String(CreateFunctionString(split)))
-			}
-			continue
+			delim = " "
 		case strings.Contains(w, "_"):
-			for _, split := range strings.Split(w, "_") {
-				temp = append(temp, caser.String(CreateFunctionString(split)))
-			}
+			delim = "_"
+		case strings.Contains(w, "-"):
+			delim = "-"
+		default:
+			temp = append(temp, caser.String(CreateFunctionString(w)))
 			continue
 		}
-		temp = append(temp, caser.String(CreateFunctionString(w)))
+		for _, split := range strings.Split(w, delim) {
+			temp = append(temp, caser.String(CreateFunctionString(split)))
+		}
 	}
 	return strings.Join(temp, "")
 }

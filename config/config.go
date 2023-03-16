@@ -9,7 +9,7 @@ import (
 )
 
 // SemVer should be updated on any new release!!
-const SemVer = "0.0.7"
+const SemVer = "0.0.9"
 
 var (
 	Debug          bool

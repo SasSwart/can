@@ -25,6 +25,7 @@ func TestGolang_SanitiseName(t *testing.T) {
 
 	specPath := "../../" + test.OpenapiFile
 	apiSpec, _ := openapi.LoadAPISpec(specPath)
+	goPropertiesWithDashes := "go-properties-with-dashes"
 
 	tests := []struct {
 		name     string
@@ -70,6 +71,11 @@ func TestGolang_SanitiseName(t *testing.T) {
 			name:     "testopenapi property",
 			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.PropertyKey, "name"),
 			expected: "ValidationFixtureEndpointPostRequestBodyModelName",
+		},
+		{
+			name:     "testopenapi property with dashes in name",
+			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.PropertyKey, goPropertiesWithDashes),
+			expected: "ValidationFixtureEndpointPostRequestBodyModelGoPropertiesWithDashes",
 		},
 	}
 	for _, testCase := range tests {
