@@ -130,6 +130,16 @@ func isAlphaNum(r rune) bool {
 	return isAlpha(r) || ('0' <= r && r <= '9')
 }
 
+func flatten[T any](nestedList [][]T) []T {
+	var flattenedList []T
+	for _, subList := range nestedList {
+		for _, innerMostElement := range subList {
+			flattenedList = append(flattenedList, innerMostElement)
+		}
+	}
+	return flattenedList
+}
+
 func ToTitle(s string) (ret string) {
 	caser := cases.Title(language.English)
 	var splitBy []rune
@@ -139,27 +149,12 @@ func ToTitle(s string) (ret string) {
 		}
 	}
 	buf := []string{s}
-	for 0 < len(splitBy) {
-		for i, word := range buf {
-			if strings.HasPrefix(word, string(splitBy[0])) {
-				buf[i] = strings.TrimPrefix(word, string(splitBy[0]))
-				splitBy = splitBy[1:]
-				continue
-			}
-			if strings.HasSuffix(word, string(splitBy[0])) {
-				buf[i] = strings.TrimSuffix(word, string(splitBy[0]))
-				splitBy = splitBy[1:]
-				continue
-			}
-			if strings.Contains(word, string(splitBy[0])) {
-				if len(buf) == 1 {
-					buf = strings.Split(word, string(splitBy[0]))
-				} else {
-					buf = append(buf[:i], strings.Split(word, string(splitBy[0]))...)
-				}
-				splitBy = splitBy[1:]
-			}
+	for _, delim := range splitBy {
+		splitbuf := make([][]string, 0)
+		for _, word := range buf {
+			splitbuf = append(splitbuf, strings.Split(word, string(delim)))
 		}
+		buf = flatten[string](splitbuf)
 	}
 	for _, word := range buf {
 		ret += caser.String(word)
