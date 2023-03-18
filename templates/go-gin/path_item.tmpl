@@ -69,13 +69,15 @@ type {{ $operation.GetName | SanitiseName }}Response interface {
 
 {{- range $name, $response := .Responses }}
 {{ $statusCode := $name }}
+{{- if not $response.Content }}
+type {{ $response.GetName | SanitiseName }} struct{}
+{{- end }}
 {{- range $name, $content := $response.Content }}
 type {{ $response.GetName | SanitiseName }} {{ $content.Schema.GetName | SanitiseName }}
-
+{{- end }}
 func ({{ $response.GetName | SanitiseName }}) GetStatus() int {
 	return {{ $statusCode }}
 }
-{{- end }}
 {{- end }}
 type {{ $operation.GetName | SanitiseName }}405Response struct {}
 func ({{ $operation.GetName | SanitiseName }}405Response) GetStatus() int {
