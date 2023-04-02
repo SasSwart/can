@@ -57,14 +57,14 @@ func Register{{ .GetName | SanitiseName }}Path(e gin.IRouter, srv {{ .GetName | 
 			return
     }
     response := srv.{{ $operation.GetName | SanitiseName }}(c, params, body)
-    c.JSON(response.GetStatus(), response)
+    response.Send(c)
   })
 {{- end }}
 }
 
 {{- range $name, $operation := .Operations }}
 type {{ $operation.GetName | SanitiseName }}Response interface {
-	GetStatus() int
+	Send(c *gin.Context)
 }
 
 {{- range $name, $response := .Responses }}
@@ -72,14 +72,18 @@ type {{ $operation.GetName | SanitiseName }}Response interface {
 {{- range $name, $content := $response.Content }}
 type {{ $response.GetName | SanitiseName }} {{ $content.Schema.GetName | SanitiseName }}
 
-func ({{ $response.GetName | SanitiseName }}) GetStatus() int {
-	return {{ $statusCode }}
+func (r {{ $response.GetName | SanitiseName }}) Send(c *gin.Context) {
+	{{- if eq $name "application/json" }}
+	c.JSON({{ $statusCode }}, r)
+	{{- else if eq $name "text/plain" }}
+	c.String({{ $statusCode }}, fmt.Sprint(r))
+	{{- end }}
 }
 {{- end }}
 {{- end }}
 type {{ $operation.GetName | SanitiseName }}405Response struct {}
-func ({{ $operation.GetName | SanitiseName }}405Response) GetStatus() int {
-	return 405
+func (r {{ $operation.GetName | SanitiseName }}405Response) Send(c *gin.Context) {
+	c.JSON(405, r)
 }
 
 {{- end }}
