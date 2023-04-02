@@ -2,6 +2,8 @@
 
 package {{ index .GetMetadata "package" }}
 
+import "github.com/gin-gonic/gin"
+
 {{- $needs_fmt := false }}
 {{- $needs_regexp := false }}
 
@@ -95,3 +97,26 @@ func (*{{ .RequestBody.GetName | SanitiseName }}) IsValid() (bool, error) {
 }
 {{- end }}
 
+type {{ .GetName | SanitiseName }}Response interface {
+	Send(c *gin.Context)
+}
+
+{{- range $name, $response := .Responses }}
+{{ $statusCode := $name }}
+{{- range $name, $content := $response.Content }}
+type {{ $response.GetName | SanitiseName }} {{ $content.Schema.GetName | SanitiseName }}
+
+func (r {{ $response.GetName | SanitiseName }}) Send(c *gin.Context) {
+	{{- if eq $name "application/json" }}
+	c.JSON({{ $statusCode }}, r)
+	{{- else if eq $name "text/plain" }}
+	c.String({{ $statusCode }}, fmt.Sprint(r))
+	{{- end }}
+}
+{{- end }}
+{{- end }}
+
+type {{ .GetName | SanitiseName }}405Response struct {}
+func (r {{ .GetName | SanitiseName }}405Response) Send(c *gin.Context) {
+	c.JSON(405, r)
+}

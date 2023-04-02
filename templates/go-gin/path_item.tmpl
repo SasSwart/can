@@ -61,29 +61,3 @@ func Register{{ .GetName | SanitiseName }}Path(e gin.IRouter, srv {{ .GetName | 
   })
 {{- end }}
 }
-
-{{- range $name, $operation := .Operations }}
-type {{ $operation.GetName | SanitiseName }}Response interface {
-	Send(c *gin.Context)
-}
-
-{{- range $name, $response := .Responses }}
-{{ $statusCode := $name }}
-{{- range $name, $content := $response.Content }}
-type {{ $response.GetName | SanitiseName }} {{ $content.Schema.GetName | SanitiseName }}
-
-func (r {{ $response.GetName | SanitiseName }}) Send(c *gin.Context) {
-	{{- if eq $name "application/json" }}
-	c.JSON({{ $statusCode }}, r)
-	{{- else if eq $name "text/plain" }}
-	c.String({{ $statusCode }}, fmt.Sprint(r))
-	{{- end }}
-}
-{{- end }}
-{{- end }}
-type {{ $operation.GetName | SanitiseName }}405Response struct {}
-func (r {{ $operation.GetName | SanitiseName }}405Response) Send(c *gin.Context) {
-	c.JSON(405, r)
-}
-
-{{- end }}
