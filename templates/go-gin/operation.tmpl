@@ -2,25 +2,24 @@
 
 package {{ index .GetMetadata "package" }}
 
-{{- $needs_fmt := false }}
+import "github.com/gin-gonic/gin"
+import "fmt"
+
 {{- $needs_regexp := false }}
 
 {{- range $i, $parameter := .Parameters }}
-{{- if ne $parameter.Schema.MinLength 0 }}{{ $needs_fmt = true }}{{- end }}
-{{- if ne $parameter.Schema.MaxLength 0 }}{{ $needs_fmt = true }}{{- end }}
 {{- if ne $parameter.Schema.Pattern "" }}{{ $needs_regexp = true }}{{- end }}
 {{- end }}
 
 {{- range $name, $requestBody := .RequestBody.Content }}
 {{- range $name, $property := $requestBody.Schema.Properties }}
-{{- if ne $property.MinLength 0 }}{{ $needs_fmt = true}}{{- end }}
-{{- if ne $property.MaxLength 0 }}{{ $needs_fmt = true}}{{- end }}
 {{- if ne $property.Pattern "" }}{{ $needs_regexp = true }}{{- end }}
 {{- end }}
 {{- end }}
 
-{{ if $needs_fmt -}} import "fmt" {{- end }}
 {{ if $needs_regexp -}} import "regexp" {{- end }}
+
+var _ = fmt.Sprint("")
 
 type {{ .GetName | SanitiseName }}Parameters struct {
 {{- range $i, $parameter := .Parameters }}
@@ -95,5 +94,39 @@ func (*{{ .RequestBody.GetName | SanitiseName }}) IsValid() (bool, error) {
 }
 {{- end }}
 
+type {{ .GetName | SanitiseName }}Response interface {
+	Send(c *gin.Context)
+}
 
+{{- range $name, $response := .Responses }}
+{{ $statusCode := $name }}
 
+{{- if not .Content }}
+type {{ .GetName | SanitiseName }} struct {}
+
+func (*{{ .GetName | SanitiseName }}) IsValid() (bool, error) {
+	return true, nil
+}
+
+func (r {{ .GetName | SanitiseName }}) Send(c *gin.Context) {
+	c.String({{ $statusCode }}, fmt.Sprint(r))
+}
+{{- end }}
+
+{{- range $name, $content := $response.Content }}
+type {{ $response.GetName | SanitiseName }} {{ $content.Schema.GetName | SanitiseName }}
+
+func (r {{ $response.GetName | SanitiseName }}) Send(c *gin.Context) {
+	{{- if eq $name "application/json" }}
+	c.JSON({{ $statusCode }}, r)
+	{{- else if eq $name "text/plain" }}
+	c.String({{ $statusCode }}, fmt.Sprint(r))
+	{{- end }}
+}
+{{- end }}
+{{- end }}
+
+type {{ .GetName | SanitiseName }}405Response struct {}
+func (r {{ .GetName | SanitiseName }}405Response) Send(c *gin.Context) {
+	c.JSON(405, r)
+}

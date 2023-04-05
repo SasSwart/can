@@ -48,14 +48,14 @@ func (e Engine) BuildRenderNode() tree.TraversalFunc {
 			templateFile = "openapi.tmpl"
 		case *path.Item:
 			templateFile = "path_item.tmpl"
+		case *operation.Operation:
+			templateFile = "operation.tmpl"
 		case *schema.Schema:
 			schemaType := node.(*schema.Schema).Type
 			if schemaType != "object" && schemaType != "array" {
 				return node, nil
 			}
 			templateFile = "schema.tmpl"
-		case *operation.Operation:
-			templateFile = "operation.tmpl"
 		}
 
 		if templateFile == "" {
