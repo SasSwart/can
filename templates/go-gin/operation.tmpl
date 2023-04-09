@@ -96,6 +96,7 @@ func (*{{ .RequestBody.GetName | SanitiseName }}) IsValid() (bool, error) {
 
 type {{ .GetName | SanitiseName }}Response interface {
 	Send(c *gin.Context)
+	GetStatus() int
 }
 
 {{- range $name, $response := .Responses }}
@@ -108,6 +109,10 @@ func (*{{ .GetName | SanitiseName }}) IsValid() (bool, error) {
 	return true, nil
 }
 
+func (r {{ .GetName | SanitiseName }}) GetStatus() int {
+	return {{ $statusCode }}
+}
+
 func (r {{ .GetName | SanitiseName }}) Send(c *gin.Context) {
 	c.String({{ $statusCode }}, fmt.Sprint(r))
 }
@@ -115,6 +120,10 @@ func (r {{ .GetName | SanitiseName }}) Send(c *gin.Context) {
 
 {{- range $name, $content := $response.Content }}
 type {{ $response.GetName | SanitiseName }} {{ $content.Schema.GetName | SanitiseName }}
+
+func (r {{ $response.GetName | SanitiseName }}) GetStatus() int {
+	return {{ $statusCode }}
+}
 
 func (r {{ $response.GetName | SanitiseName }}) Send(c *gin.Context) {
 	{{- if eq $name "application/json" }}
@@ -127,6 +136,9 @@ func (r {{ $response.GetName | SanitiseName }}) Send(c *gin.Context) {
 {{- end }}
 
 type {{ .GetName | SanitiseName }}405Response struct {}
+func (r {{ .GetName | SanitiseName }}405Response) GetStatus() int {
+	return 405
+}
 func (r {{ .GetName | SanitiseName }}405Response) Send(c *gin.Context) {
 	c.JSON(405, r)
 }
