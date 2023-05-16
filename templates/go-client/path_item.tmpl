@@ -1,32 +1,89 @@
 package {{ index .GetMetadata "package" }}
 
 import (
+	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
-	"os"
+	"net/url"
+	"strconv"
+
+	// TODO eliminate this dependency - use strconv
+	"strings"
+
+	"github.com/google/go-querystring/query"
 )
 
 {{- range $name, $operation := .Operations }}
-func {{ $operation.GetName | SanitiseName }}(config ApiConfig, params *{{ $operation.GetName | SanitiseName }}Parameters, body *{{ $operation.RequestBody.GetName | SanitiseName }}) {
-	requestURL := fmt.Sprintf("%s://%s:%d", config.Protocol, config.Host, config.Port)
-	req, err := http.NewRequest(http.Method{{ $name | ToTitle }}, requestURL, nil)
+func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, params *{{ $operation.GetName | SanitiseName }}Parameters, body *{{ $operation.RequestBody.GetName | SanitiseName }}) (ret *{{ $operation.GetName | SanitiseName }}Response, err error) {
+    if ctx == nil {
+        ctx = context.Background()
+    }
+    var payload io.Reader = nil
+    {{- if eq $operation.Name "POST" }}
+    if body != nil {
+        data, err := json.Marshal(body)
+        if err != nil { // This serves as our validation, for now
+            return nil, err
+        }
+        payload = bytes.NewReader(data)
+    } else {
+        return nil, errors.New("(c *Client) {{ $operation.OperationId }} :: post operation with nil body")
+    }
+    {{- end }}
+    var vals url.Values
+    if params != nil {
+        vals, err = query.Values(params) // TODO this only works if we generate url tags for our param structs
+        if err != nil {
+            return nil, err
+        }
+    } else {
+        return nil, errors.New("(c *Client) {{ $operation.OperationId }} :: nil params")
+    }
+	pathPattern := "{{ .GetParent.Name }}"
+	{{- range $param := $operation.Parameters }}
+    {{- if eq ($param.In | ToTitle) "Path" }}
+    strings.Replace(pathPattern, ":{{ $param.ParamName }}", params.{{ $param.ParamName | ToTitle }}, -1)
+    {{- end }}
+	{{- end }}
+	uri := url.URL{
+		Scheme:      c.cfg.Protocol,
+		Host:        c.cfg.base,
+		Path:        pathPattern,
+		RawQuery:    vals.Encode(),
+	}
+	req, err := http.NewRequestWithContext(ctx, http.Method{{ $name | ToTitle }}, uri.String(), payload)
 	if err != nil {
-		fmt.Printf("client: could not create request: %s\n", err)
-		os.Exit(1)
+		return nil, err
+	}
+	req.Header.Add("Content-Type", c.cfg.ContentType)
+
+	// TODO IF AUTH
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.cfg.Token))
+	// TODO ENDIF AUTH
+
+	res, err := c.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode < 200 || res.StatusCode > 399 {
+		return nil, fmt.Errorf("status code check failed :: url %s :: returned %d", uri.String(), res.StatusCode)
 	}
 
-	res, err := http.DefaultClient.Do(req)
-	defer res.Body.Close()
+	defer res.Body.Close() // TODO figure out how to bubble this error up for checking
+
+	responseBytes, err := io.ReadAll(res.Body)
 	if err != nil {
-		fmt.Printf("client: error making http request: %s\n", err)
-		os.Exit(1)
+		return nil, err
 	}
 
-	resBody, err := ioutil.ReadAll(res.Body)
+	err = json.Unmarshal(responseBytes, &ret)
 	if err != nil {
-		fmt.Printf("client: could not read response body: %s\n", err)
-		os.Exit(1)
+		return nil, err
 	}
+	return ret, nil
 }
 {{- end }}
+

@@ -8,8 +8,33 @@ type {{ .GetName | SanitiseName }}Parameters struct {
 
 {{- $requestBody := .RequestBody }}
 {{ range $name, $requestBodyContent := $requestBody.Content }}
-type {{ $requestBody.GetName }} {{ $requestBodyContent.Schema.GetName }}
+type {{ $requestBody.GetName | SanitiseName }} {{ $requestBodyContent.Schema.GetName | SanitiseName }}
 {{- end }}
 {{- if not .RequestBody.Content }}
 type {{ $requestBody.GetName | SanitiseName }} struct {}
 {{- end }}
+
+type {{ .GetName | SanitiseName }}Response interface {
+	GetStatus() int
+}
+
+{{- range $name, $response := .Responses }}
+{{ $statusCode := $name }}
+
+{{- if not .Content }}
+type {{ .GetName | SanitiseName }} struct {}
+
+func (r {{ .GetName | SanitiseName }}) GetStatus() int {
+	return {{ $statusCode }}
+}
+{{- end }}
+
+{{- range $name, $content := $response.Content }}
+type {{ $response.GetName | SanitiseName }} {{ $content.Schema.GetName | SanitiseName }}
+
+func (r {{ $response.GetName | SanitiseName }}) GetStatus() int {
+	return {{ $statusCode }}
+}
+{{- end }}
+{{- end }}
+

@@ -1,7 +1,43 @@
 package {{ index .GetMetadata "package" }}
 
-type ApiConfig struct {
+import (
+    "context"
+	"errors"
+	"net/http"
+)
+
+// ClientService is the interface for Client methods
+type ClientService interface {
+    {{- range $pathName, $path := .Paths }}
+    {{- range $name, $operation := $path.Operations }}
+    {{ $operation.GetName | SanitiseName }}(context.Context, *{{ $operation.GetName | SanitiseName }}Parameters, *{{ $operation.RequestBody.GetName | SanitiseName }}) (*{{ $operation.GetName | SanitiseName }}Response, error)
+    {{- end }}
+    {{- end }}
+}
+
+var _ ClientService = &Client{}
+
+type Config struct {
 	Port int
 	Host string
 	Protocol string
+	Token string
+	ContentType string
+
+	base string
+}
+
+type Client struct {
+    cfg *Config
+    *http.Client
+}
+
+func NewHTTPClient(cfg *Config) (ret *Client, err error) {
+    if cfg == nil {
+          return nil, errors.New("cannot start client without config")
+    }
+    cfg.base = fmt.Sprintf("%s://%s:%d", cfg.Protocol, cfg.Host, cfg.Port)
+    ret.cfg = cfg
+    ret.Client = http.DefaultClient
+    return
 }
