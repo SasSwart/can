@@ -2,7 +2,11 @@ package {{ index .GetMetadata "package" }}
 
 type {{ .GetName | SanitiseName }}Parameters struct {
 {{- range $i, $parameter := .Parameters }}
+    {{- if eq $parameter.In "query" }}
+	{{ $parameter.ParamName | ToTitle }} {{ $parameter.Schema | SanitiseType }} `url:"{{ $parameter.ParamName }},omitempty"`
+    {{- else }}
 	{{ $parameter.ParamName | ToTitle }} {{ $parameter.Schema | SanitiseType }}
+	{{- end }}
 {{- end }}
 }
 

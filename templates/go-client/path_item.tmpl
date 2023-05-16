@@ -8,9 +8,9 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strconv"
 
-	// TODO eliminate this dependency - use strconv
+	// TODO these dependencies are needed only when certain parameters are used
+	"strconv"
 	"strings"
 
 	"github.com/google/go-querystring/query"
@@ -79,6 +79,7 @@ func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, pa
 		return nil, err
 	}
 
+    // TODO this is currently broken
 	err = json.Unmarshal(responseBytes, &ret)
 	if err != nil {
 		return nil, err

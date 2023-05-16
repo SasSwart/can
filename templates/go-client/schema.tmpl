@@ -11,7 +11,7 @@ type {{ .GetName | SanitiseName }} {{ . | SanitiseType }}
         {{ if eq ($schema | SanitiseType) "struct" -}}
             {{ $name | ToTitle }} {{ $schema.GetName | SanitiseName }}
         {{- else -}}
-            {{ $name | ToTitle }} {{ $schema | SanitiseType }} `json:"{{ $name }}" url:"{{ $name }}"`
+            {{ $name | ToTitle }} {{ $schema | SanitiseType }} `json:"{{ $name }}"`
         {{- end }}
 	{{- end }}
 }

@@ -3,6 +3,7 @@ package {{ index .GetMetadata "package" }}
 import (
     "context"
 	"errors"
+	"fmt"
 	"net/http"
 )
 
@@ -32,12 +33,13 @@ type Client struct {
     *http.Client
 }
 
-func NewHTTPClient(cfg *Config) (ret *Client, err error) {
+func NewHTTPClient(cfg *Config) (*Client, error) {
     if cfg == nil {
           return nil, errors.New("cannot start client without config")
     }
     cfg.base = fmt.Sprintf("%s://%s:%d", cfg.Protocol, cfg.Host, cfg.Port)
-    ret.cfg = cfg
-    ret.Client = http.DefaultClient
-    return
+    return &Client{
+        cfg: cfg,
+        Client: http.DefaultClient,
+    }, nil
 }
