@@ -45,31 +45,26 @@ func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, pa
 	pathPattern := "{{ .GetParent.Name }}"
 	{{- range $param := $operation.Parameters }}
     {{- if eq ($param.In | ToTitle) "Path" }}
-    strings.Replace(pathPattern, ":{{ $param.ParamName }}", params.{{ $param.ParamName | ToTitle }}, -1)
+    strings.Replace(pathPattern, "{ {{- $param.ParamName -}} }", params.{{ $param.ParamName | ToTitle }}, -1)
     {{- end }}
 	{{- end }}
-	uri := url.URL{
-		Scheme:      c.cfg.Protocol,
-		Host:        c.cfg.base,
-		Path:        pathPattern,
-		RawQuery:    vals.Encode(),
-	}
-	req, err := http.NewRequestWithContext(ctx, http.Method{{ $name | ToTitle }}, uri.String(), payload)
+	URL := c.createUrl(pathPattern, vals)
+	req, err := http.NewRequestWithContext(ctx, http.Method{{ $name | ToTitle }}, URL.String(), payload)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Add("Content-Type", c.cfg.ContentType)
 
-	// TODO IF AUTH
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.cfg.Token))
-	// TODO ENDIF AUTH
+    if c.auth != nil {
+        c.auth(req)
+    }
 
 	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	if res.StatusCode < 200 || res.StatusCode > 399 {
-		return nil, fmt.Errorf("status code check failed :: url %s :: returned %d", uri.String(), res.StatusCode)
+		return nil, fmt.Errorf("status code check failed :: url %s :: returned %d", URL.String(), res.StatusCode)
 	}
 
 	defer res.Body.Close() // TODO figure out how to bubble this error up for checking
