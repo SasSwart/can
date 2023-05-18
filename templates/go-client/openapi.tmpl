@@ -15,7 +15,7 @@ import (
 type ClientService interface {
     {{- range $pathName, $path := .Paths }}
     {{- range $name, $operation := $path.Operations }}
-    {{ $operation.GetName | SanitiseName }}(context.Context, *{{ $operation.GetName | SanitiseName }}Parameters, *{{ $operation.RequestBody.GetName | SanitiseName }}) (*{{ $operation.GetName | SanitiseName }}Response, error)
+    {{ $operation.GetName | SanitiseName }}(context.Context, *{{ $operation.GetName | SanitiseName }}Parameters, *{{ $operation.RequestBody.GetName | SanitiseName }}) ([]byte, error)
     {{- end }}
     {{- end }}
 }
@@ -24,7 +24,7 @@ var _ ClientService = &Client{}
 
 // AuthFunc needs to be passed in as a closure at client generation and allows for authentication to be applied to any
 // request being made. It should contain any logic and data needed to apply and maintain authentication with a server.
-type AuthFunc func(*http.Request)
+type AuthFunc func(*http.Request) error
 
 type Config struct {
 	Port string `validate:"required,hostname_port"`

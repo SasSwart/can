@@ -1,23 +1,39 @@
 package {{ index .GetMetadata "package" }}
-
+{{- $pathParamPresent := false}}
+{{- $postMethodPresent := false}}
+{{- range $name, $operation := .Operations }}
+    {{- if eq $operation.Name "POST" }}
+        {{- $postMethodPresent = true }}
+    {{- end }}
+	{{- range $param := $operation.Parameters }}
+    {{- if eq ($param.In | ToTitle) "Path" }}
+        {{- $pathParamPresent = true }}
+    {{- end }}
+    {{- end }}
+{{- end }}
 import (
+{{ if $postMethodPresent }}
+    "bytes"
+{{- end }}
 	"context"
-	"encoding/json"
+{{ if $postMethodPresent }}
+    "encoding/json"
+{{- end }}
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
-
-	// TODO these dependencies are needed only when certain parameters are used
-	"strconv"
+{{ if $pathParamPresent }}
 	"strings"
+{{- end }}
 
 	"github.com/google/go-querystring/query"
 )
 
+
 {{- range $name, $operation := .Operations }}
-func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, params *{{ $operation.GetName | SanitiseName }}Parameters, body *{{ $operation.RequestBody.GetName | SanitiseName }}) (ret *{{ $operation.GetName | SanitiseName }}Response, err error) {
+func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, params *{{ $operation.GetName | SanitiseName }}Parameters, body *{{ $operation.RequestBody.GetName | SanitiseName }}) ([]byte, error) {
     if ctx == nil {
         ctx = context.Background()
     }
@@ -34,8 +50,9 @@ func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, pa
     }
     {{- end }}
     var vals url.Values
+    var err error
     if params != nil {
-        vals, err = query.Values(params) // TODO this only works if we generate url tags for our param structs
+        vals, err = query.Values(params)
         if err != nil {
             return nil, err
         }
@@ -53,10 +70,12 @@ func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, pa
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Content-Type", c.cfg.ContentType)
-
+	req.Header.Add("Content-Type", c.cfg.ContentType) // TODO this feels hacky
     if c.auth != nil {
-        c.auth(req)
+        err = c.auth(req)
+        if err != nil {
+            return nil, err
+        }
     }
 
 	res, err := c.Do(req)
@@ -64,7 +83,12 @@ func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, pa
 		return nil, err
 	}
 	if res.StatusCode < 200 || res.StatusCode > 399 {
-		return nil, fmt.Errorf("status code check failed :: url %s :: returned %d", URL.String(), res.StatusCode)
+	    var body []byte
+	    body, err := io.ReadAll(res.Body)
+	    if err == nil { // Close body if it is not nil and is read successfully
+            defer res.Body.Close() // TODO figure out how to bubble this error up for checking
+	    }
+		return nil, fmt.Errorf("status code check failed :: url %s :: returned %d :: body %v", URL.String(), res.StatusCode, string(body))
 	}
 
 	defer res.Body.Close() // TODO figure out how to bubble this error up for checking
@@ -73,13 +97,7 @@ func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, pa
 	if err != nil {
 		return nil, err
 	}
-
-    // TODO this is currently broken
-	err = json.Unmarshal(responseBytes, &ret)
-	if err != nil {
-		return nil, err
-	}
-	return ret, nil
+	return responseBytes, nil
 }
 {{- end }}
 
