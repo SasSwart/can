@@ -5,7 +5,7 @@ type {{ .GetName | SanitiseName }}Parameters struct {
     {{- if eq $parameter.In "query" }}
 	{{ $parameter.ParamName | ToTitle }} {{ $parameter.Schema | SanitiseType }} `url:"{{ $parameter.ParamName }},omitempty"`
     {{- else }}
-	{{ $parameter.ParamName | ToTitle }} {{ $parameter.Schema | SanitiseType }}
+	{{ $parameter.ParamName | ToTitle }} {{ $parameter.Schema | SanitiseType }} `url:"-"`
 	{{- end }}
 {{- end }}
 }

@@ -62,7 +62,7 @@ func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, pa
 	pathPattern := "{{ .GetParent.Name }}"
 	{{- range $param := $operation.Parameters }}
     {{- if eq ($param.In | ToTitle) "Path" }}
-    strings.Replace(pathPattern, "{ {{- $param.ParamName -}} }", params.{{ $param.ParamName | ToTitle }}, -1)
+    pathPattern = strings.Replace(pathPattern, `{ {{- $param.ParamName -}} }`, params.{{ $param.ParamName | ToTitle }}, -1)
     {{- end }}
 	{{- end }}
 	URL := c.createUrl(pathPattern, vals)
