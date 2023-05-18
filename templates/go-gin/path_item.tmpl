@@ -57,29 +57,7 @@ func Register{{ .GetName | SanitiseName }}Path(e gin.IRouter, srv {{ .GetName | 
 			return
     }
     response := srv.{{ $operation.GetName | SanitiseName }}(c, params, body)
-    c.JSON(response.GetStatus(), response)
+    response.Send(c)
   })
 {{- end }}
 }
-
-{{- range $name, $operation := .Operations }}
-type {{ $operation.GetName | SanitiseName }}Response interface {
-	GetStatus() int
-}
-
-{{- range $name, $response := .Responses }}
-{{ $statusCode := $name }}
-{{- range $name, $content := $response.Content }}
-type {{ $response.GetName | SanitiseName }} {{ $content.Schema.GetName | SanitiseName }}
-
-func ({{ $response.GetName | SanitiseName }}) GetStatus() int {
-	return {{ $statusCode }}
-}
-{{- end }}
-{{- end }}
-type {{ $operation.GetName | SanitiseName }}405Response struct {}
-func ({{ $operation.GetName | SanitiseName }}405Response) GetStatus() int {
-	return 405
-}
-
-{{- end }}
