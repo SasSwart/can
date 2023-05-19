@@ -29,6 +29,9 @@ func (g *Renderer) SetTemplateFuncMap(f *template.FuncMap) {
 	g.Base.SetTemplateFuncMap(&template.FuncMap{
 		"ToUpper": strings.ToUpper,
 		"ToTitle": ToTitle,
+		"StringsReplace": func(input, from, to string) string {
+			return strings.Replace(input, from, to, -1)
+		},
 		// TODO this should NOT be self-referential
 		"SanitiseName": g.SanitiseName,
 		"SanitiseType": g.SanitiseType,
