@@ -46,7 +46,7 @@ func (p *{{ .GetName | SanitiseName }}) IsValid() (bool, error) {
 	{{- if ne $property.Pattern "" }}
 	// Regular expressions are checked for compilation during code generation
 	// No need to check them here.
-	r{{ $name | ToTitle }}, _ := regexp.Compile("{{ $property.Pattern }}")
+	r{{ $name | ToTitle }}, _ := regexp.Compile(`{{ $property.Pattern }}`)
 	if !r{{ $name | ToTitle }}.MatchString(p.{{ $name | ToTitle }}) {
 			return false, fmt.Errorf("p.{{ $name | ToTitle }} did not pass validation pattern")
 	}
