@@ -1,4 +1,4 @@
-VERSION := 0.0.0
+VERSION := v0.0.0
 
 all: linux_amd64.zip
 
