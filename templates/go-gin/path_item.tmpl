@@ -1,0 +1,70 @@
+package {{ index .GetMetadata "package" }}
+
+import (
+	"github.com/gin-gonic/gin"
+)
+
+// GENERATED INTERFACE. DO NOT EDIT
+
+type {{ .GetName | SanitiseName }} interface {
+{{- range $name, $operation := .Operations }}
+  {{ $operation.GetName | SanitiseName }}(*gin.Context, *{{ $operation.GetName | SanitiseName }}Parameters, *{{ $operation.RequestBody.GetName | SanitiseName }}) {{ $operation.GetName | SanitiseName }}Response
+{{- end }}
+	InvalidRequest(*gin.Context, error)
+}
+
+{{ $pathItemStructName := printf "Unimplemented%s" (.GetName | SanitiseName) -}}
+type {{ $pathItemStructName }} struct {}
+
+{{- range $name, $operation := .Operations }}
+func (u {{ $pathItemStructName }}) {{ $operation.GetName | SanitiseName }}(*gin.Context, *{{ $operation.GetName | SanitiseName }}Parameters, *{{ $operation.RequestBody.GetName | SanitiseName }}) {{ $operation.GetName | SanitiseName }}Response {
+	return {{ $operation.GetName | SanitiseName }}405Response{}
+}
+{{- end }}
+func (u {{ $pathItemStructName }}) InvalidRequest(c *gin.Context, err error) {
+	c.JSON(400, err.Error())
+	c.Abort()
+}
+
+func Register{{ .GetName | SanitiseName }}Path(e gin.IRouter, srv {{ .GetName | SanitiseName }}) {
+{{- range $name, $operation := .Operations }}
+	{{ $path := .GetParent.Name }}
+	{{- range $i, $parameter := $operation.Parameters}}
+        {{- if eq ($parameter.In | ToTitle) ("path" | ToTitle) }}
+            {{ $from := printf "{%s}" $parameter.ParamName }}
+            {{ $to := printf ":%s" $parameter.ParamName }}
+            {{ $path = StringsReplace $path $from $to }}
+    	{{- end }}
+	{{- end }}
+  e.{{ $name | ToUpper }}("{{ $path }}", func(c *gin.Context) {
+  	params := &{{ $operation.GetName | SanitiseName }}Parameters{}
+    {{- range $param := $operation.Parameters }}
+		params.{{ $param.GetParamName | SanitiseName }} =
+			{{- if eq $param.In "path" }} c.Param("{{ $param.ParamName }}") {{- end -}}
+			{{- if eq $param.In "query" }} c.Query("{{ $param.ParamName }}") {{- end }}
+  	{{- end }}
+
+		if valid, err := params.IsValid(); !valid {
+			srv.InvalidRequest(c, err)
+			return
+		}
+
+  	var body *{{ $operation.RequestBody.GetName | SanitiseName }}
+  	{{- if ne (index $operation.RequestBody.Content "application/json") nil}}
+		body = &{{ $operation.RequestBody.GetName | SanitiseName }}{}
+		err := c.ShouldBindJSON(body)
+		if err != nil {
+			srv.InvalidRequest(c, err)
+			return
+		}
+	{{- end }}
+
+    if valid, err := body.IsValid(); !valid {
+			srv.InvalidRequest(c, err)
+			return
+    }
+    response := srv.{{ $operation.GetName | SanitiseName }}(c, params, body)
+    response.Send(c)
+  })
+{{- end }}
+}

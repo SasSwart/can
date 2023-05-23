@@ -1,0 +1,144 @@
+// GENERATED CODE. DO NOT EDIT
+
+package {{ index .GetMetadata "package" }}
+
+import "github.com/gin-gonic/gin"
+import "fmt"
+
+{{- $needs_regexp := false }}
+
+{{- range $i, $parameter := .Parameters }}
+{{- if ne $parameter.Schema.Pattern "" }}{{ $needs_regexp = true }}{{- end }}
+{{- end }}
+
+{{- range $name, $requestBody := .RequestBody.Content }}
+{{- range $name, $property := $requestBody.Schema.Properties }}
+{{- if ne $property.Pattern "" }}{{ $needs_regexp = true }}{{- end }}
+{{- end }}
+{{- end }}
+
+{{ if $needs_regexp -}} import "regexp" {{- end }}
+
+var _ = fmt.Sprint("")
+
+type {{ .GetName | SanitiseName }}Parameters struct {
+{{- range $i, $parameter := .Parameters }}
+	{{ $parameter.GetParamName | SanitiseName }} {{ $parameter.Schema | SanitiseType }} `json:"{{ $parameter.ParamName }}"`
+{{- end }}
+}
+
+func (p *{{ .GetName | SanitiseName }}Parameters) IsValid() (bool, error) {
+	{{- range $i, $parameter := .Parameters }}
+    {{- if $parameter.Required }}
+    {{- if ne $parameter.Schema.MinLength 0 }}
+    if len(p.{{ $parameter.Name | ToTitle }}) < {{ $parameter.Schema.MinLength }} {
+    return false, fmt.Errorf("p.{{$parameter.Name | ToTitle }} too short")
+    }
+    {{- end }}
+
+    {{- if ne $parameter.Schema.MaxLength 0 }}
+    if len(p.{{ $parameter.Name | ToTitle }}) > {{ $parameter.Schema.MaxLength }} {
+    return false, fmt.Errorf("p.{{ $parameter.Name | ToTitle }} too long")
+    }
+    {{- end }}
+
+    {{- if ne $parameter.Schema.Pattern "" }}
+    // Regular expressions are checked for compilation during code generation
+    // No need to check them here.
+    r{{ $parameter.Name | ToTitle }}, _ := regexp.Compile(`{{ $parameter.Schema.Pattern }}`)
+    if !r{{ $parameter.Name | ToTitle }}.MatchString(p.{{ $parameter.Name | ToTitle }}) {
+        return false, fmt.Errorf("p.{{ $parameter.Name | ToTitle }} did not pass validation pattern")
+    }
+    {{- end }}
+    {{- end }}
+	{{- end }}
+
+	return true, nil
+}
+
+{{- range $name, $requestBody := .RequestBody.Content }}
+type {{ .GetName | SanitiseName }} {{ $requestBody.Schema.GetName | SanitiseName }}
+
+func (p *{{ .GetName | SanitiseName }}) IsValid() (bool, error) {
+	{{- range $name, $property := $requestBody.Schema.Properties }}
+	{{- if ne $property.MinLength 0 }}
+	if len(p.{{ $name | ToTitle }}) < {{ $property.MinLength }} {
+	return false, fmt.Errorf("p.{{$name | ToTitle }} too short")
+	}
+	{{- end }}
+
+	{{- if ne $property.MaxLength 0 }}
+	if len(p.{{ $name | ToTitle }}) > {{ $property.MaxLength }} {
+	return false, fmt.Errorf("p.{{ $name | ToTitle }} too long")
+	}
+	{{- end }}
+
+	{{- if ne $property.Pattern "" }}
+	// Regular expressions are checked for compilation during code generation
+	// No need to check them here.
+	r{{ $name | ToTitle }}, _ := regexp.Compile(`{{ $property.Pattern }}`)
+	if !r{{ $name | ToTitle }}.MatchString(p.{{ $name | ToTitle }}) {
+			return false, fmt.Errorf("p.{{ $name | ToTitle }} did not pass validation pattern")
+	}
+	{{- end }}
+	{{- end }}
+
+	return true, nil
+}
+{{- end }}
+{{- if not .RequestBody.Content }}
+type {{ .RequestBody.GetName | SanitiseName }} struct {}
+
+func (*{{ .RequestBody.GetName | SanitiseName }}) IsValid() (bool, error) {
+	return true, nil
+}
+{{- end }}
+
+type {{ .GetName | SanitiseName }}Response interface {
+	Send(c *gin.Context)
+	GetStatus() int
+}
+
+{{- range $name, $response := .Responses }}
+{{ $statusCode := $name }}
+
+{{- if not .Content }}
+type {{ .GetName | SanitiseName }} struct {}
+
+func (*{{ .GetName | SanitiseName }}) IsValid() (bool, error) {
+	return true, nil
+}
+
+func (r {{ .GetName | SanitiseName }}) GetStatus() int {
+	return {{ $statusCode }}
+}
+
+func (r {{ .GetName | SanitiseName }}) Send(c *gin.Context) {
+	c.String({{ $statusCode }}, fmt.Sprint(r))
+}
+{{- end }}
+
+{{- range $name, $content := $response.Content }}
+type {{ $response.GetName | SanitiseName }} {{ $content.Schema.GetName | SanitiseName }}
+
+func (r {{ $response.GetName | SanitiseName }}) GetStatus() int {
+	return {{ $statusCode }}
+}
+
+func (r {{ $response.GetName | SanitiseName }}) Send(c *gin.Context) {
+	{{- if eq $name "application/json" }}
+	c.JSON({{ $statusCode }}, r)
+	{{- else if eq $name "text/plain" }}
+	c.String({{ $statusCode }}, fmt.Sprint(r))
+	{{- end }}
+}
+{{- end }}
+{{- end }}
+
+type {{ .GetName | SanitiseName }}405Response struct {}
+func (r {{ .GetName | SanitiseName }}405Response) GetStatus() int {
+	return 405
+}
+func (r {{ .GetName | SanitiseName }}405Response) Send(c *gin.Context) {
+	c.JSON(405, r)
+}

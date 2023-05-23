@@ -1,0 +1,18 @@
+type: object
+properties:
+  go-properties-with-dashes:
+    type: string
+  enabled:
+    type: boolean
+  name:
+    type: string
+    minLength: 1
+    maxLength: 64
+    pattern: ^([a-zA-Z0-9])+([-_ @\.]([a-zA-Z0-9])+)*$
+  description:
+    type: string
+  id:
+    type: string
+    format: uuid
+required:
+  - name

@@ -1,0 +1,28 @@
+// GENERATED CODE. DO NOT EDIT
+
+package {{ index .GetMetadata "package" }}
+
+import "github.com/gin-gonic/gin"
+
+type API interface {
+{{- range $name, $pathItem := .Paths }}
+  {{ $pathItem.GetName | SanitiseName }}
+{{- end }}
+}
+
+func RegisterAPI(e gin.IRouter, srv API) {
+{{- range $name, $pathItem := .Paths }}
+  Register{{ $pathItem.GetName | SanitiseName }}Path(e, srv)
+{{- end }}
+}
+
+type UnimplementedServer struct {
+{{- range $name, $pathItem := .Paths }}
+  Unimplemented{{ $pathItem.GetName | SanitiseName }}
+{{- end }}
+}
+
+func (u UnimplementedServer) InvalidRequest(c *gin.Context, err error) {
+	c.JSON(400, err.Error())
+	c.Abort()
+}

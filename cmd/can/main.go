@@ -2,57 +2,61 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"path"
-
-	"github.com/sasswart/gin-in-a-can/generator"
+	"github.com/sasswart/gin-in-a-can/config"
 	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/spf13/viper"
+	"github.com/sasswart/gin-in-a-can/render"
+	golang "github.com/sasswart/gin-in-a-can/render/go"
+	"github.com/sasswart/gin-in-a-can/tree"
+	"os"
 )
 
+var Renderer *render.Engine
+
 func main() {
-	// Load config
-	viper.SetConfigName("config")
-	viper.AddConfigPath(".")
-	err := viper.ReadInConfig()
+	cfg := config.Data{}
+	err := cfg.Load()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+	if config.Debug {
+		fmt.Printf("Reading API specification from \"%s\"\n", cfg.GetOpenAPIFilepath())
+	}
+	apiSpec, err := openapi.LoadAPISpec(cfg.GetOpenAPIFilepath())
+	if err != nil {
+		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
-	var config generator.TemplateConfig
-
-	viper.Unmarshal(&config)
-
-	openAPIEntryPoint := viper.GetString("openAPIFile")
-
-	apiSpec, err := openapi.LoadOpenAPI(openAPIEntryPoint)
+	// Setup appropriate renderer via the `strategy` design pattern
+	err = setRenderStrategy(cfg)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
-	outputPath := viper.GetString("outputPath")
-	basePackageName := viper.GetString("basePackageName")
-	configWithSpec := config.WithServer(*apiSpec)
-	for _, target := range []struct {
-		templateDir string
-		pkg         string
-		file        string
-		template    string
-	}{
-		{"go-gin", "controller", "controller.go", "controller.tmpl"},
-		{"go-gin", "controller", "unimplemented.go", "unimplemented.tmpl"},
-		{"go-gin", "models", "models.go", "models.tmpl"},
-	} {
-		file, err := generator.Generate(configWithSpec, target.templateDir, target.template)
-		if err != nil {
-			fmt.Println(err)
-		}
+	apiSpec.SetMetadata(tree.Metadata{
+		"package": cfg.Template.BasePackageName,
+	})
 
-		err = os.WriteFile(path.Join(outputPath, basePackageName, target.pkg, target.file), file, 0777)
-		if err != nil {
-			fmt.Println(err)
-		}
+	_, err = tree.Traverse(apiSpec, Renderer.BuildRenderNode())
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+}
+
+func setRenderStrategy(cfg config.Data) error {
+	switch cfg.Template.Name {
+	case "go-gin", "go-client":
+		e := render.Engine{}
+		r := &golang.Renderer{Base: &render.Base{}}
+		r.SetTemplateFuncMap(nil)
+		Renderer = e.With(r, cfg)
+		return nil
+	case "openapi-3":
+		return fmt.Errorf("openapi-3 renderer not implemented yet")
+	default:
+		return fmt.Errorf("%s is not a valid template name. Could not instantiate renderer", cfg.Template.Name)
 	}
 }

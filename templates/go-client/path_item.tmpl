@@ -1,0 +1,103 @@
+package {{ index .GetMetadata "package" }}
+{{- $pathParamPresent := false}}
+{{- $postMethodPresent := false}}
+{{- range $name, $operation := .Operations }}
+    {{- if eq $operation.Name "POST" }}
+        {{- $postMethodPresent = true }}
+    {{- end }}
+	{{- range $param := $operation.Parameters }}
+    {{- if eq ($param.In | ToTitle) "Path" }}
+        {{- $pathParamPresent = true }}
+    {{- end }}
+    {{- end }}
+{{- end }}
+import (
+{{ if $postMethodPresent }}
+    "bytes"
+{{- end }}
+	"context"
+{{ if $postMethodPresent }}
+    "encoding/json"
+{{- end }}
+	"errors"
+	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+{{ if $pathParamPresent }}
+	"strings"
+{{- end }}
+
+	"github.com/google/go-querystring/query"
+)
+
+
+{{- range $name, $operation := .Operations }}
+func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, params *{{ $operation.GetName | SanitiseName }}Parameters, body *{{ $operation.RequestBody.GetName | SanitiseName }}) ([]byte, error) {
+    if ctx == nil {
+        ctx = context.Background()
+    }
+    var payload io.Reader = nil
+    {{- if eq $operation.Name "POST" }}
+    if body != nil {
+        data, err := json.Marshal(body)
+        if err != nil { // This serves as our validation, for now
+            return nil, err
+        }
+        payload = bytes.NewReader(data)
+    } else {
+        return nil, errors.New("(c *Client) {{ $operation.OperationId }} :: post operation with nil body")
+    }
+    {{- end }}
+    var vals url.Values
+    var err error
+    if params != nil {
+        vals, err = query.Values(params)
+        if err != nil {
+            return nil, err
+        }
+    } else {
+        return nil, errors.New("(c *Client) {{ $operation.OperationId }} :: nil params")
+    }
+	pathPattern := "{{ .GetParent.Name }}"
+	{{- range $param := $operation.Parameters }}
+    {{- if eq ($param.In | ToTitle) "Path" }}
+    pathPattern = strings.Replace(pathPattern, `{ {{- $param.ParamName -}} }`, params.{{ $param.ParamName | ToTitle }}, -1)
+    {{- end }}
+	{{- end }}
+	URL := c.createUrl(pathPattern, vals)
+	req, err := http.NewRequestWithContext(ctx, http.Method{{ $name | ToTitle }}, URL.String(), payload)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Content-Type", c.cfg.ContentType) // TODO this feels hacky
+    if c.auth != nil {
+        err = c.auth(req)
+        if err != nil {
+            return nil, err
+        }
+    }
+
+	res, err := c.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode < 200 || res.StatusCode > 399 {
+	    var body []byte
+	    body, err := io.ReadAll(res.Body)
+	    if err == nil { // Close body if it is not nil and is read successfully
+            defer res.Body.Close() // TODO figure out how to bubble this error up for checking
+	    }
+		return nil, fmt.Errorf("status code check failed :: url %s :: returned %d :: body %v", URL.String(), res.StatusCode, string(body))
+	}
+
+	defer res.Body.Close() // TODO figure out how to bubble this error up for checking
+
+	responseBytes, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	return responseBytes, nil
+}
+{{- end }}
+

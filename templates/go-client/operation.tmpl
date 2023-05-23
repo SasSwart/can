@@ -1,0 +1,44 @@
+package {{ index .GetMetadata "package" }}
+
+type {{ .GetName | SanitiseName }}Parameters struct {
+{{- range $i, $parameter := .Parameters }}
+    {{- if eq $parameter.In "query" }}
+	{{ $parameter.ParamName | ToTitle }} {{ $parameter.Schema | SanitiseType }} `url:"{{ $parameter.ParamName }},omitempty"`
+    {{- else }}
+	{{ $parameter.ParamName | ToTitle }} {{ $parameter.Schema | SanitiseType }} `url:"-"`
+	{{- end }}
+{{- end }}
+}
+
+{{- $requestBody := .RequestBody }}
+{{ range $name, $requestBodyContent := $requestBody.Content }}
+type {{ $requestBody.GetName | SanitiseName }} {{ $requestBodyContent.Schema.GetName | SanitiseName }}
+{{- end }}
+{{- if not .RequestBody.Content }}
+type {{ $requestBody.GetName | SanitiseName }} struct {}
+{{- end }}
+
+type {{ .GetName | SanitiseName }}Response interface {
+	GetStatus() int
+}
+
+{{- range $name, $response := .Responses }}
+{{ $statusCode := $name }}
+
+{{- if not .Content }}
+type {{ .GetName | SanitiseName }} struct {}
+
+func (r {{ .GetName | SanitiseName }}) GetStatus() int {
+	return {{ $statusCode }}
+}
+{{- end }}
+
+{{- range $name, $content := $response.Content }}
+type {{ $response.GetName | SanitiseName }} {{ $content.Schema.GetName | SanitiseName }}
+
+func (r {{ $response.GetName | SanitiseName }}) GetStatus() int {
+	return {{ $statusCode }}
+}
+{{- end }}
+{{- end }}
+
