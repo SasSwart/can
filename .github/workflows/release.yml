@@ -20,7 +20,7 @@ jobs:
       - name: Show go version
         run: go version
       - name: Generate build files
-        run: make VERSION='$GITHUB_REF' all
+        run: make VERSION='${{ github.ref }}' all
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
