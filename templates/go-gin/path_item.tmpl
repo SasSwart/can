@@ -28,8 +28,15 @@ func (u {{ $pathItemStructName }}) InvalidRequest(c *gin.Context, err error) {
 
 func Register{{ .GetName | SanitiseName }}Path(e gin.IRouter, srv {{ .GetName | SanitiseName }}) {
 {{- range $name, $operation := .Operations }}
-	{{ $parent := .GetParent }}
-  e.{{ $name | ToUpper }}("{{ $parent.Name }}", func(c *gin.Context) {
+	{{ $path := .GetParent.Name }}
+	{{- range $i, $parameter := $operation.Parameters}}
+        {{- if eq ($parameter.In | ToTitle) ("path" | ToTitle) }}
+            {{ $from := printf "{%s}" $parameter.ParamName }}
+            {{ $to := printf ":%s" $parameter.ParamName }}
+            {{ $path = StringsReplace $path $from $to }}
+    	{{- end }}
+	{{- end }}
+  e.{{ $name | ToUpper }}("{{ $path }}", func(c *gin.Context) {
   	params := &{{ $operation.GetName | SanitiseName }}Parameters{}
     {{- range $param := $operation.Parameters }}
 		params.{{ $param.GetParamName | SanitiseName }} =

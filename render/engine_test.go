@@ -5,12 +5,8 @@ import (
 	golang "github.com/sasswart/gin-in-a-can/render/go"
 	"github.com/sasswart/gin-in-a-can/test"
 	"github.com/sasswart/gin-in-a-can/tree"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	"os"
-	"strings"
 	"testing"
-	"text/template"
 )
 
 func Test_Render_Render(t *testing.T) {
@@ -31,15 +27,7 @@ func Test_Render_Render(t *testing.T) {
 	cfg.OutputPath = tempFolder
 	e := render.Engine{}.With(&golang.Renderer{Base: &render.Base{}}, cfg)
 	r := *e.GetRenderer()
-	r.SetTemplateFuncMap(&template.FuncMap{
-		"ToUpper": strings.ToUpper,
-		"ToTitle": func(s string) string {
-			caser := cases.Title(language.English)
-			return caser.String(s)
-		},
-		"SanitiseName": r.SanitiseName,
-		"SanitiseType": r.SanitiseType,
-	})
+	r.SetTemplateFuncMap(nil)
 	if r.GetTemplateFuncMap() == nil {
 		t.Errorf("TemplateFuncMap should NOT be nil")
 	}
