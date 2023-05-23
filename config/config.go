@@ -1,6 +1,7 @@
 package config
 
 import (
+	_ "embed"
 	"flag"
 	"fmt"
 	"github.com/spf13/viper"
@@ -8,8 +9,8 @@ import (
 	"path/filepath"
 )
 
-// SemVer should be updated on any new release!!
-const SemVer = "0.0.13"
+//go:embed version.txt
+var SemVer string
 
 var (
 	Debug          bool

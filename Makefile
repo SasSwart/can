@@ -1,4 +1,4 @@
-APP_GO_FILES := $(shell find . -name '*.go')
+VERSION := 0.0.0
 
 all: linux_amd64.zip
 
@@ -7,8 +7,9 @@ linux_amd64.zip: build/linux_amd64 LICENSE
 
 build/linux_amd64: build/linux_amd64/can build/linux_amd64/templates
 
-build/linux_amd64/can: $(APP_GO_FILES)
-	go build -o ./build/linux_amd64/ ./cmd/...
+build/linux_amd64/can:
+	echo '${VERSION}' > ./config/version.txt
+	go build -o ./build/linux_amd64/ ./...
 
 build/linux_amd64/templates:
 	cp -r templates build/linux_amd64/templates
