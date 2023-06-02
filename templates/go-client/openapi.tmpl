@@ -27,7 +27,7 @@ var _ ClientService = &Client{}
 type AuthFunc func(*http.Request) error
 
 type Config struct {
-	Port string `validate:"required,hostname_port"`
+	Port string `validate:"hostname_port"`
 	Host string `validate:"required,hostname"` // Hostname RFC 952
 	Protocol string `validate:"required"`
 	ContentType string `validate:"required"`
