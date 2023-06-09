@@ -1,9 +1,13 @@
 package {{ index .GetMetadata "package" }}
 {{- $pathParamPresent := false}}
 {{- $postMethodPresent := false}}
+{{- $patchMethodPresent := false}}
 {{- range $name, $operation := .Operations }}
     {{- if eq $operation.Name "POST" }}
         {{- $postMethodPresent = true }}
+    {{- end }}
+    {{- if eq $operation.Name "PATCH" }}
+        {{- $patchMethodPresent = true }}
     {{- end }}
 	{{- range $param := $operation.Parameters }}
     {{- if eq ($param.In | ToTitle) "Path" }}
@@ -12,11 +16,11 @@ package {{ index .GetMetadata "package" }}
     {{- end }}
 {{- end }}
 import (
-{{ if $postMethodPresent }}
+{{- if or $postMethodPresent $patchMethodPresent }}
     "bytes"
 {{- end }}
 	"context"
-{{ if $postMethodPresent }}
+{{- if or $postMethodPresent $patchMethodPresent }}
     "encoding/json"
 {{- end }}
 	"errors"
@@ -24,7 +28,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-{{ if $pathParamPresent }}
+{{- if $pathParamPresent }}
 	"strings"
 {{- end }}
 
@@ -38,7 +42,7 @@ func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, pa
         ctx = context.Background()
     }
     var payload io.Reader = nil
-    {{- if eq $operation.Name "POST" }}
+    {{- if or (eq $operation.Name "POST") (eq $operation.Name "PATCH") }}
     if body != nil {
         data, err := json.Marshal(body)
         if err != nil { // This serves as our validation, for now
@@ -46,7 +50,7 @@ func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, pa
         }
         payload = bytes.NewReader(data)
     } else {
-        return nil, errors.New("(c *Client) {{ $operation.OperationId }} :: post operation with nil body")
+        return nil, errors.New("(c *Client) {{ $operation.OperationId }} :: post or patch operation with nil body")
     }
     {{- end }}
     var vals url.Values
