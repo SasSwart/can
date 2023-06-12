@@ -13,6 +13,7 @@ import (
 var Renderer *render.Engine
 
 func main() {
+	fmt.Printf("can %s\n", config.SemVer)
 	cfg := config.Data{}
 	err := cfg.Load()
 	if err != nil {
