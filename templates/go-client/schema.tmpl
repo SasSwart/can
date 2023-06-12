@@ -11,7 +11,17 @@ type {{ .GetName | SanitiseName }} {{ . | SanitiseType }}
         {{ if eq ($schema | SanitiseType) "struct" -}}
             {{ $name | ToTitle }} {{ $schema.GetName | SanitiseName }}
         {{- else -}}
-            {{ $name | ToTitle }} {{ $schema | SanitiseType }} `json:"{{ $name }}"`
+            {{- $required := false }}
+            {{- range $requiredProperty := $schema.Required }}
+                {{- if eq $name $requiredProperty }}
+                    {{- $required = true }}
+                {{- end }}
+            {{- end }}
+            {{- if eq $required false -}}
+                {{ $name | ToTitle }}  {{ if eq ($schema | SanitiseType) "bool" }}*{{ end }}{{ $schema | SanitiseType }} `json:"{{ $name }},omitempty"`
+            {{- else }}
+                {{ $name | ToTitle }} {{ $schema | SanitiseType }} `json:"{{ $name }}"`
+            {{- end }}
         {{- end }}
 	{{- end }}
 }
