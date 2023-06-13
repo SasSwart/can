@@ -27,12 +27,10 @@ var _ ClientService = &Client{}
 type AuthFunc func(*http.Request) error
 
 type Config struct {
-	Port string `validate:"hostname_port"`
+	Port string
 	Host string `validate:"required,hostname"` // Hostname RFC 952
 	Protocol string `validate:"required"`
 	ContentType string `validate:"required"`
-
-	base string
 }
 
 type Client struct {
@@ -51,20 +49,25 @@ func (c *Client) createUrl(pathPattern string, vals url.Values) url.URL {
 	}
 }
 
+// NewHTTPClient will create a new client with the given configuration and authentication function. It will perform
+// validation on the contents of the config and throw an error if config contents prove to be invalid or the auth
+// function is missing.
 func NewHTTPClient(cfg *Config, af AuthFunc) (*Client, error) {
     if cfg == nil {
           return nil, errors.New("cannot start client without config")
     }
+    if af == nil {
+          return nil, errors.New("cannot start client without auth function")
+    }
+	if cfg.Protocol == "" && strings.Contains(cfg.Host, "://") {
+		split := strings.Split(cfg.Host, "://")
+		cfg.Host = split[1]
+		cfg.Protocol = split[0]
+	}
     validate := validator.New()
     if err := validate.Struct(cfg); err != nil {
         return nil, err
     }
-	if strings.Contains(cfg.Host, "://") {
-		cfg.Host = strings.Split(cfg.Host, "://")[1]
-		cfg.base = fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
-	} else {
-		cfg.base = fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
-	}
     return &Client{
         Client: http.DefaultClient,
         cfg: cfg,
