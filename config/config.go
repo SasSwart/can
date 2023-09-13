@@ -47,6 +47,7 @@ type Data struct {
 type Template struct {
 	Name       string
 	ModuleName string
+	Strategy   string
 	// BasePackageName represents the
 	BasePackageName string
 
@@ -209,6 +210,7 @@ func (d *Data) validTemplateName() bool {
 }
 
 func (d *Data) validTemplates() (templates []string, err error) {
+	fmt.Printf("Checking for templates in %s\n", d.TemplatesDir)
 	dirs, err := os.ReadDir(d.TemplatesDir)
 	if err != nil {
 		fmt.Println(fmt.Errorf("could not list directories %w", err))
@@ -219,6 +221,7 @@ func (d *Data) validTemplates() (templates []string, err error) {
 	}
 	return templates, nil
 }
+
 func (d *Data) resolveTemplateConfig() error {
 	pwdDirs, err := os.ReadDir(ProcWorkingDir)
 	if err != nil {
