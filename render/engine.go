@@ -13,7 +13,6 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/tree"
-	"go/format"
 	"os"
 	"path/filepath"
 	"text/template"
@@ -65,7 +64,7 @@ func (e Engine) BuildRenderNode() tree.TraversalFunc {
 
 		_, err := e.render(node, templateFile)
 		if err != nil {
-			return node, err
+			return node, fmt.Errorf("could not render into %s - possible syntax error in output after templating: %w", templateFile, err)
 		}
 
 		return node, nil
@@ -96,8 +95,8 @@ func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte
 		fmt.Printf("Rendering %s using %s\n", r.GetOutputFilename(node), templateFilename)
 		fmt.Println(string(buff.Bytes()))
 	}
-	// gofmt
-	formatted, err := format.Source(buff.Bytes())
+	// format code based on formatter provided by interface
+	formatted, err := r.Format(buff.Bytes())
 	if err != nil {
 		return nil, err
 	}
