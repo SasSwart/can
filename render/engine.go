@@ -13,6 +13,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/path"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/tree"
+	"go/format"
 	"os"
 	"path/filepath"
 	"text/template"
@@ -95,17 +96,14 @@ func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte
 		fmt.Printf("Rendering %s using %s\n", r.GetOutputFilename(node), templateFilename)
 		fmt.Println(string(buff.Bytes()))
 	}
-
+	// gofmt
+	formatted, err := format.Source(buff.Bytes())
+	if err != nil {
+		return nil, err
+	}
 	outPath := filepath.Join(e.config.GetOutputDir(), r.GetOutputFilename(node))
 	if !config.Dryrun {
-		if _, err := os.Stat(filepath.Dir(outPath)); errors.Is(err, os.ErrNotExist) {
-			err = os.MkdirAll(filepath.Dir(outPath), 0755)
-			if err != nil {
-				return nil, err
-			}
-		}
-		err = os.WriteFile(outPath, buff.Bytes(), 0644)
-		if err != nil {
+		if err := writeToDisk(formatted, outPath); err != nil {
 			return nil, err
 		}
 		if config.Debug {
@@ -113,4 +111,17 @@ func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte
 		}
 	}
 	return buff.Bytes(), nil
+}
+
+func writeToDisk(contents []byte, outPath string) error {
+	if _, err := os.Stat(filepath.Dir(outPath)); errors.Is(err, os.ErrNotExist) {
+		err = os.MkdirAll(filepath.Dir(outPath), 0755)
+		if err != nil {
+			return err
+		}
+	}
+	if err := os.WriteFile(outPath, contents, 0644); err != nil {
+		return err
+	}
+	return nil
 }
