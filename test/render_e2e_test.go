@@ -145,6 +145,9 @@ func TestGolang_GoClient_Renderer_HeavyNesting(t *testing.T) {
 	if err := fileShouldContain(file, "type NestedApiExampleNestedendpointPostRequestBodyModelChildobjectGrandchildarrayItem struct {\n        Grandchildproperty  string `json:\"grandchildProperty,omitempty\"`\n}"); err != nil {
 		t.Error(err)
 	}
+	if err := file.Close(); err != nil {
+		t.Error(err)
+	}
 }
 
 func TestGolang_GoGin_Renderer_HeavyNesting(t *testing.T) {
@@ -188,6 +191,9 @@ func TestGolang_GoGin_Renderer_HeavyNesting(t *testing.T) {
 		t.Error(err)
 	}
 	if err := fileShouldContain(file, "type NestedApiExampleNestedendpointPostRequestBodyModelChildobjectGrandchildarrayItem struct {\n        Grandchildproperty string `json:\"grandchildProperty\"`\n}"); err != nil {
+		t.Error(err)
+	}
+	if err := file.Close(); err != nil {
 		t.Error(err)
 	}
 }
