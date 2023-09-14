@@ -1,0 +1,60 @@
+openapi: 3.0.0
+info:
+  title: Nested API Example
+  version: 1.0.0
+paths:
+  /nested_endpoint:
+    post:
+      summary: Create a nested resource
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                parentProperty:
+                  type: string
+                childObject:
+                  type: object
+                  properties:
+                    childProperty1:
+                      type: string
+                    childProperty2:
+                      type: integer
+                    grandchildArray:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          grandchildProperty:
+                            type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  nestedResource:
+                    type: object
+                    properties:
+                      parentProperty:
+                        type: string
+                      childObject:
+                        type: object
+                        properties:
+                          childProperty1:
+                            type: string
+                          childProperty2:
+                            type: integer
+                          grandchildArray:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                grandchildProperty:
+                                  type: string
