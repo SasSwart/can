@@ -1,6 +1,7 @@
 package render
 
 import (
+	"fmt"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"text/template"
 )
@@ -12,6 +13,7 @@ type Renderer interface {
 	GetOutputFilename(n tree.NodeTraverser) string
 	SetTemplateFuncMap(*template.FuncMap)
 	GetTemplateFuncMap() *template.FuncMap
+	Format([]byte) ([]byte, error)
 }
 
 // Base defines the base render object. This should be used as a compositional base for specialising it's interface
@@ -25,4 +27,9 @@ func (b *Base) GetTemplateFuncMap() *template.FuncMap {
 }
 func (b *Base) SetTemplateFuncMap(funcMap *template.FuncMap) {
 	b.templateFuncMapping = funcMap
+}
+
+func (b *Base) Format(input []byte) ([]byte, error) {
+	fmt.Println("no formatter implemented")
+	return input, nil
 }

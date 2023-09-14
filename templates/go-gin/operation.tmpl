@@ -21,7 +21,7 @@ import "fmt"
 
 var _ = fmt.Sprint("")
 
-type {{ .GetName | SanitiseName }}Parameters struct {
+type {{ .GetName | SanitiseName }}Parameters struct{
 {{- range $i, $parameter := .Parameters }}
 	{{ $parameter.GetParamName | SanitiseName }} {{ $parameter.Schema | SanitiseType }} `json:"{{ $parameter.ParamName }}"`
 {{- end }}
@@ -57,7 +57,7 @@ func (p *{{ .GetName | SanitiseName }}Parameters) IsValid() (bool, error) {
 }
 
 {{- range $name, $requestBody := .RequestBody.Content }}
-type {{ .GetName | SanitiseName }} {{ $requestBody.Schema.GetName | SanitiseName }}
+type {{ .GetName | SanitiseName }} {{ if eq ($requestBody.Schema.GetName | SanitiseName) "" }}struct{}{{ else }}{{ $requestBody.Schema.GetName | SanitiseName }}{{ end }}
 
 func (p *{{ .GetName | SanitiseName }}) IsValid() (bool, error) {
 	{{- range $name, $property := $requestBody.Schema.Properties }}
@@ -87,7 +87,7 @@ func (p *{{ .GetName | SanitiseName }}) IsValid() (bool, error) {
 }
 {{- end }}
 {{- if not .RequestBody.Content }}
-type {{ .RequestBody.GetName | SanitiseName }} struct {}
+type {{ .RequestBody.GetName | SanitiseName }} struct{}
 
 func (*{{ .RequestBody.GetName | SanitiseName }}) IsValid() (bool, error) {
 	return true, nil
@@ -103,7 +103,7 @@ type {{ .GetName | SanitiseName }}Response interface {
 {{ $statusCode := $name }}
 
 {{- if not .Content }}
-type {{ .GetName | SanitiseName }} struct {}
+type {{ .GetName | SanitiseName }} struct{}
 
 func (*{{ .GetName | SanitiseName }}) IsValid() (bool, error) {
 	return true, nil
@@ -119,7 +119,7 @@ func (r {{ .GetName | SanitiseName }}) Send(c *gin.Context) {
 {{- end }}
 
 {{- range $name, $content := $response.Content }}
-type {{ $response.GetName | SanitiseName }} {{ $content.Schema.GetName | SanitiseName }}
+type {{ $response.GetName | SanitiseName }} {{ if eq ($content.Schema.GetName | SanitiseName) "" }}struct{}{{ else }}{{ $content.Schema.GetName | SanitiseName }}{{ end }}
 
 func (r {{ $response.GetName | SanitiseName }}) GetStatus() int {
 	return {{ $statusCode }}
@@ -135,7 +135,7 @@ func (r {{ $response.GetName | SanitiseName }}) Send(c *gin.Context) {
 {{- end }}
 {{- end }}
 
-type {{ .GetName | SanitiseName }}405Response struct {}
+type {{ .GetName | SanitiseName }}405Response struct{}
 func (r {{ .GetName | SanitiseName }}405Response) GetStatus() int {
 	return 405
 }

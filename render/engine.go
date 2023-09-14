@@ -64,7 +64,7 @@ func (e Engine) BuildRenderNode() tree.TraversalFunc {
 
 		_, err := e.render(node, templateFile)
 		if err != nil {
-			return node, err
+			return node, fmt.Errorf("could not render into %s - possible syntax error in output after templating: %w", templateFile, err)
 		}
 
 		return node, nil
@@ -95,17 +95,14 @@ func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte
 		fmt.Printf("Rendering %s using %s\n", r.GetOutputFilename(node), templateFilename)
 		fmt.Println(string(buff.Bytes()))
 	}
-
+	// format code based on formatter provided by interface
+	formatted, err := r.Format(buff.Bytes())
+	if err != nil {
+		return nil, err
+	}
 	outPath := filepath.Join(e.config.GetOutputDir(), r.GetOutputFilename(node))
 	if !config.Dryrun {
-		if _, err := os.Stat(filepath.Dir(outPath)); errors.Is(err, os.ErrNotExist) {
-			err = os.MkdirAll(filepath.Dir(outPath), 0755)
-			if err != nil {
-				return nil, err
-			}
-		}
-		err = os.WriteFile(outPath, buff.Bytes(), 0644)
-		if err != nil {
+		if err := writeToDisk(formatted, outPath); err != nil {
 			return nil, err
 		}
 		if config.Debug {
@@ -113,4 +110,17 @@ func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte
 		}
 	}
 	return buff.Bytes(), nil
+}
+
+func writeToDisk(contents []byte, outPath string) error {
+	if _, err := os.Stat(filepath.Dir(outPath)); errors.Is(err, os.ErrNotExist) {
+		err = os.MkdirAll(filepath.Dir(outPath), 0755)
+		if err != nil {
+			return err
+		}
+	}
+	if err := os.WriteFile(outPath, contents, 0644); err != nil {
+		return err
+	}
+	return nil
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/render"
 	"github.com/sasswart/gin-in-a-can/tree"
+	"go/format"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"strconv"
@@ -62,6 +63,10 @@ func (g *Renderer) SanitiseType(n tree.NodeTraverser) string {
 		}
 	}
 	return ""
+}
+
+func (g *Renderer) Format(input []byte) ([]byte, error) {
+	return format.Source(input)
 }
 
 func (g *Renderer) GetOutputFilename(n tree.NodeTraverser) string {
