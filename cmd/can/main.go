@@ -48,16 +48,18 @@ func main() {
 }
 
 func setRenderStrategy(cfg config.Data) error {
-	switch cfg.Template.Name {
-	case "go-gin", "go-client":
-		e := render.Engine{}
-		r := &golang.Renderer{Base: &render.Base{}}
-		r.SetTemplateFuncMap(nil)
-		Renderer = e.With(r, cfg)
-		return nil
+	e := render.Engine{}
+	var r render.Renderer
+	switch cfg.Template.Strategy {
+	case "go":
+		r = &golang.Renderer{Base: &render.Base{}}
 	case "openapi-3":
 		return fmt.Errorf("openapi-3 renderer not implemented yet")
 	default:
-		return fmt.Errorf("%s is not a valid template name. Could not instantiate renderer", cfg.Template.Name)
+		fmt.Printf("No rendering strategy set. Defaulting to go\n")
+		r = &golang.Renderer{Base: &render.Base{}}
 	}
+	r.SetTemplateFuncMap(nil)
+	Renderer = e.With(r, cfg)
+	return nil
 }
