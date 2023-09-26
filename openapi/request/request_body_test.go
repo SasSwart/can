@@ -13,7 +13,7 @@ import (
 )
 
 func TestOpenAPI_LoadsRequestBodyValidation(t *testing.T) {
-	apiSpec, _ := openapi.LoadAPISpec("../../" + test.OpenapiFile)
+	apiSpec, _ := openapi.LoadFromYaml("../../" + test.OpenapiFile)
 
 	traversable := test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.PropertyKey, "name")
 	name := traversable.(*schema.Schema)

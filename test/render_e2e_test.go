@@ -37,7 +37,7 @@ func TestGolang_GinServer_Renderer(t *testing.T) {
 	}
 
 	// We have to pop the first element off the path constant
-	apiTree, err := openapi.LoadAPISpec(filepath.Join(strings.Split(OpenapiFile, "/")[1:]...))
+	apiTree, err := openapi.LoadFromYaml(filepath.Join(strings.Split(OpenapiFile, "/")[1:]...))
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -74,7 +74,7 @@ func TestGolang_GoClient_Renderer(t *testing.T) {
 	}
 
 	// We have to pop the first element off the path constant
-	apiTree, err := openapi.LoadAPISpec(filepath.Join(strings.Split(OpenapiFile, "/")[1:]...))
+	apiTree, err := openapi.LoadFromYaml(filepath.Join(strings.Split(OpenapiFile, "/")[1:]...))
 	if err != nil {
 		t.Errorf(err.Error())
 	}

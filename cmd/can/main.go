@@ -23,7 +23,7 @@ func main() {
 	if config.Debug {
 		fmt.Printf("Reading API specification from \"%s\"\n", cfg.GetOpenAPIFilepath())
 	}
-	apiSpec, err := openapi.LoadAPISpec(cfg.GetOpenAPIFilepath())
+	apiSpec, err := openapi.LoadFromYaml(cfg.GetOpenAPIFilepath())
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)

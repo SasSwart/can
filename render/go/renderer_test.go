@@ -24,7 +24,7 @@ func TestGolang_SetTemplateFuncMap(t *testing.T) {
 func TestGolang_SanitiseName(t *testing.T) {
 
 	specPath := "../../" + test.OpenapiFile
-	apiSpec, _ := openapi.LoadAPISpec(specPath)
+	apiSpec, _ := openapi.LoadFromYaml(specPath)
 	goPropertiesWithDashes := "go-properties-with-dashes"
 
 	tests := []struct {

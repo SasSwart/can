@@ -16,7 +16,7 @@ import (
 
 func TestOpenAPI_LoadOpenAPI(t *testing.T) {
 	specPath := "../" + test.OpenapiFile
-	apiSpec, err := openapi.LoadAPISpec(specPath)
+	apiSpec, err := openapi.LoadFromYaml(specPath)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -75,7 +75,7 @@ func TestOpenAPI_GetAndSetMetadata(t *testing.T) {
 }
 
 func TestOpenAPI_MetadataSetPoint(t *testing.T) {
-	apiSpec, _ := openapi.LoadAPISpec("../" + test.OpenapiFile)
+	apiSpec, _ := openapi.LoadFromYaml("../" + test.OpenapiFile)
 	data := tree.Metadata{"this": "is", "some": "metadata"}
 	traversable := test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.PropertyKey, "name")
 
