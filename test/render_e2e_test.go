@@ -124,7 +124,7 @@ func TestGolang_GoClient_Renderer_HeavyNesting(t *testing.T) {
 	}
 
 	// We have to pop the first element off the path constant
-	apiTree, err := openapi.LoadAPISpec(filepath.Join(strings.Split(cfg.OpenAPIFile, "/")[1:]...))
+	apiTree, err := openapi.LoadFromYaml(filepath.Join(strings.Split(cfg.OpenAPIFile, "/")[1:]...))
 	if err != nil {
 		t.Error(err)
 	}
@@ -142,7 +142,8 @@ func TestGolang_GoClient_Renderer_HeavyNesting(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if err := fileShouldContain(file, "type NestedApiExampleNestedendpointPostRequestBodyModelChildobjectGrandchildarrayItem struct {\n        Grandchildproperty  string `json:\"grandchildProperty,omitempty\"`\n}"); err != nil {
+	want := "type NestedApiExampleNestedendpointPostRequestBodyModelChildobjectGrandchildarrayItem struct {\n\tGrandchildproperty string `json:\"grandchildProperty,omitempty\"`\n}"
+	if err := fileShouldContain(file, want); err != nil {
 		t.Error(err)
 	}
 	if err := file.Close(); err != nil {
@@ -172,7 +173,7 @@ func TestGolang_GoGin_Renderer_HeavyNesting(t *testing.T) {
 	}
 
 	// We have to pop the first element off the path constant
-	apiTree, err := openapi.LoadAPISpec(filepath.Join(strings.Split(cfg.OpenAPIFile, "/")[1:]...))
+	apiTree, err := openapi.LoadFromYaml(filepath.Join(strings.Split(cfg.OpenAPIFile, "/")[1:]...))
 	if err != nil {
 		t.Error(err)
 	}
@@ -190,7 +191,8 @@ func TestGolang_GoGin_Renderer_HeavyNesting(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if err := fileShouldContain(file, "type NestedApiExampleNestedendpointPostRequestBodyModelChildobjectGrandchildarrayItem struct {\n        Grandchildproperty string `json:\"grandchildProperty\"`\n}"); err != nil {
+	want := "type NestedApiExampleNestedendpointPostRequestBodyModelChildobjectGrandchildarrayItem struct {\n\tGrandchildproperty string `json:\"grandchildProperty\"`\n}"
+	if err := fileShouldContain(file, want); err != nil {
 		t.Error(err)
 	}
 	if err := file.Close(); err != nil {
