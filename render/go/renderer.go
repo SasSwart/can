@@ -170,25 +170,25 @@ func ToTitle(s string) (ret string) {
 	return ret
 }
 
-func NewGinServerTestConfig() config.Data {
-	config.ConfigFilePath = "../render/go/config_goginserver_test.yml"
+func NewGinServerTestConfig(configPath, openAPIPath string) config.Data {
+	config.ConfigFilePath = configPath
 	config.Debug = true
 	return config.Data{
 		Template: config.Template{
 			Name: "go-gin",
 		},
-		OpenAPIFile: "../openapi/test/fixtures/validation_no_refs.yaml",
+		OpenAPIFile: openAPIPath,
 		OutputPath:  ".",
 	}
 }
-func NewGoClientTestConfig() config.Data {
-	config.ConfigFilePath = "../render/go/config_goclient_test.yml"
+func NewGoClientTestConfig(configPath, openAPIPath string) config.Data {
+	config.ConfigFilePath = configPath
 	config.Debug = true
 	return config.Data{
 		Template: config.Template{
 			Name: "go-client",
 		},
-		OpenAPIFile: "../openapi/test/fixtures/validation_no_refs.yaml",
+		OpenAPIFile: openAPIPath,
 		OutputPath:  ".",
 	}
 }
