@@ -15,7 +15,7 @@ import (
 type ClientService interface {
     {{- range $pathName, $path := .Paths }}
     {{- range $name, $operation := $path.Operations }}
-    {{ $operation.GetName | SanitiseName }}(context.Context, *{{ $operation.GetName | SanitiseName }}Parameters, *{{ $operation.RequestBody.GetName | SanitiseName }}) ([]byte, error)
+    {{ $operation.GetName | SanitiseName }}(context.Context, *{{ $operation.GetName | SanitiseName }}Parameters, *{{ $operation.RequestBody.GetName | SanitiseName }}) (*http.Response, error)
     {{- end }}
     {{- end }}
 }
@@ -26,13 +26,13 @@ var _ ClientService = &Client{}
 // request being made. It should contain any logic and data needed to apply and maintain authentication with a server.
 type AuthFunc func(*http.Request) error
 
+// Config allows you to specify the Host, Protocol, Content Type and optionally a Port when initialising this client.
+// It should only be used once, when calling NewHTTPClient.
 type Config struct {
-	Port string `validate:"hostname_port"`
-	Host string `validate:"required,hostname"` // Hostname RFC 952
+	Host string `validate:"required"`
 	Protocol string `validate:"required"`
 	ContentType string `validate:"required"`
-
-	base string
+	Port string
 }
 
 type Client struct {
@@ -43,15 +43,24 @@ type Client struct {
 }
 
 func (c *Client) createUrl(pathPattern string, vals url.Values) url.URL {
-	return url.URL{
+	u := url.URL{
 		Scheme:   c.cfg.Protocol,
-		Host:     c.cfg.Host + c.cfg.Port,
+		Host:     c.cfg.Host,
 		Path:     pathPattern,
 		RawQuery: vals.Encode(),
 	}
+	if c.Port != "" {
+	    u.Host += ":"
+	    u.Host += c.Port
+	}
+	return u
 }
 
-func NewHTTPClient(cfg *Config, af AuthFunc) (*Client, error) {
+// NewHTTPClient allows you to specify the configuration of your client. This function allows you to specify optional
+// auth steps that will be executed before a request is made, such as the attaching of an Authorization header to the
+// request, as well as the http.Client you intend to use to make the calls. See the config struct for an idea of what it
+// allows you to configure.
+func NewHTTPClient(cfg *Config, client *http.Client, af AuthFunc) (*Client, error) {
     if cfg == nil {
           return nil, errors.New("cannot start client without config")
     }
@@ -61,13 +70,15 @@ func NewHTTPClient(cfg *Config, af AuthFunc) (*Client, error) {
     }
 	if strings.Contains(cfg.Host, "://") {
 		cfg.Host = strings.Split(cfg.Host, "://")[1]
-		cfg.base = fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
-	} else {
-		cfg.base = fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
 	}
-    return &Client{
-        Client: http.DefaultClient,
+    c := &Client{
         cfg: cfg,
         auth: af,
-    }, nil
+    }
+    if client == nil {
+        c.Client = http.DefaultClient
+    } else {
+        c.Client = client
+    }
+    return c, nil
 }
