@@ -1,0 +1,26 @@
+openapi: 3.0.0
+info:
+  version: 0.0.1
+  title: Empty Request and Response API
+paths:
+  /resource:
+    post:
+      requestBody:
+        required: true
+      responses:
+        '201':
+          description: ""
+    patch:
+      requestBody:
+        required: true
+      responses:
+        '204':
+          description: ""
+    get:
+      responses:
+        '200':
+          description: ""
+    delete:
+      responses:
+        '204':
+          description: ""
