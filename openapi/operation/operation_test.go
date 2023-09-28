@@ -22,7 +22,7 @@ func TestOpenAPI_Operation_SetAndGetBasePath(t *testing.T) {
 }
 
 func TestOpenAPI_Operation_GetRef(t *testing.T) {
-	apiSpec, _ := openapi.LoadAPISpec("../../" + test.OpenapiFile)
+	apiSpec, _ := openapi.LoadFromYaml("../../" + test.OpenapiFile)
 	ops := test.Dig(apiSpec, test.Endpoint)
 	for _, op := range ops.GetChildren() {
 		if o, ok := op.(*operation.Operation); ok {
@@ -34,7 +34,7 @@ func TestOpenAPI_Operation_GetRef(t *testing.T) {
 }
 
 func TestOpenAPI_Operation_SetAndGetParent(t *testing.T) {
-	apiSpec, _ := openapi.LoadAPISpec("../../" + test.OpenapiFile)
+	apiSpec, _ := openapi.LoadFromYaml("../../" + test.OpenapiFile)
 	ops := test.Dig(apiSpec, test.Endpoint)
 	for _, o := range ops.GetChildren() {
 		if o.GetParent() == nil {

@@ -55,13 +55,46 @@ func (o *OpenAPI) SetChild(i string, child tree.NodeTraverser) {
 	errors.CastFail("(o *OpenAPI) setChild", "NodeTraverser", "*schema.Schema")
 }
 
-func LoadAPISpec(openAPIFile string) (*OpenAPI, error) {
-	// skeleton
-	absPath, err := filepath.Abs(openAPIFile)
+// LoadFromYaml expects an absolute path. It will unmarshal the yaml file and resolve the references contained within.
+func LoadFromYaml(openApiFilepath string) (*OpenAPI, error) {
+	// Read yaml file
+	content, err := os.ReadFile(openApiFilepath)
 	if err != nil {
+		return nil, fmt.Errorf("LoadFromYaml:: unable to read file \"%s\": %w", openApiFilepath, err)
+	}
+
+	api := NewBaseOpenApi()
+	if err := api.Load(content); err != nil {
 		return nil, err
 	}
-	api := OpenAPI{
+	// Resolve references
+	if err := api.ResolveReferences(openApiFilepath); err != nil {
+		return nil, err
+	}
+	return &api, err
+}
+
+func (o *OpenAPI) ResolveReferences(absoluteBasePath string) error {
+	o.SetBasePath(filepath.Dir(absoluteBasePath))
+	o, err := tree.Traverse(o, tree.ResolveRefs)
+	if err != nil {
+		return fmt.Errorf("tree traversal error: %w", err)
+	}
+	return nil
+}
+
+// Load loads the yaml content into the OpenAPI struct. Extraneous functions that aid in this process should live here.
+func (o *OpenAPI) Load(content []byte) error {
+	err := yaml.Unmarshal(content, o)
+	if err != nil {
+		return fmt.Errorf("yaml unmarshalling error: %w", err)
+	}
+	o.SetName(o.Info.Title)
+	return nil
+}
+
+func NewBaseOpenApi() OpenAPI {
+	return OpenAPI{
 		Node: tree.Node{},
 		Components: components.Components{
 			Schemas: nil,
@@ -69,27 +102,4 @@ func LoadAPISpec(openAPIFile string) (*OpenAPI, error) {
 		Info:  info.Info{},
 		Paths: map[string]*path.Item{},
 	}
-	api.SetBasePath(filepath.Dir(absPath))
-
-	// Read yaml file
-	content, err := os.ReadFile(openAPIFile)
-	if err != nil {
-		return nil, fmt.Errorf("LoadAPISpec:: unable to read file \"%s\": %w", openAPIFile, err)
-	}
-
-	err = yaml.Unmarshal(content, &api)
-	if err != nil {
-		return nil, fmt.Errorf("LoadAPISpec:: yaml unmarshalling error: %w", err)
-	}
-
-	api.SetName(api.Info.Title)
-
-	// Resolve references
-	newApi, err := tree.Traverse(&api, tree.ResolveRefs)
-
-	if err != nil {
-		return nil, fmt.Errorf("LoadAPISpec:: tree traversal error: %w", err)
-	}
-
-	return newApi, err
 }

@@ -77,7 +77,6 @@ func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte
 	if r.GetTemplateFuncMap() == nil {
 		return nil, fmt.Errorf("e.render()::: template function mapping not set")
 	}
-	buff := bytes.NewBuffer([]byte{})
 	templater := template.New(templateFilename)
 	templater.Funcs(*r.GetTemplateFuncMap())
 
@@ -86,6 +85,7 @@ func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte
 		return nil, err
 	}
 
+	buff := bytes.NewBuffer([]byte{})
 	err = parsedTemplate.Execute(buff, node)
 	if err != nil {
 		return nil, err
