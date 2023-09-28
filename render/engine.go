@@ -29,20 +29,23 @@ type Engine struct {
 	config   config.Data
 }
 
-var _ EngineInterface = Engine{}
+var _ EngineInterface = &Engine{}
 
-func (e Engine) With(config config.Data) Engine {
+func NewEngine() *Engine {
+	return &Engine{}
+}
+func (e *Engine) With(config config.Data) Engine {
 	return Engine{config: config}
 }
 
-func (e Engine) GetRenderer() Renderer {
+func (e *Engine) GetRenderer() Renderer {
 	return e.renderer
 }
 
-func (e Engine) SetRenderer(r Renderer) {
+func (e *Engine) SetRenderer(r Renderer) {
 	e.renderer = r
 }
-func (e Engine) BuildRenderNode() tree.TraversalFunc {
+func (e *Engine) BuildRenderNode() tree.TraversalFunc {
 	return func(key string, parent, node tree.NodeTraverser) (tree.NodeTraverser, error) {
 		if s, ok := node.(*schema.Schema); ok {
 			if s.Type != "object" && s.Type != "array" {
@@ -50,7 +53,7 @@ func (e Engine) BuildRenderNode() tree.TraversalFunc {
 			}
 		}
 
-		templateFile := getTemplateFilename(node)
+		templateFile := GetTemplateFilename(node)
 		if templateFile == "" {
 			return node, nil
 		}
@@ -60,7 +63,7 @@ func (e Engine) BuildRenderNode() tree.TraversalFunc {
 		}
 		if !config.Dryrun {
 			outPath := filepath.Join(e.config.GetOutputDir(), e.GetRenderer().GetOutputFilename(node))
-			if err := writeToDisk(output, outPath); err != nil {
+			if err := WriteToDisk(output, outPath); err != nil {
 				return nil, err
 			}
 			if config.Debug {
@@ -71,7 +74,7 @@ func (e Engine) BuildRenderNode() tree.TraversalFunc {
 	}
 }
 
-func getTemplateFilename(node tree.NodeTraverser) string {
+func GetTemplateFilename(node tree.NodeTraverser) string {
 	switch node.(type) {
 	case *openapi.OpenAPI:
 		return "openapi.tmpl"
@@ -86,7 +89,7 @@ func getTemplateFilename(node tree.NodeTraverser) string {
 }
 
 // Render contains the parsing and rendering steps
-func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte, error) {
+func (e *Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte, error) {
 	r := e.GetRenderer()
 	templateDirectory := e.config.GetTemplateFilesDir()
 	parsedTemplate, err := r.ParseTemplate(templateFilename, templateDirectory)
@@ -106,7 +109,7 @@ func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte
 	return formatted, nil
 }
 
-func writeToDisk(contents []byte, outPath string) error {
+func WriteToDisk(contents []byte, outPath string) error {
 	if _, err := os.Stat(filepath.Dir(outPath)); errors.Is(err, os.ErrNotExist) {
 		err = os.MkdirAll(filepath.Dir(outPath), 0755)
 		if err != nil {
@@ -117,4 +120,25 @@ func writeToDisk(contents []byte, outPath string) error {
 		return err
 	}
 	return nil
+}
+
+func (e *Engine) BuildTestRenderNode(outputChan chan<- []byte) tree.TraversalFunc {
+	return func(key string, parent, node tree.NodeTraverser) (tree.NodeTraverser, error) {
+		if s, ok := node.(*schema.Schema); ok {
+			if s.Type != "object" && s.Type != "array" {
+				return node, nil
+			}
+		}
+
+		templateFile := GetTemplateFilename(node)
+		if templateFile == "" {
+			return node, nil
+		}
+		output, err := e.render(node, templateFile)
+		if err != nil {
+			return node, fmt.Errorf("could not render into %s: %w", templateFile, err)
+		}
+		outputChan <- output
+		return node, nil
+	}
 }

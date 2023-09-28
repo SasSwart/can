@@ -27,7 +27,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	e := render.Engine{}.With(cfg)
+	e := render.NewEngine().With(cfg)
 	// Setup appropriate renderer via the `strategy` design pattern
 	err = setStrategy(e, cfg.Template.Strategy)
 	if err != nil {
