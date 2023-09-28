@@ -52,7 +52,7 @@ func (e Engine) BuildRenderNode() tree.TraversalFunc {
 		}
 		output, err := e.render(node, templateFile)
 		if err != nil {
-			return node, fmt.Errorf("could not render into %s - possible syntax error in output after templating: %w", templateFile, err)
+			return node, fmt.Errorf("could not render into %s: %w", templateFile, err)
 		}
 		if !config.Dryrun {
 			outPath := filepath.Join(e.config.GetOutputDir(), e.GetRenderer().GetOutputFilename(node))
@@ -97,7 +97,7 @@ func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte
 	// format code based on formatter provided by interface
 	formatted, err := r.Format(renderedOutput)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not format output: %w", err)
 	}
 	return formatted, nil
 }
