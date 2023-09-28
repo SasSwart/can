@@ -19,7 +19,7 @@ func Test_Render_Render(t *testing.T) {
 	}(tempFolder)
 
 	// TODO test this in a language agnostic way or move to E2E testing suite
-	cfg := golang.NewGinServerTestConfig()
+	cfg := golang.NewGinServerTestConfig("../render/go/config_goginserver_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
 	err := cfg.Load()
 	if err != nil {
 		t.Errorf(err.Error())

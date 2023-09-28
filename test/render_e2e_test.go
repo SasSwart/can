@@ -23,7 +23,7 @@ func TestGolang_GinServer_Renderer(t *testing.T) {
 		}
 	}(tempFolder)
 
-	cfg := golang.NewGinServerTestConfig()
+	cfg := golang.NewGinServerTestConfig("../render/go/config_goginserver_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
 	err := cfg.Load()
 	if err != nil {
 		t.Errorf(err.Error())
@@ -60,7 +60,7 @@ func TestGolang_GoClient_Renderer(t *testing.T) {
 		}
 	}(tempFolder)
 
-	cfg := golang.NewGoClientTestConfig()
+	cfg := golang.NewGoClientTestConfig("../render/go/config_goclient_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
 	err := cfg.Load()
 	if err != nil {
 		t.Errorf(err.Error())
@@ -110,7 +110,7 @@ func TestGolang_GoClient_Renderer_HeavyNesting(t *testing.T) {
 			t.Errorf(err.Error())
 		}
 	}(tempFolder)
-	cfg := golang.NewGoClientTestConfig()
+	cfg := golang.NewGoClientTestConfig("../render/go/config_goclient_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
 	if err := cfg.Load(); err != nil {
 		t.Error(err)
 	}
@@ -159,7 +159,7 @@ func TestGolang_GoGin_Renderer_HeavyNesting(t *testing.T) {
 			t.Errorf(err.Error())
 		}
 	}(tempFolder)
-	cfg := golang.NewGinServerTestConfig()
+	cfg := golang.NewGinServerTestConfig("../render/go/config_goginserver_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
 	if err := cfg.Load(); err != nil {
 		t.Error(err)
 	}
@@ -200,6 +200,187 @@ func TestGolang_GoGin_Renderer_HeavyNesting(t *testing.T) {
 	}
 }
 
+func TestRegression_GoClient_EmptyRequestAndResponseBodiesShouldRender(t *testing.T) {
+	tempFolder, _ := os.MkdirTemp(os.TempDir(), "CanTestArtifacts")
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+	}(tempFolder)
+
+	cfg := golang.NewGoClientTestConfig("fixtures/regressions/empty_bodies/config_goclient_empty_bodies.yml", "fixtures/regressions/empty_bodies/empty_bodies.yml")
+	err := cfg.Load()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	cfg.OutputPath = tempFolder
+	e := render.Engine{}.With(&golang.Renderer{Base: &render.Base{}}, cfg)
+	r := *e.GetRenderer()
+	r.SetTemplateFuncMap(nil)
+	if r.GetTemplateFuncMap() == nil {
+		t.Errorf("TemplateFuncMap should NOT be nil")
+	}
+	api, err := openapi.LoadFromYaml(cfg.OpenAPIFile)
+	if err != nil {
+		t.Error(err)
+	}
+
+	api.SetMetadata(tree.Metadata{
+		"package": cfg.Template.BasePackageName,
+	})
+	_, err = tree.Traverse(api, e.BuildRenderNode())
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	// Patch file assertions
+	file, err := os.Open(filepath.Join(tempFolder, "EmptyRequestAndResponseApiResourcePatch.go"))
+	if err != nil {
+		t.Error(err)
+	}
+	want1 := "type EmptyRequestAndResponseApiResourcePatchRequestBody struct{}"
+	want2 := "type EmptyRequestAndResponseApiResourcePatch204Response struct{}"
+	if err := fileShouldContain(file, want1, want2); err != nil {
+		t.Error(err)
+	}
+	if err := file.Close(); err != nil {
+		t.Error(err)
+	}
+
+	// Delete file assertions
+	file, err = os.Open(filepath.Join(tempFolder, "EmptyRequestAndResponseApiResourceDelete.go"))
+	if err != nil {
+		t.Error(err)
+	}
+	want1 = "type EmptyRequestAndResponseApiResourceDeleteRequestBody struct{}"
+	want2 = "type EmptyRequestAndResponseApiResourceDelete204Response struct{}"
+	if err := fileShouldContain(file, want1, want2); err != nil {
+		t.Error(err)
+	}
+	if err := file.Close(); err != nil {
+		t.Error(err)
+	}
+
+	// Get file assertions
+	file, err = os.Open(filepath.Join(tempFolder, "EmptyRequestAndResponseApiResourceGet.go"))
+	if err != nil {
+		t.Error(err)
+	}
+	want1 = "type EmptyRequestAndResponseApiResourceGetRequestBody struct{}"
+	want2 = "type EmptyRequestAndResponseApiResourceGet200Response struct{}"
+	if err := fileShouldContain(file, want1, want2); err != nil {
+		t.Error(err)
+	}
+	if err := file.Close(); err != nil {
+		t.Error(err)
+	}
+
+	// Post file assertions
+	file, err = os.Open(filepath.Join(tempFolder, "EmptyRequestAndResponseApiResourcePost.go"))
+	if err != nil {
+		t.Error(err)
+	}
+	want1 = "type EmptyRequestAndResponseApiResourcePostRequestBody struct{}"
+	want2 = "type EmptyRequestAndResponseApiResourcePost201Response struct{}"
+	if err := fileShouldContain(file, want1, want2); err != nil {
+		t.Error(err)
+	}
+	if err := file.Close(); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestRegression_GoGin_EmptyRequestAndResponseBodiesShouldRender(t *testing.T) {
+	tempFolder, _ := os.MkdirTemp(os.TempDir(), "CanTestArtifacts")
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+	}(tempFolder)
+
+	cfg := golang.NewGinServerTestConfig("fixtures/regressions/empty_bodies/config_goclient_empty_bodies.yml", "fixtures/regressions/empty_bodies/empty_bodies.yml")
+	err := cfg.Load()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	cfg.OutputPath = tempFolder
+	e := render.Engine{}.With(&golang.Renderer{Base: &render.Base{}}, cfg)
+	r := *e.GetRenderer()
+	r.SetTemplateFuncMap(nil)
+	if r.GetTemplateFuncMap() == nil {
+		t.Errorf("TemplateFuncMap should NOT be nil")
+	}
+	api, err := openapi.LoadFromYaml(cfg.OpenAPIFile)
+	if err != nil {
+		t.Error(err)
+	}
+
+	api.SetMetadata(tree.Metadata{
+		"package": cfg.Template.BasePackageName,
+	})
+	_, err = tree.Traverse(api, e.BuildRenderNode())
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	// Patch file assertions
+	file, err := os.Open(filepath.Join(tempFolder, "EmptyRequestAndResponseApiResourcePatch.go"))
+	if err != nil {
+		t.Error(err)
+	}
+	want1 := "type EmptyRequestAndResponseApiResourcePatchRequestBody struct{}"
+	want2 := "type EmptyRequestAndResponseApiResourcePatch204Response struct{}"
+	if err := fileShouldContain(file, want1, want2); err != nil {
+		t.Error(err)
+	}
+	if err := file.Close(); err != nil {
+		t.Error(err)
+	}
+
+	// Delete file assertions
+	file, err = os.Open(filepath.Join(tempFolder, "EmptyRequestAndResponseApiResourceDelete.go"))
+	if err != nil {
+		t.Error(err)
+	}
+	want1 = "type EmptyRequestAndResponseApiResourceDeleteRequestBody struct{}"
+	want2 = "type EmptyRequestAndResponseApiResourceDelete204Response struct{}"
+	if err := fileShouldContain(file, want1, want2); err != nil {
+		t.Error(err)
+	}
+	if err := file.Close(); err != nil {
+		t.Error(err)
+	}
+
+	// Get file assertions
+	file, err = os.Open(filepath.Join(tempFolder, "EmptyRequestAndResponseApiResourceGet.go"))
+	if err != nil {
+		t.Error(err)
+	}
+	want1 = "type EmptyRequestAndResponseApiResourceGetRequestBody struct{}"
+	want2 = "type EmptyRequestAndResponseApiResourceGet200Response struct{}"
+	if err := fileShouldContain(file, want1, want2); err != nil {
+		t.Error(err)
+	}
+	if err := file.Close(); err != nil {
+		t.Error(err)
+	}
+
+	// Post file assertions
+	file, err = os.Open(filepath.Join(tempFolder, "EmptyRequestAndResponseApiResourcePost.go"))
+	if err != nil {
+		t.Error(err)
+	}
+	want1 = "type EmptyRequestAndResponseApiResourcePostRequestBody struct{}"
+	want2 = "type EmptyRequestAndResponseApiResourcePost201Response struct{}"
+	if err := fileShouldContain(file, want1, want2); err != nil {
+		t.Error(err)
+	}
+	if err := file.Close(); err != nil {
+		t.Error(err)
+	}
+}
 func assertFilesPresent(parentDirectoryPath string, haystack [12]string) func(currentFilePath string, info os.FileInfo, err error) error {
 	return func(currentFilePath string, info os.FileInfo, err error) error {
 		// handle error, return if present
@@ -226,7 +407,7 @@ func findFile(needle string, haystack [12]string) error {
 	}
 	return nil
 }
-func fileShouldContain(file *os.File, needle string) error {
+func fileShouldContain(file *os.File, needles ...string) error {
 	fileInfo, err := file.Stat()
 	if err != nil {
 		return err
@@ -235,8 +416,10 @@ func fileShouldContain(file *os.File, needle string) error {
 	if _, err := io.ReadFull(file, buf); err != nil {
 		return err
 	}
-	if !strings.Contains(string(buf), needle) {
-		return fmt.Errorf("rendered file does not contain %s", needle)
+	for _, needle := range needles {
+		if !strings.Contains(string(buf), needle) {
+			return fmt.Errorf("rendered file does not contain %s", needle)
+		}
 	}
 	return nil
 }

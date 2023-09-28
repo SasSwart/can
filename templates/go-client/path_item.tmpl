@@ -37,7 +37,7 @@ import (
 
 
 {{- range $name, $operation := .Operations }}
-func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, params *{{ $operation.GetName | SanitiseName }}Parameters, body *{{ $operation.RequestBody.GetName | SanitiseName }}) ([]byte, error) {
+func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, params *{{ $operation.GetName | SanitiseName }}Parameters, body *{{ $operation.RequestBody.GetName | SanitiseName }}) (*http.Response, error) {
     if ctx == nil {
         ctx = context.Background()
     }
@@ -74,7 +74,7 @@ func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, pa
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Content-Type", c.cfg.ContentType) // TODO this feels hacky
+	req.Header.Add("Content-Type", c.cfg.ContentType)
     if c.auth != nil {
         err = c.auth(req)
         if err != nil {
@@ -82,26 +82,7 @@ func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, pa
         }
     }
 
-	res, err := c.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	if res.StatusCode < 200 || res.StatusCode > 399 {
-	    var body []byte
-	    body, err := io.ReadAll(res.Body)
-	    if err == nil { // Close body if it is not nil and is read successfully
-            defer res.Body.Close() // TODO figure out how to bubble this error up for checking
-	    }
-		return nil, fmt.Errorf("status code check failed :: url %s :: returned %d :: body %v", URL.String(), res.StatusCode, string(body))
-	}
-
-	defer res.Body.Close() // TODO figure out how to bubble this error up for checking
-
-	responseBytes, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-	return responseBytes, nil
+	return c.Do(req)
 }
 {{- end }}
 
