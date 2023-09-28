@@ -13,21 +13,3 @@ type Renderer interface {
 	ParseTemplate(string, string) (*template.Template, error)
 	RenderToText(*template.Template, tree.NodeTraverser) ([]byte, error)
 }
-
-// Base defines the base render object. This should be used as a compositional base for specialising it's interface
-// towards a specific use case.
-//type Base struct {
-//	templateFuncMapping *template.FuncMap
-//}
-//
-//func (b *Base) GetTemplateFuncMap() *template.FuncMap {
-//	return b.templateFuncMapping
-//}
-//func (b *Base) SetTemplateFuncMap(funcMap *template.FuncMap) {
-//	b.templateFuncMapping = funcMap
-//}
-//
-//func (b *Base) Format(input []byte) ([]byte, error) {
-//	fmt.Println("no formatter implemented")
-//	return input, nil
-//}

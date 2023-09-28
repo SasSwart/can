@@ -17,8 +17,9 @@ import (
 )
 
 type EngineInterface interface {
-	With(renderer Renderer, config config.Data) *Engine
+	With(config.Data) Engine
 	GetRenderer() Renderer
+	SetRenderer(renderer Renderer)
 	BuildRenderNode() tree.TraversalFunc
 
 	render(data tree.NodeTraverser, templateFile string) ([]byte, error)
@@ -30,14 +31,17 @@ type Engine struct {
 
 var _ EngineInterface = Engine{}
 
-func (e Engine) With(renderer Renderer, config config.Data) *Engine {
-	return &Engine{renderer: renderer, config: config}
+func (e Engine) With(config config.Data) Engine {
+	return Engine{config: config}
 }
 
 func (e Engine) GetRenderer() Renderer {
 	return e.renderer
 }
 
+func (e Engine) SetRenderer(r Renderer) {
+	e.renderer = r
+}
 func (e Engine) BuildRenderNode() tree.TraversalFunc {
 	return func(key string, parent, node tree.NodeTraverser) (tree.NodeTraverser, error) {
 		if s, ok := node.(*schema.Schema); ok {
