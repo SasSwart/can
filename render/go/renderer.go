@@ -19,32 +19,26 @@ import (
 var _ render.Renderer = &Renderer{}
 
 type Renderer struct {
-	*render.Base
+	funcMap *template.FuncMap
 }
 
 func (g *Renderer) SetTemplateFuncMap(f *template.FuncMap) {
-	if f != nil {
-		g.Base.SetTemplateFuncMap(f)
-		return
-	}
-	g.Base.SetTemplateFuncMap(&template.FuncMap{
-		"ToUpper": strings.ToUpper,
-		"ToTitle": ToTitle,
-		"StringsReplace": func(input, from, to string) string {
-			return strings.Replace(input, from, to, -1)
-		},
-		// TODO this should NOT be self-referential
-		"SanitiseName": g.SanitiseName,
-		"SanitiseType": g.SanitiseType,
-	})
+	g.funcMap = f
 }
 
 func (g *Renderer) GetTemplateFuncMap() *template.FuncMap {
-	return g.Base.GetTemplateFuncMap()
+	return g.funcMap
+}
+func (g *Renderer) Format(input []byte) ([]byte, error) {
+	return format.Source(input)
+}
+
+func (g *Renderer) GetOutputFilename(n tree.NodeTraverser) string {
+	return SanitiseName(n.GetName()) + ".go"
 }
 
 // SanitiseType sanitizes the prepares the contents of the Type field of a node for use by the renderer
-func (g *Renderer) SanitiseType(n tree.NodeTraverser) string {
+func SanitiseType(n tree.NodeTraverser) string {
 	if n == nil {
 		return ""
 	}
@@ -53,7 +47,7 @@ func (g *Renderer) SanitiseType(n tree.NodeTraverser) string {
 		case "boolean":
 			return "bool"
 		case "array":
-			return "[]" + g.SanitiseName(s.GetChildren()[schema.ItemsKey].(*schema.Schema).GetName())
+			return "[]" + SanitiseName(s.GetChildren()[schema.ItemsKey].(*schema.Schema).GetName())
 		case "integer":
 			return "int"
 		case "object":
@@ -65,18 +59,10 @@ func (g *Renderer) SanitiseType(n tree.NodeTraverser) string {
 	return ""
 }
 
-func (g *Renderer) Format(input []byte) ([]byte, error) {
-	return format.Source(input)
-}
-
-func (g *Renderer) GetOutputFilename(n tree.NodeTraverser) string {
-	return g.SanitiseName(n.GetName()) + ".go"
-}
-
 // SanitiseName should consume the result of an NodeTraverser's .GetName() function.
 // It creates a string array that is compliant to go function name restrictions and
 // joins the result before returning a single string.
-func (g *Renderer) SanitiseName(s []string) string {
+func SanitiseName(s []string) string {
 	caser := cases.Title(language.English)
 	var temp []string
 	for _, w := range s {
@@ -190,5 +176,17 @@ func NewGoClientTestConfig(configPath, openAPIPath string) config.Data {
 		},
 		OpenAPIFile: openAPIPath,
 		OutputPath:  ".",
+	}
+}
+
+func DefaultFuncMap() *template.FuncMap {
+	return &template.FuncMap{
+		"ToUpper": strings.ToUpper,
+		"ToTitle": ToTitle,
+		"StringsReplace": func(input, from, to string) string {
+			return strings.Replace(input, from, to, -1)
+		},
+		"SanitiseName": SanitiseName,
+		"SanitiseType": SanitiseType,
 	}
 }

@@ -20,23 +20,23 @@ import (
 
 type EngineInterface interface {
 	With(renderer Renderer, config config.Data) *Engine
-	GetRenderer() *Renderer
+	GetRenderer() Renderer
 	BuildRenderNode() tree.TraversalFunc
 
 	render(data tree.NodeTraverser, templateFile string) ([]byte, error)
 }
 type Engine struct {
-	renderer *Renderer
+	renderer Renderer
 	config   config.Data
 }
 
 var _ EngineInterface = Engine{}
 
 func (e Engine) With(renderer Renderer, config config.Data) *Engine {
-	return &Engine{renderer: &renderer, config: config}
+	return &Engine{renderer: renderer, config: config}
 }
 
-func (e Engine) GetRenderer() *Renderer {
+func (e Engine) GetRenderer() Renderer {
 	return e.renderer
 }
 
@@ -73,7 +73,7 @@ func (e Engine) BuildRenderNode() tree.TraversalFunc {
 
 // Render contains the parsing and rendering steps
 func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte, error) {
-	r := *e.GetRenderer()
+	r := e.GetRenderer()
 	if r.GetTemplateFuncMap() == nil {
 		return nil, fmt.Errorf("e.render()::: template function mapping not set")
 	}

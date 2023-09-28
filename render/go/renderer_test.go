@@ -5,7 +5,6 @@ import (
 	"github.com/sasswart/gin-in-a-can/openapi/media"
 	"github.com/sasswart/gin-in-a-can/openapi/request"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
-	"github.com/sasswart/gin-in-a-can/render"
 	golang "github.com/sasswart/gin-in-a-can/render/go"
 	"github.com/sasswart/gin-in-a-can/test"
 	"github.com/sasswart/gin-in-a-can/tree"
@@ -14,8 +13,8 @@ import (
 )
 
 func TestGolang_SetTemplateFuncMap(t *testing.T) {
-	g := &golang.Renderer{Base: &render.Base{}}
-	g.SetTemplateFuncMap(nil)
+	g := golang.Renderer{}
+	g.SetTemplateFuncMap(golang.DefaultFuncMap())
 	if g.GetTemplateFuncMap() == nil {
 		t.Errorf("GetTemplateFuncMap() error")
 	}
@@ -80,9 +79,8 @@ func TestGolang_SanitiseName(t *testing.T) {
 	}
 	for _, testCase := range tests {
 		t.Run(testCase.name, func(t *testing.T) {
-			renderer := &golang.Renderer{}
 			want := testCase.expected
-			got := renderer.SanitiseName(testCase.node.GetName())
+			got := golang.SanitiseName(testCase.node.GetName())
 			if want != got {
 				t.Errorf("Wanted %s but got %s\n", want, got)
 			}
@@ -136,9 +134,8 @@ func TestGolang_SanitiseType(t *testing.T) {
 	}
 	for _, testCase := range tests {
 		t.Run(testCase.name, func(t *testing.T) {
-			renderer := &golang.Renderer{}
 			want := testCase.expected
-			got := renderer.SanitiseType(testCase.schema)
+			got := golang.SanitiseType(testCase.schema)
 			if want != got {
 				t.Errorf("Wanted %s but got %s\n", want, got)
 			}
