@@ -32,6 +32,9 @@ func (g *Renderer) ParseTemplate(templateFilename, templateDirectory string) (*t
 }
 
 func (g *Renderer) RenderToText(parsedTemplate *template.Template, node tree.NodeTraverser) ([]byte, error) {
+	if parsedTemplate == nil {
+		return nil, fmt.Errorf("parsedTemplate is nil")
+	}
 	buff := bytes.NewBuffer([]byte{})
 	err := parsedTemplate.Execute(buff, node)
 	if err != nil {
@@ -86,7 +89,7 @@ func SanitiseName(s []string) string {
 	for _, w := range s {
 		var delim string
 		switch true {
-		case isHttpStatusCode(w):
+		case IsHttpStatusCode(w):
 			temp = append(temp, w)
 			continue
 		case strings.Contains(w, "/"):
@@ -126,7 +129,7 @@ func CreateFunctionString(s string) (ret string) {
 	return ret
 }
 
-func isHttpStatusCode(s string) bool {
+func IsHttpStatusCode(s string) bool {
 	if code, err := strconv.Atoi(s); err == nil {
 		if 100 <= code && code <= 599 {
 			return true
