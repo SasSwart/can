@@ -10,6 +10,8 @@ type Renderer interface {
 	SetTemplateFuncMap(*template.FuncMap)
 	GetTemplateFuncMap() *template.FuncMap
 	Format([]byte) ([]byte, error)
+	ParseTemplate(string, string) (*template.Template, error)
+	RenderToText(*template.Template, tree.NodeTraverser) ([]byte, error)
 }
 
 // Base defines the base render object. This should be used as a compositional base for specialising it's interface

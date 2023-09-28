@@ -4,7 +4,6 @@
 package render
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"github.com/sasswart/gin-in-a-can/config"
@@ -15,7 +14,6 @@ import (
 	"github.com/sasswart/gin-in-a-can/tree"
 	"os"
 	"path/filepath"
-	"text/template"
 )
 
 type EngineInterface interface {
@@ -42,74 +40,66 @@ func (e Engine) GetRenderer() Renderer {
 
 func (e Engine) BuildRenderNode() tree.TraversalFunc {
 	return func(key string, parent, node tree.NodeTraverser) (tree.NodeTraverser, error) {
-		var templateFile string
-		switch node.(type) {
-		case *openapi.OpenAPI:
-			templateFile = "openapi.tmpl"
-		case *path.Item:
-			templateFile = "path_item.tmpl"
-		case *operation.Operation:
-			templateFile = "operation.tmpl"
-		case *schema.Schema:
-			schemaType := node.(*schema.Schema).Type
-			if schemaType != "object" && schemaType != "array" {
+		if s, ok := node.(*schema.Schema); ok {
+			if s.Type != "object" && s.Type != "array" {
 				return node, nil
 			}
-			templateFile = "schema.tmpl"
 		}
 
+		templateFile := getTemplateFilename(node)
 		if templateFile == "" {
 			return node, nil
 		}
-
-		_, err := e.render(node, templateFile)
+		output, err := e.render(node, templateFile)
 		if err != nil {
 			return node, fmt.Errorf("could not render into %s - possible syntax error in output after templating: %w", templateFile, err)
 		}
-
+		if !config.Dryrun {
+			outPath := filepath.Join(e.config.GetOutputDir(), e.GetRenderer().GetOutputFilename(node))
+			if err := writeToDisk(output, outPath); err != nil {
+				return nil, err
+			}
+			if config.Debug {
+				fmt.Printf("written %d bytes to %s\n", len(output), outPath)
+			}
+		}
 		return node, nil
 	}
+}
+
+func getTemplateFilename(node tree.NodeTraverser) string {
+	switch node.(type) {
+	case *openapi.OpenAPI:
+		return "openapi.tmpl"
+	case *path.Item:
+		return "path_item.tmpl"
+	case *operation.Operation:
+		return "operation.tmpl"
+	case *schema.Schema:
+		return "schema.tmpl"
+	}
+	return ""
 }
 
 // Render contains the parsing and rendering steps
 func (e Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte, error) {
 	r := e.GetRenderer()
-	if r.GetTemplateFuncMap() == nil {
-		return nil, fmt.Errorf("e.render()::: template function mapping not set")
-	}
-	templater := template.New(templateFilename)
-	templater.Funcs(*r.GetTemplateFuncMap())
-
-	parsedTemplate, err := templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", e.config.GetTemplateFilesDir()))
+	templateDirectory := e.config.GetTemplateFilesDir()
+	parsedTemplate, err := r.ParseTemplate(templateFilename, templateDirectory)
 	if err != nil {
 		return nil, err
 	}
-
-	buff := bytes.NewBuffer([]byte{})
-	err = parsedTemplate.Execute(buff, node)
-	if err != nil {
-		return nil, err
-	}
-
+	renderedOutput, err := r.RenderToText(parsedTemplate, node)
 	if config.Debug {
 		fmt.Printf("Rendering %s using %s\n", r.GetOutputFilename(node), templateFilename)
-		fmt.Println(string(buff.Bytes()))
+		fmt.Println(string(renderedOutput))
 	}
 	// format code based on formatter provided by interface
-	formatted, err := r.Format(buff.Bytes())
+	formatted, err := r.Format(renderedOutput)
 	if err != nil {
 		return nil, err
 	}
-	outPath := filepath.Join(e.config.GetOutputDir(), r.GetOutputFilename(node))
-	if !config.Dryrun {
-		if err := writeToDisk(formatted, outPath); err != nil {
-			return nil, err
-		}
-		if config.Debug {
-			fmt.Printf("written %d bytes to %s\n", buff.Len(), outPath)
-		}
-	}
-	return buff.Bytes(), nil
+	return formatted, nil
 }
 
 func writeToDisk(contents []byte, outPath string) error {

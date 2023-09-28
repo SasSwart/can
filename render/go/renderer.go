@@ -4,6 +4,8 @@
 package golang
 
 import (
+	"bytes"
+	"fmt"
 	"github.com/sasswart/gin-in-a-can/config"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/render"
@@ -20,6 +22,22 @@ var _ render.Renderer = &Renderer{}
 
 type Renderer struct {
 	funcMap *template.FuncMap
+}
+
+func (g *Renderer) ParseTemplate(templateFilename, templateDirectory string) (*template.Template, error) {
+	templater := template.New(templateFilename)
+	funcMap := g.GetTemplateFuncMap()
+	templater.Funcs(*funcMap)
+	return templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", templateDirectory))
+}
+
+func (g *Renderer) RenderToText(parsedTemplate *template.Template, node tree.NodeTraverser) ([]byte, error) {
+	buff := bytes.NewBuffer([]byte{})
+	err := parsedTemplate.Execute(buff, node)
+	if err != nil {
+		return nil, err
+	}
+	return buff.Bytes(), nil
 }
 
 func (g *Renderer) SetTemplateFuncMap(f *template.FuncMap) {
