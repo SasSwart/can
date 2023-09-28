@@ -29,12 +29,9 @@ func TestGolang_GinServer_Renderer(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 	cfg.OutputPath = tempFolder
-	e := render.Engine{}.With(&golang.Renderer{Base: &render.Base{}}, cfg)
+	e := render.Engine{}.With(&golang.Renderer{}, cfg)
 	r := e.GetRenderer()
-	r.SetTemplateFuncMap(nil)
-	if r.GetTemplateFuncMap() == nil {
-		t.Errorf("TemplateFuncMap should NOT be nil")
-	}
+	r.SetTemplateFuncMap(golang.DefaultFuncMap())
 
 	// We have to pop the first element off the path constant
 	apiTree, err := openapi.LoadAPISpec(filepath.Join(strings.Split(OpenapiFile, "/")[1:]...))
@@ -66,12 +63,9 @@ func TestGolang_GoClient_Renderer(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 	cfg.OutputPath = tempFolder
-	e := render.Engine{}.With(&golang.Renderer{Base: &render.Base{}}, cfg)
+	e := render.Engine{}.With(&golang.Renderer{}, cfg)
 	r := e.GetRenderer()
-	r.SetTemplateFuncMap(nil)
-	if r.GetTemplateFuncMap() == nil {
-		t.Errorf("TemplateFuncMap should NOT be nil")
-	}
+	r.SetTemplateFuncMap(golang.DefaultFuncMap())
 
 	// We have to pop the first element off the path constant
 	apiTree, err := openapi.LoadAPISpec(filepath.Join(strings.Split(OpenapiFile, "/")[1:]...))
@@ -116,12 +110,9 @@ func TestGolang_GoClient_Renderer_HeavyNesting(t *testing.T) {
 	}
 	cfg.OpenAPIFile = "test/fixtures/heavy_nesting.yaml"
 	cfg.OutputPath = tempFolder
-	e := render.Engine{}.With(&golang.Renderer{Base: &render.Base{}}, cfg)
-	r := e.GetRenderer()
-	r.SetTemplateFuncMap(nil)
-	if r.GetTemplateFuncMap() == nil {
-		t.Errorf("TemplateFuncMap should NOT be nil")
-	}
+	r := &golang.Renderer{}
+	r.SetTemplateFuncMap(golang.DefaultFuncMap())
+	e := render.Engine{}.With(r, cfg)
 
 	// We have to pop the first element off the path constant
 	apiTree, err := openapi.LoadAPISpec(filepath.Join(strings.Split(cfg.OpenAPIFile, "/")[1:]...))
@@ -164,12 +155,9 @@ func TestGolang_GoGin_Renderer_HeavyNesting(t *testing.T) {
 	}
 	cfg.OpenAPIFile = "test/fixtures/heavy_nesting.yaml"
 	cfg.OutputPath = tempFolder
-	e := render.Engine{}.With(&golang.Renderer{Base: &render.Base{}}, cfg)
-	r := e.GetRenderer()
-	r.SetTemplateFuncMap(nil)
-	if r.GetTemplateFuncMap() == nil {
-		t.Errorf("TemplateFuncMap should NOT be nil")
-	}
+	r := &golang.Renderer{}
+	r.SetTemplateFuncMap(golang.DefaultFuncMap())
+	e := render.Engine{}.With(r, cfg)
 
 	// We have to pop the first element off the path constant
 	apiTree, err := openapi.LoadAPISpec(filepath.Join(strings.Split(cfg.OpenAPIFile, "/")[1:]...))

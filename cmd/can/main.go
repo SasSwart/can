@@ -52,14 +52,15 @@ func setRenderStrategy(cfg config.Data) error {
 	var r render.Renderer
 	switch cfg.Template.Strategy {
 	case "go":
-		r = &golang.Renderer{Base: &render.Base{}}
+		r = &golang.Renderer{}
+		r.SetTemplateFuncMap(golang.DefaultFuncMap())
 	case "openapi-3":
 		return fmt.Errorf("openapi-3 renderer not implemented yet")
 	default:
-		fmt.Printf("No rendering strategy set. Defaulting to go\n")
-		r = &golang.Renderer{Base: &render.Base{}}
+		fmt.Println("No rendering strategy set. Defaulting to go")
+		r = &golang.Renderer{}
+		r.SetTemplateFuncMap(golang.DefaultFuncMap())
 	}
-	r.SetTemplateFuncMap(nil)
 	Renderer = e.With(r, cfg)
 	return nil
 }

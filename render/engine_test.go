@@ -25,12 +25,9 @@ func Test_Render_Render(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 	cfg.OutputPath = tempFolder
-	e := render.Engine{}.With(&golang.Renderer{Base: &render.Base{}}, cfg)
-	r := e.GetRenderer()
-	r.SetTemplateFuncMap(nil)
-	if r.GetTemplateFuncMap() == nil {
-		t.Errorf("TemplateFuncMap should NOT be nil")
-	}
+	r := &golang.Renderer{}
+	r.SetTemplateFuncMap(golang.DefaultFuncMap())
+	e := render.Engine{}.With(r, cfg)
 	_, err = tree.Traverse(test.OpenAPITree(), e.BuildRenderNode())
 	if err != nil {
 		t.Errorf(err.Error())
