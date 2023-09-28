@@ -26,7 +26,7 @@ func Test_Render_Render(t *testing.T) {
 	}
 	cfg.OutputPath = tempFolder
 	e := render.Engine{}.With(&golang.Renderer{Base: &render.Base{}}, cfg)
-	r := *e.GetRenderer()
+	r := e.GetRenderer()
 	r.SetTemplateFuncMap(nil)
 	if r.GetTemplateFuncMap() == nil {
 		t.Errorf("TemplateFuncMap should NOT be nil")

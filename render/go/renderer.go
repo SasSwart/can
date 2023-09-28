@@ -22,7 +22,7 @@ type Renderer struct {
 	*render.Base
 }
 
-func (g *Renderer) SetTemplateFuncMap(f *template.FuncMap) {
+func (g Renderer) SetTemplateFuncMap(f *template.FuncMap) {
 	if f != nil {
 		g.Base.SetTemplateFuncMap(f)
 		return
@@ -39,12 +39,12 @@ func (g *Renderer) SetTemplateFuncMap(f *template.FuncMap) {
 	})
 }
 
-func (g *Renderer) GetTemplateFuncMap() *template.FuncMap {
+func (g Renderer) GetTemplateFuncMap() *template.FuncMap {
 	return g.Base.GetTemplateFuncMap()
 }
 
 // SanitiseType sanitizes the prepares the contents of the Type field of a node for use by the renderer
-func (g *Renderer) SanitiseType(n tree.NodeTraverser) string {
+func (g Renderer) SanitiseType(n tree.NodeTraverser) string {
 	if n == nil {
 		return ""
 	}
@@ -65,18 +65,18 @@ func (g *Renderer) SanitiseType(n tree.NodeTraverser) string {
 	return ""
 }
 
-func (g *Renderer) Format(input []byte) ([]byte, error) {
+func (g Renderer) Format(input []byte) ([]byte, error) {
 	return format.Source(input)
 }
 
-func (g *Renderer) GetOutputFilename(n tree.NodeTraverser) string {
+func (g Renderer) GetOutputFilename(n tree.NodeTraverser) string {
 	return g.SanitiseName(n.GetName()) + ".go"
 }
 
 // SanitiseName should consume the result of an NodeTraverser's .GetName() function.
 // It creates a string array that is compliant to go function name restrictions and
 // joins the result before returning a single string.
-func (g *Renderer) SanitiseName(s []string) string {
+func (g Renderer) SanitiseName(s []string) string {
 	caser := cases.Title(language.English)
 	var temp []string
 	for _, w := range s {
