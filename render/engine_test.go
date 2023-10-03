@@ -30,17 +30,13 @@ func Test_Render_Render(t *testing.T) {
 	}(tempFolder)
 
 	// TODO test this in a language agnostic way or move to E2E testing suite
-	cfg := golang.NewGinServerTestConfig("../render/go/config_goginserver_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
-	err := cfg.Load()
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+	cfg := golang.MustLoadGinServerTestConfig("../render/go/config_goginserver_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
 	cfg.OutputPath = tempFolder
 	r := &golang.Renderer{}
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
 	e := render.NewEngine(cfg)
 	e.SetRenderer(r)
-	_, err = tree.Traverse(test.OpenAPITree(), e.Render)
+	_, err := tree.Traverse(test.OpenAPITree(), e.Render)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -88,11 +84,7 @@ func TestParseTemplate(t *testing.T) {
 
 	// Create a Renderer instance
 
-	cfg := golang.NewGoClientTestConfig("../render/go/config_goclient_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
-	err := cfg.Load()
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+	cfg := golang.MustLoadGoClientTestConfig("../render/go/config_goclient_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
 	e := render.NewEngine(cfg)
 	e.SetRenderer(&golang.Renderer{})
 

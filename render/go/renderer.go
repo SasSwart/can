@@ -192,27 +192,34 @@ func ToTitle(s string) (ret string) {
 	return ret
 }
 
-func NewGinServerTestConfig(configPath, openAPIPath string) config.Data {
-	// TODO: `Must` this function and load the returned config before returning it
+func MustLoadGinServerTestConfig(configPath, openAPIPath string) config.Data {
 	config.ConfigFilePath = configPath
 	config.Debug = true
-	return config.Data{
+	c := config.Data{
 		Template: config.Template{
 			Name: "go-gin",
 		},
 		OpenAPIFile: openAPIPath,
 		OutputPath:  ".",
 	}
+	if err := c.Load(); err != nil {
+		panic(err)
+	}
+	return c
 }
-func NewGoClientTestConfig(configPath, openAPIPath string) config.Data {
+func MustLoadGoClientTestConfig(configPath, openAPIPath string) config.Data {
 	// TODO: `Must` this function and load the returned config before returning it
 	config.ConfigFilePath = configPath
 	config.Debug = true
-	return config.Data{
+	c := config.Data{
 		Template: config.Template{
 			Name: "go-client",
 		},
 		OpenAPIFile: openAPIPath,
 		OutputPath:  ".",
 	}
+	if err := c.Load(); err != nil {
+		panic(err)
+	}
+	return c
 }
