@@ -43,7 +43,7 @@ func TestGolang_GinServer_Renderer(t *testing.T) {
 	apiTree.SetMetadata(tree.Metadata{
 		"package": cfg.Template.BasePackageName,
 	})
-	_, err = tree.Traverse(apiTree, e.BuildRenderNode())
+	_, err = tree.Traverse(apiTree, e.Render)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -78,7 +78,7 @@ func TestGolang_GoClient_Renderer(t *testing.T) {
 	apiTree.SetMetadata(tree.Metadata{
 		"package": cfg.Template.BasePackageName,
 	})
-	_, err = tree.Traverse(apiTree, e.BuildRenderNode())
+	_, err = tree.Traverse(apiTree, e.Render)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -126,7 +126,7 @@ func TestGolang_GoClient_Renderer_HeavyNesting(t *testing.T) {
 	apiTree.SetMetadata(tree.Metadata{
 		"package": cfg.Template.BasePackageName,
 	})
-	if _, err := tree.Traverse(apiTree, e.BuildRenderNode()); err != nil {
+	if _, err := tree.Traverse(apiTree, e.Render); err != nil {
 		t.Error(err)
 	}
 	if err := filepath.Walk(tempFolder, assertFilesPresent(tempFolder, heavyNestingFilenames)); err != nil {
@@ -173,7 +173,7 @@ func TestGolang_GoGin_Renderer_HeavyNesting(t *testing.T) {
 	apiTree.SetMetadata(tree.Metadata{
 		"package": cfg.Template.BasePackageName,
 	})
-	if _, err := tree.Traverse(apiTree, e.BuildRenderNode()); err != nil {
+	if _, err := tree.Traverse(apiTree, e.Render); err != nil {
 		t.Error(err)
 	}
 	if err := filepath.Walk(tempFolder, assertFilesPresent(tempFolder, heavyNestingFilenames)); err != nil {
@@ -219,7 +219,7 @@ func TestRegression_GoClient_EmptyRequestAndResponseBodiesShouldRender(t *testin
 	api.SetMetadata(tree.Metadata{
 		"package": cfg.Template.BasePackageName,
 	})
-	_, err = tree.Traverse(api, e.BuildRenderNode())
+	_, err = tree.Traverse(api, e.Render)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -308,7 +308,7 @@ func TestRegression_GoGin_EmptyRequestAndResponseBodiesShouldRender(t *testing.T
 	api.SetMetadata(tree.Metadata{
 		"package": cfg.Template.BasePackageName,
 	})
-	_, err = tree.Traverse(api, e.BuildRenderNode())
+	_, err = tree.Traverse(api, e.Render)
 	if err != nil {
 		t.Errorf(err.Error())
 	}

@@ -44,7 +44,7 @@ func main() {
 		"package": cfg.Template.BasePackageName,
 	})
 
-	_, err = tree.Traverse(apiSpec, engine.BuildRenderNode())
+	_, err = tree.Traverse(apiSpec, engine.Render)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)

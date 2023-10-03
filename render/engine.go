@@ -21,9 +21,7 @@ type EngineInterface interface {
 	ParseTemplate(string, string) (*template.Template, error)
 	GetRenderer() Renderer
 	SetRenderer(renderer Renderer)
-	BuildRenderNode() tree.TraversalFunc
-
-	render(data tree.NodeTraverser, templateFile string) ([]byte, error)
+	Render(key string, parent, node tree.NodeTraverser) (tree.NodeTraverser, error)
 }
 type Engine struct {
 	// renderer contains the object responsible for
@@ -54,40 +52,36 @@ func (e *Engine) ParseTemplate(templateFilename, templateDirectory string) (*tem
 	return templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", templateDirectory))
 }
 
-// BuildRenderNode returns a function that fetches the appropriate template name and renders and the provided node to
-// disk.
-// TODO: This could simply be e.Render() as opposed to returning another function
-func (e *Engine) BuildRenderNode() tree.TraversalFunc {
-	return func(key string, parent, node tree.NodeTraverser) (tree.NodeTraverser, error) {
-		if s, ok := node.(*schema.Schema); ok {
-			// This allows us to avoid rendering schemas with these types
-			if s.Type != "object" && s.Type != "array" {
-				return node, nil
-			}
-		}
-
-		// find appropriate template name based on node provided
-		templateFile := GetTemplateFilename(node)
-		if templateFile == "" {
+// Render fetches the appropriate template name and renders yielded by it and the provided node to disk.
+func (e *Engine) Render(key string, parent, node tree.NodeTraverser) (tree.NodeTraverser, error) {
+	if s, ok := node.(*schema.Schema); ok {
+		// This allows us to avoid rendering schemas with these types
+		if s.Type != "object" && s.Type != "array" {
 			return node, nil
 		}
+	}
 
-		// render node and template into output ready to be written to disk
-		output, err := e.render(node, templateFile)
-		if err != nil {
-			return node, fmt.Errorf("could not render into %s: %w", templateFile, err)
-		}
-		if !config.Dryrun {
-			outPath := filepath.Join(e.config.GetOutputDir(), e.GetRenderer().GetOutputFilename(node))
-			if err := WriteToDisk(output, outPath); err != nil {
-				return nil, err
-			}
-			if config.Debug {
-				fmt.Printf("written %d bytes to %s\n", len(output), outPath)
-			}
-		}
+	// find appropriate template name based on node provided
+	templateFile := GetTemplateFilename(node)
+	if templateFile == "" {
 		return node, nil
 	}
+
+	// render node and template into output ready to be written to disk
+	output, err := e.render(node, templateFile)
+	if err != nil {
+		return node, fmt.Errorf("could not render into %s: %w", templateFile, err)
+	}
+	if !config.Dryrun {
+		outPath := filepath.Join(e.config.GetOutputDir(), e.GetRenderer().GetOutputFilename(node))
+		if err := WriteToDisk(output, outPath); err != nil {
+			return nil, err
+		}
+		if config.Debug {
+			fmt.Printf("written %d bytes to %s\n", len(output), outPath)
+		}
+	}
+	return node, nil
 }
 
 func GetTemplateFilename(node tree.NodeTraverser) string {

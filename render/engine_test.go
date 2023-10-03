@@ -40,7 +40,7 @@ func Test_Render_Render(t *testing.T) {
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
 	e := render.NewEngine(cfg)
 	e.SetRenderer(r)
-	_, err = tree.Traverse(test.OpenAPITree(), e.BuildRenderNode())
+	_, err = tree.Traverse(test.OpenAPITree(), e.Render)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
