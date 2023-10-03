@@ -121,7 +121,7 @@ func (d *Data) Load() (err error) {
 	return nil
 }
 
-func (d *Data) GetTemplateFilesDir() (path string) {
+func (d *Data) GetTemplateFilesDir() string {
 	if d.Template.absDirectory != "" {
 		return d.Template.absDirectory
 	}
@@ -132,10 +132,21 @@ func (d *Data) GetTemplateFilesDir() (path string) {
 	case filepath.IsAbs(ConfigFilePath):
 		d.Template.absDirectory = filepath.Join(filepath.Dir(ConfigFilePath), d.TemplatesDir, d.Template.Name)
 		return d.Template.absDirectory
-
 	// No absolute dir provided. Let's build one
 	default:
 		d.Template.absDirectory = filepath.Join(ProcWorkingDir, filepath.Dir(ConfigFilePath), d.TemplatesDir, d.Template.Name)
+		if filepath.IsAbs(d.Template.absDirectory) {
+			if _, err := os.Stat(d.Template.absDirectory); err == nil {
+				return d.Template.absDirectory
+			}
+		}
+		// TODO: use this method to validate all paths returned
+		var err error
+		d.Template.absDirectory, err = filepath.Abs(d.TemplatesDir)
+		if err != nil {
+			// TODO: don't panic
+			panic("could not find template dir")
+		}
 		return d.Template.absDirectory
 	}
 }

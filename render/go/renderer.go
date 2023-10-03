@@ -25,15 +25,6 @@ type Renderer struct {
 	funcMap *template.FuncMap
 }
 
-// ParseTemplate reads the given template and returns a template object with the appropriate function map applied.
-func (g *Renderer) ParseTemplate(templateFilename, templateDirectory string) (*template.Template, error) {
-	// TODO: This may very well be the same implementation for all languages. Consider moving to engine struct
-	templater := template.New(templateFilename)
-	funcMap := g.GetTemplateFuncMap()
-	templater.Funcs(*funcMap)
-	return templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", templateDirectory))
-}
-
 // RenderNode writes the relevant information contained within an openapi node into the provided template and returns
 // the result.
 func (g *Renderer) RenderNode(parsedTemplate *template.Template, node tree.NodeTraverser) ([]byte, error) {
@@ -202,6 +193,7 @@ func ToTitle(s string) (ret string) {
 }
 
 func NewGinServerTestConfig(configPath, openAPIPath string) config.Data {
+	// TODO: `Must` this function and load the returned config before returning it
 	config.ConfigFilePath = configPath
 	config.Debug = true
 	return config.Data{
@@ -213,6 +205,7 @@ func NewGinServerTestConfig(configPath, openAPIPath string) config.Data {
 	}
 }
 func NewGoClientTestConfig(configPath, openAPIPath string) config.Data {
+	// TODO: `Must` this function and load the returned config before returning it
 	config.ConfigFilePath = configPath
 	config.Debug = true
 	return config.Data{

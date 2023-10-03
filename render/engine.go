@@ -14,9 +14,11 @@ import (
 	"github.com/sasswart/gin-in-a-can/tree"
 	"os"
 	"path/filepath"
+	"text/template"
 )
 
 type EngineInterface interface {
+	ParseTemplate(string, string) (*template.Template, error)
 	GetRenderer() Renderer
 	SetRenderer(renderer Renderer)
 	BuildRenderNode() tree.TraversalFunc
@@ -41,6 +43,15 @@ func (e *Engine) GetRenderer() Renderer {
 
 func (e *Engine) SetRenderer(r Renderer) {
 	e.renderer = r
+}
+
+// ParseTemplate reads the given template and returns a template object with the appropriate function map applied.
+func (e *Engine) ParseTemplate(templateFilename, templateDirectory string) (*template.Template, error) {
+	renderer := e.GetRenderer()
+	templater := template.New(templateFilename)
+	funcMap := renderer.GetTemplateFuncMap()
+	templater.Funcs(*funcMap)
+	return templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", templateDirectory))
 }
 
 // BuildRenderNode returns a function that fetches the appropriate template name and renders and the provided node to
@@ -100,7 +111,7 @@ func (e *Engine) render(node tree.NodeTraverser, templateFilename string) ([]byt
 	templateDirectory := e.config.GetTemplateFilesDir()
 
 	// fetch appropriate template object
-	parsedTemplate, err := renderer.ParseTemplate(templateFilename, templateDirectory)
+	parsedTemplate, err := e.ParseTemplate(templateFilename, templateDirectory)
 	if err != nil {
 		return nil, err
 	}
