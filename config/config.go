@@ -12,6 +12,7 @@ import (
 //go:embed version.txt
 var SemVer string
 
+// TODO: move these flags into the config and embed the config into the renderer/engine where needed in order to expose them.
 var (
 	Debug          bool
 	Dryrun         bool

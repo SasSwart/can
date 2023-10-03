@@ -22,7 +22,7 @@ func (mr MockRenderer) ParseTemplate(filename, directory string) (*template.Temp
 	return template.New(filename), nil
 }
 
-func (mr MockRenderer) RenderToText(template *template.Template, traverser tree.NodeTraverser) ([]byte, error) {
+func (mr MockRenderer) RenderNode(template *template.Template, traverser tree.NodeTraverser) ([]byte, error) {
 	return []byte("rendered_output"), nil
 }
 

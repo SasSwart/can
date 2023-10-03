@@ -303,7 +303,7 @@ func TestRenderToText(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			output, err := r.RenderToText(test.parsedTemplate, test.node)
+			output, err := r.RenderNode(test.parsedTemplate, test.node)
 			if (err != nil) != test.expectedErr {
 				t.Errorf("Expected error: %v, but got: %v", test.expectedErr, err)
 			}

@@ -37,7 +37,7 @@ func Test_Render_Render(t *testing.T) {
 	cfg.OutputPath = tempFolder
 	r := &golang.Renderer{}
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
-	e := render.NewEngine().With(cfg)
+	e := render.NewEngine(cfg)
 	e.SetRenderer(r)
 	_, err = tree.Traverse(test.OpenAPITree(), e.BuildRenderNode())
 	if err != nil {
@@ -60,7 +60,7 @@ func TestEngineGetAndSetRenderer(t *testing.T) {
 func TestRender(t *testing.T) {
 	mockRenderer := render.MockRenderer{}
 	mockConfig := config.Data{OutputPath: "../templates"}
-	testEngine := render.NewEngine().With(mockConfig)
+	testEngine := render.NewEngine(mockConfig)
 	testEngine.SetRenderer(mockRenderer)
 
 	mockNode := &schema.Schema{Type: "object"}

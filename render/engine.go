@@ -17,7 +17,6 @@ import (
 )
 
 type EngineInterface interface {
-	With(config.Data) Engine
 	GetRenderer() Renderer
 	SetRenderer(renderer Renderer)
 	BuildRenderNode() tree.TraversalFunc
@@ -25,16 +24,14 @@ type EngineInterface interface {
 	render(data tree.NodeTraverser, templateFile string) ([]byte, error)
 }
 type Engine struct {
+	// renderer contains the object responsible for
 	renderer Renderer
 	config   config.Data
 }
 
 var _ EngineInterface = &Engine{}
 
-func NewEngine() *Engine {
-	return &Engine{}
-}
-func (e *Engine) With(config config.Data) Engine {
+func NewEngine(config config.Data) Engine {
 	return Engine{config: config}
 }
 
@@ -45,18 +42,26 @@ func (e *Engine) GetRenderer() Renderer {
 func (e *Engine) SetRenderer(r Renderer) {
 	e.renderer = r
 }
+
+// BuildRenderNode returns a function that fetches the appropriate template name and renders and the provided node to
+// disk.
+// TODO: This could simply be e.Render() as opposed to returning another function
 func (e *Engine) BuildRenderNode() tree.TraversalFunc {
 	return func(key string, parent, node tree.NodeTraverser) (tree.NodeTraverser, error) {
 		if s, ok := node.(*schema.Schema); ok {
+			// This allows us to avoid rendering schemas with these types
 			if s.Type != "object" && s.Type != "array" {
 				return node, nil
 			}
 		}
 
+		// find appropriate template name based on node provided
 		templateFile := GetTemplateFilename(node)
 		if templateFile == "" {
 			return node, nil
 		}
+
+		// render node and template into output ready to be written to disk
 		output, err := e.render(node, templateFile)
 		if err != nil {
 			return node, fmt.Errorf("could not render into %s: %w", templateFile, err)
@@ -88,21 +93,28 @@ func GetTemplateFilename(node tree.NodeTraverser) string {
 	return ""
 }
 
-// Render contains the parsing and rendering steps
+// Render contains the parsing and rendering steps. It parses a template, renders a node into it and applies any
+// required formatting.
 func (e *Engine) render(node tree.NodeTraverser, templateFilename string) ([]byte, error) {
-	r := e.GetRenderer()
+	renderer := e.GetRenderer()
 	templateDirectory := e.config.GetTemplateFilesDir()
-	parsedTemplate, err := r.ParseTemplate(templateFilename, templateDirectory)
+
+	// fetch appropriate template object
+	parsedTemplate, err := renderer.ParseTemplate(templateFilename, templateDirectory)
 	if err != nil {
 		return nil, err
 	}
-	renderedOutput, err := r.RenderToText(parsedTemplate, node)
+
+	// render the node and template to bytes
+	renderedOutput, err := renderer.RenderNode(parsedTemplate, node)
+	// TODO: this debug output could be moved into renderer.RenderNode
 	if config.Debug {
-		fmt.Printf("Rendering %s using %s\n", r.GetOutputFilename(node), templateFilename)
+		fmt.Printf("Rendering %s using %s\n", renderer.GetOutputFilename(node), templateFilename)
 		fmt.Println(string(renderedOutput))
 	}
+
 	// format code based on formatter provided by interface
-	formatted, err := r.Format(renderedOutput)
+	formatted, err := renderer.Format(renderedOutput)
 	if err != nil {
 		return nil, fmt.Errorf("could not format output: %w", err)
 	}

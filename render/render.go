@@ -11,5 +11,5 @@ type Renderer interface {
 	GetTemplateFuncMap() *template.FuncMap
 	Format([]byte) ([]byte, error)
 	ParseTemplate(string, string) (*template.Template, error)
-	RenderToText(*template.Template, tree.NodeTraverser) ([]byte, error)
+	RenderNode(*template.Template, tree.NodeTraverser) ([]byte, error)
 }

@@ -21,17 +21,22 @@ import (
 var _ render.Renderer = &Renderer{}
 
 type Renderer struct {
+	// TODO add config for flags to be referenced where needed once globals are removed
 	funcMap *template.FuncMap
 }
 
+// ParseTemplate reads the given template and returns a template object with the appropriate function map applied.
 func (g *Renderer) ParseTemplate(templateFilename, templateDirectory string) (*template.Template, error) {
+	// TODO: This may very well be the same implementation for all languages. Consider moving to engine struct
 	templater := template.New(templateFilename)
 	funcMap := g.GetTemplateFuncMap()
 	templater.Funcs(*funcMap)
 	return templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", templateDirectory))
 }
 
-func (g *Renderer) RenderToText(parsedTemplate *template.Template, node tree.NodeTraverser) ([]byte, error) {
+// RenderNode writes the relevant information contained within an openapi node into the provided template and returns
+// the result.
+func (g *Renderer) RenderNode(parsedTemplate *template.Template, node tree.NodeTraverser) ([]byte, error) {
 	if parsedTemplate == nil {
 		return nil, fmt.Errorf("parsedTemplate is nil")
 	}
@@ -50,12 +55,31 @@ func (g *Renderer) SetTemplateFuncMap(f *template.FuncMap) {
 func (g *Renderer) GetTemplateFuncMap() *template.FuncMap {
 	return g.funcMap
 }
+
+// Format applies the same formatter in use in gofmt to a rendered template. This is the standard formatter for all go
+// code.
 func (g *Renderer) Format(input []byte) ([]byte, error) {
 	return format.Source(input)
 }
 
+// GetOutputFilename provides an appropriate filename for any rendered output based on the node provided.
 func (g *Renderer) GetOutputFilename(n tree.NodeTraverser) string {
+	// TODO: SanitiseName is being used to clean output while rendering templates and openapi nodes to byte output.
+	// 	 Perhaps it shouldn't be used here.
 	return SanitiseName(n.GetName()) + ".go"
+}
+
+// DefaultFuncMap contains a function map with sensible defaults for go template rendering
+func DefaultFuncMap() *template.FuncMap {
+	return &template.FuncMap{
+		"ToUpper": strings.ToUpper,
+		"ToTitle": ToTitle,
+		"StringsReplace": func(input, from, to string) string {
+			return strings.Replace(input, from, to, -1)
+		},
+		"SanitiseName": SanitiseName,
+		"SanitiseType": SanitiseType,
+	}
 }
 
 // SanitiseType sanitizes the prepares the contents of the Type field of a node for use by the renderer
@@ -197,17 +221,5 @@ func NewGoClientTestConfig(configPath, openAPIPath string) config.Data {
 		},
 		OpenAPIFile: openAPIPath,
 		OutputPath:  ".",
-	}
-}
-
-func DefaultFuncMap() *template.FuncMap {
-	return &template.FuncMap{
-		"ToUpper": strings.ToUpper,
-		"ToTitle": ToTitle,
-		"StringsReplace": func(input, from, to string) string {
-			return strings.Replace(input, from, to, -1)
-		},
-		"SanitiseName": SanitiseName,
-		"SanitiseType": SanitiseType,
 	}
 }

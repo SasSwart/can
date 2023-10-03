@@ -31,7 +31,7 @@ func TestGolang_GinServer_Renderer(t *testing.T) {
 	cfg.OutputPath = tempFolder
 	r := golang.Renderer{}
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
-	e := render.NewEngine().With(cfg)
+	e := render.NewEngine(cfg)
 	e.SetRenderer(&r)
 
 	// We have to pop the first element off the path constant
@@ -66,7 +66,7 @@ func TestGolang_GoClient_Renderer(t *testing.T) {
 	cfg.OutputPath = tempFolder
 	r := golang.Renderer{}
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
-	e := render.NewEngine().With(cfg)
+	e := render.NewEngine(cfg)
 	e.SetRenderer(&r)
 
 	// We have to pop the first element off the path constant
@@ -114,7 +114,7 @@ func TestGolang_GoClient_Renderer_HeavyNesting(t *testing.T) {
 	cfg.OutputPath = tempFolder
 	r := golang.Renderer{}
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
-	e := render.NewEngine().With(cfg)
+	e := render.NewEngine(cfg)
 	e.SetRenderer(&r)
 
 	// We have to pop the first element off the path constant
@@ -161,7 +161,7 @@ func TestGolang_GoGin_Renderer_HeavyNesting(t *testing.T) {
 	cfg.OutputPath = tempFolder
 	r := golang.Renderer{}
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
-	e := render.NewEngine().With(cfg)
+	e := render.NewEngine(cfg)
 	e.SetRenderer(&r)
 
 	// We have to pop the first element off the path constant
@@ -209,7 +209,7 @@ func TestRegression_GoClient_EmptyRequestAndResponseBodiesShouldRender(t *testin
 	cfg.OutputPath = tempFolder
 	r := golang.Renderer{}
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
-	e := render.NewEngine().With(cfg)
+	e := render.NewEngine(cfg)
 	e.SetRenderer(&r)
 	api, err := openapi.LoadFromYaml(cfg.OpenAPIFile)
 	if err != nil {
@@ -298,7 +298,7 @@ func TestRegression_GoGin_EmptyRequestAndResponseBodiesShouldRender(t *testing.T
 	cfg.OutputPath = tempFolder
 	r := golang.Renderer{}
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
-	e := render.NewEngine().With(cfg)
+	e := render.NewEngine(cfg)
 	e.SetRenderer(&r)
 	api, err := openapi.LoadFromYaml(cfg.OpenAPIFile)
 	if err != nil {

@@ -12,6 +12,7 @@ import (
 
 func main() {
 	fmt.Printf("can %s\n", config.SemVer)
+	// TODO: MustLoadConfig
 	cfg := config.Data{}
 	err := cfg.Load()
 	if err != nil {
@@ -21,15 +22,19 @@ func main() {
 	if config.Debug {
 		fmt.Printf("Reading API specification from \"%s\"\n", cfg.GetOpenAPIFilepath())
 	}
+	// TODO: What if JSON?
+	// TODO: MustLoadOpenApiFile
 	apiSpec, err := openapi.LoadFromYaml(cfg.GetOpenAPIFilepath())
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
-	e := render.NewEngine().With(cfg)
+	engine := render.NewEngine(cfg)
+
 	// Setup appropriate renderer via the `strategy` design pattern
-	err = setStrategy(e, cfg.Template.Strategy)
+	// TODO: MustSetStrategy
+	err = setStrategy(engine, cfg.Template.Strategy)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
@@ -39,12 +44,14 @@ func main() {
 		"package": cfg.Template.BasePackageName,
 	})
 
-	_, err = tree.Traverse(apiSpec, e.BuildRenderNode())
+	_, err = tree.Traverse(apiSpec, engine.BuildRenderNode())
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 }
+
+// setStrategy creates and applies the renderer for the given strategy. An error is returned if the strategy is invalid
 func setStrategy(e render.Engine, strategy string) error {
 	var r render.Renderer
 	switch strategy {
