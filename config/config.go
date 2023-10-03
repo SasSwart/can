@@ -243,14 +243,12 @@ func (d *Data) resolveTemplateConfig() error {
 			}
 		}
 		// Then we look in the executable directory
-		if d.TemplatesDir == "" {
-			for _, dirEnt := range exeDirs {
-				if dirEnt.Name() == "templates" {
-					templateDir := filepath.Join(filepath.Dir(ExePath), "templates")
-					d.TemplatesDir = templateDir
-					fmt.Printf("No template directory specified, defaulting to %s\n", templateDir)
-					break
-				}
+		for _, dirEnt := range exeDirs {
+			if dirEnt.Name() == "templates" {
+				templateDir := filepath.Join(filepath.Dir(ExePath), "templates")
+				d.TemplatesDir = templateDir
+				fmt.Printf("No template directory specified, defaulting to %s\n", templateDir)
+				break
 			}
 		}
 	}

@@ -10,8 +10,6 @@ import (
 	"os"
 )
 
-var Renderer *render.Engine
-
 func main() {
 	fmt.Printf("can %s\n", config.SemVer)
 	cfg := config.Data{}
@@ -23,14 +21,15 @@ func main() {
 	if config.Debug {
 		fmt.Printf("Reading API specification from \"%s\"\n", cfg.GetOpenAPIFilepath())
 	}
-	apiSpec, err := openapi.LoadAPISpec(cfg.GetOpenAPIFilepath())
+	apiSpec, err := openapi.LoadFromYaml(cfg.GetOpenAPIFilepath())
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
+	e := render.NewEngine().With(cfg)
 	// Setup appropriate renderer via the `strategy` design pattern
-	err = setRenderStrategy(cfg)
+	err = setStrategy(e, cfg.Template.Strategy)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
@@ -40,26 +39,20 @@ func main() {
 		"package": cfg.Template.BasePackageName,
 	})
 
-	_, err = tree.Traverse(apiSpec, Renderer.BuildRenderNode())
+	_, err = tree.Traverse(apiSpec, e.BuildRenderNode())
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 }
-
-func setRenderStrategy(cfg config.Data) error {
-	e := render.Engine{}
+func setStrategy(e render.Engine, strategy string) error {
 	var r render.Renderer
-	switch cfg.Template.Strategy {
+	switch strategy {
 	case "go":
-		r = &golang.Renderer{Base: &render.Base{}}
-	case "openapi-3":
-		return fmt.Errorf("openapi-3 renderer not implemented yet")
-	default:
-		fmt.Printf("No rendering strategy set. Defaulting to go\n")
-		r = &golang.Renderer{Base: &render.Base{}}
+		r = &golang.Renderer{}
+		r.SetTemplateFuncMap(golang.DefaultFuncMap())
+		e.SetRenderer(r)
+		return nil
 	}
-	r.SetTemplateFuncMap(nil)
-	Renderer = e.With(r, cfg)
-	return nil
+	return fmt.Errorf("%s render strategy not implemented yet", strategy)
 }

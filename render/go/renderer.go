@@ -4,6 +4,8 @@
 package golang
 
 import (
+	"bytes"
+	"fmt"
 	"github.com/sasswart/gin-in-a-can/config"
 	"github.com/sasswart/gin-in-a-can/openapi/schema"
 	"github.com/sasswart/gin-in-a-can/render"
@@ -19,32 +21,45 @@ import (
 var _ render.Renderer = &Renderer{}
 
 type Renderer struct {
-	*render.Base
+	funcMap *template.FuncMap
+}
+
+func (g *Renderer) ParseTemplate(templateFilename, templateDirectory string) (*template.Template, error) {
+	templater := template.New(templateFilename)
+	funcMap := g.GetTemplateFuncMap()
+	templater.Funcs(*funcMap)
+	return templater.ParseGlob(fmt.Sprintf("%s/*.tmpl", templateDirectory))
+}
+
+func (g *Renderer) RenderToText(parsedTemplate *template.Template, node tree.NodeTraverser) ([]byte, error) {
+	if parsedTemplate == nil {
+		return nil, fmt.Errorf("parsedTemplate is nil")
+	}
+	buff := bytes.NewBuffer([]byte{})
+	err := parsedTemplate.Execute(buff, node)
+	if err != nil {
+		return nil, err
+	}
+	return buff.Bytes(), nil
 }
 
 func (g *Renderer) SetTemplateFuncMap(f *template.FuncMap) {
-	if f != nil {
-		g.Base.SetTemplateFuncMap(f)
-		return
-	}
-	g.Base.SetTemplateFuncMap(&template.FuncMap{
-		"ToUpper": strings.ToUpper,
-		"ToTitle": ToTitle,
-		"StringsReplace": func(input, from, to string) string {
-			return strings.Replace(input, from, to, -1)
-		},
-		// TODO this should NOT be self-referential
-		"SanitiseName": g.SanitiseName,
-		"SanitiseType": g.SanitiseType,
-	})
+	g.funcMap = f
 }
 
 func (g *Renderer) GetTemplateFuncMap() *template.FuncMap {
-	return g.Base.GetTemplateFuncMap()
+	return g.funcMap
+}
+func (g *Renderer) Format(input []byte) ([]byte, error) {
+	return format.Source(input)
+}
+
+func (g *Renderer) GetOutputFilename(n tree.NodeTraverser) string {
+	return SanitiseName(n.GetName()) + ".go"
 }
 
 // SanitiseType sanitizes the prepares the contents of the Type field of a node for use by the renderer
-func (g *Renderer) SanitiseType(n tree.NodeTraverser) string {
+func SanitiseType(n tree.NodeTraverser) string {
 	if n == nil {
 		return ""
 	}
@@ -53,7 +68,7 @@ func (g *Renderer) SanitiseType(n tree.NodeTraverser) string {
 		case "boolean":
 			return "bool"
 		case "array":
-			return "[]" + g.SanitiseName(s.GetChildren()[schema.ItemsKey].(*schema.Schema).GetName())
+			return "[]" + SanitiseName(s.GetChildren()[schema.ItemsKey].(*schema.Schema).GetName())
 		case "integer":
 			return "int"
 		case "object":
@@ -65,24 +80,16 @@ func (g *Renderer) SanitiseType(n tree.NodeTraverser) string {
 	return ""
 }
 
-func (g *Renderer) Format(input []byte) ([]byte, error) {
-	return format.Source(input)
-}
-
-func (g *Renderer) GetOutputFilename(n tree.NodeTraverser) string {
-	return g.SanitiseName(n.GetName()) + ".go"
-}
-
 // SanitiseName should consume the result of an NodeTraverser's .GetName() function.
 // It creates a string array that is compliant to go function name restrictions and
 // joins the result before returning a single string.
-func (g *Renderer) SanitiseName(s []string) string {
+func SanitiseName(s []string) string {
 	caser := cases.Title(language.English)
 	var temp []string
 	for _, w := range s {
 		var delim string
 		switch true {
-		case isHttpStatusCode(w):
+		case IsHttpStatusCode(w):
 			temp = append(temp, w)
 			continue
 		case strings.Contains(w, "/"):
@@ -122,7 +129,7 @@ func CreateFunctionString(s string) (ret string) {
 	return ret
 }
 
-func isHttpStatusCode(s string) bool {
+func IsHttpStatusCode(s string) bool {
 	if code, err := strconv.Atoi(s); err == nil {
 		if 100 <= code && code <= 599 {
 			return true
@@ -170,25 +177,37 @@ func ToTitle(s string) (ret string) {
 	return ret
 }
 
-func NewGinServerTestConfig() config.Data {
-	config.ConfigFilePath = "../render/go/config_goginserver_test.yml"
+func NewGinServerTestConfig(configPath, openAPIPath string) config.Data {
+	config.ConfigFilePath = configPath
 	config.Debug = true
 	return config.Data{
 		Template: config.Template{
 			Name: "go-gin",
 		},
-		OpenAPIFile: "../openapi/test/fixtures/validation_no_refs.yaml",
+		OpenAPIFile: openAPIPath,
 		OutputPath:  ".",
 	}
 }
-func NewGoClientTestConfig() config.Data {
-	config.ConfigFilePath = "../render/go/config_goclient_test.yml"
+func NewGoClientTestConfig(configPath, openAPIPath string) config.Data {
+	config.ConfigFilePath = configPath
 	config.Debug = true
 	return config.Data{
 		Template: config.Template{
 			Name: "go-client",
 		},
-		OpenAPIFile: "../openapi/test/fixtures/validation_no_refs.yaml",
+		OpenAPIFile: openAPIPath,
 		OutputPath:  ".",
+	}
+}
+
+func DefaultFuncMap() *template.FuncMap {
+	return &template.FuncMap{
+		"ToUpper": strings.ToUpper,
+		"ToTitle": ToTitle,
+		"StringsReplace": func(input, from, to string) string {
+			return strings.Replace(input, from, to, -1)
+		},
+		"SanitiseName": SanitiseName,
+		"SanitiseType": SanitiseType,
 	}
 }
