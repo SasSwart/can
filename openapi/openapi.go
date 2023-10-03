@@ -24,7 +24,7 @@ type ExternalDocs struct {
 // OpenAPI is a programmatic representation of the OpenApi Document object defined here: https://swagger.io/specification/#openapi-object
 type OpenAPI struct {
 	tree.Node
-	OpenAPI    string `yaml:"openapi"` // TODO it's unclear what this refers to
+	OpenAPI    string `yaml:"openapi"`
 	Info       info.Info
 	Servers    []servers.Server
 	Paths      map[string]*path.Item
@@ -65,20 +65,19 @@ func LoadFromYaml(openApiFilepath string) (*OpenAPI, error) {
 		return nil, fmt.Errorf("LoadFromYaml:: unable to read file \"%s\": %w", openApiFilepath, err)
 	}
 
-	api := NewBaseOpenApi()
-	if err := api.LoadFromBytes(content); err != nil {
+	api := newBaseOpenApi()
+	if err := api.loadFromBytes(content); err != nil {
 		return nil, err
 	}
 	// Resolve references
-	if err := api.ResolveReferences(openApiFilepath); err != nil {
+	if err := api.resolveReferences(openApiFilepath); err != nil {
 		return nil, err
 	}
 	return &api, err
 }
 
-// ResolveReferences traverses the entire openapi struct tree and loads te h
-// TODO: this doesn't have to be public
-func (o *OpenAPI) ResolveReferences(absoluteBasePath string) error {
+// resolveReferences traverses the entire openapi struct tree and loads te h
+func (o *OpenAPI) resolveReferences(absoluteBasePath string) error {
 	o.SetBasePath(filepath.Dir(absoluteBasePath))
 	// TODO: what if JSON?
 	o, err := tree.Traverse(o, tree.ResolveRefs)
@@ -88,9 +87,8 @@ func (o *OpenAPI) ResolveReferences(absoluteBasePath string) error {
 	return nil
 }
 
-// LoadFromBytes loads the content into an OpenAPI struct. Extraneous functions that aid in this process should live here.A
-// TODO: this doesn't have to be public
-func (o *OpenAPI) LoadFromBytes(content []byte) error {
+// loadFromBytes loads the content into an OpenAPI struct. Extraneous functions that aid in this process should live here.A
+func (o *OpenAPI) loadFromBytes(content []byte) error {
 	err := yaml.Unmarshal(content, o)
 	if err != nil {
 		return fmt.Errorf("yaml unmarshalling error: %w", err)
@@ -99,8 +97,7 @@ func (o *OpenAPI) LoadFromBytes(content []byte) error {
 	return nil
 }
 
-// TODO: this doesn't have to be public
-func NewBaseOpenApi() OpenAPI {
+func newBaseOpenApi() OpenAPI {
 	return OpenAPI{
 		Node: tree.Node{},
 		Components: components.Components{

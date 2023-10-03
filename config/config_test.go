@@ -9,7 +9,7 @@ import (
 )
 
 // FYI - if your tests are utilizing flags from os.Args, flags are likely to be redefined through the
-// config.Data{}.LoadFromBytes() method. This will cause test suites to panic!
+// config.Data{}.loadFromBytes() method. This will cause test suites to panic!
 func TestConfig_Load(t *testing.T) {
 	absTestTemplateDir, err := filepath.Abs(filepath.Join("../", testTemplateDir))
 	if err != nil {
