@@ -215,58 +215,6 @@ func TestGolang_ToTitle(t *testing.T) {
 	}
 }
 
-func TestParseTemplate(t *testing.T) {
-	tests := []struct {
-		name              string
-		templateFilename  string
-		templateDirectory string
-		funcMap           *template.FuncMap
-		expectedErr       bool
-	}{
-		{
-			name:              "Valid Input",
-			templateFilename:  "openapi.tmpl",
-			templateDirectory: "../../templates/go-client",
-			funcMap:           golang.DefaultFuncMap(),
-			expectedErr:       false,
-		},
-		{
-			name:              "Invalid Directory",
-			templateFilename:  "test.tmpl",
-			templateDirectory: "nonexistent_directory",
-			funcMap:           golang.DefaultFuncMap(),
-			expectedErr:       true,
-		},
-		{
-			name:              "Empty FuncMap",
-			templateFilename:  "test.tmpl",
-			templateDirectory: "../../templates/go-client",
-			funcMap:           &template.FuncMap{},
-			expectedErr:       true,
-		},
-		{
-			name:              "Glob Error",
-			templateFilename:  "test.tmpl",
-			templateDirectory: "invalid_directory",
-			funcMap:           golang.DefaultFuncMap(),
-			expectedErr:       true,
-		},
-	}
-
-	// Create a Renderer instance
-	r := &golang.Renderer{}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			r.SetTemplateFuncMap(test.funcMap)
-			_, err := r.ParseTemplate(test.templateFilename, test.templateDirectory)
-			if (err != nil) != test.expectedErr {
-				t.Errorf("Expected error: %v, but got: %v", test.expectedErr, err)
-			}
-		})
-	}
-}
-
 func TestRenderToText(t *testing.T) {
 	tests := []struct {
 		name           string
@@ -303,7 +251,7 @@ func TestRenderToText(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			output, err := r.RenderToText(test.parsedTemplate, test.node)
+			output, err := r.RenderNode(test.parsedTemplate, test.node)
 			if (err != nil) != test.expectedErr {
 				t.Errorf("Expected error: %v, but got: %v", test.expectedErr, err)
 			}

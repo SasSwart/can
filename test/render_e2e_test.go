@@ -23,15 +23,11 @@ func TestGolang_GinServer_Renderer(t *testing.T) {
 		}
 	}(tempFolder)
 
-	cfg := golang.NewGinServerTestConfig("../render/go/config_goginserver_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
-	err := cfg.Load()
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+	cfg := golang.MustLoadGinServerTestConfig("../render/go/config_goginserver_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
 	cfg.OutputPath = tempFolder
 	r := golang.Renderer{}
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
-	e := render.NewEngine().With(cfg)
+	e := render.NewEngine(cfg)
 	e.SetRenderer(&r)
 
 	// We have to pop the first element off the path constant
@@ -43,7 +39,7 @@ func TestGolang_GinServer_Renderer(t *testing.T) {
 	apiTree.SetMetadata(tree.Metadata{
 		"package": cfg.Template.BasePackageName,
 	})
-	_, err = tree.Traverse(apiTree, e.BuildRenderNode())
+	_, err = tree.Traverse(apiTree, e.Render)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -58,15 +54,11 @@ func TestGolang_GoClient_Renderer(t *testing.T) {
 		}
 	}(tempFolder)
 
-	cfg := golang.NewGoClientTestConfig("../render/go/config_goclient_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
-	err := cfg.Load()
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+	cfg := golang.MustLoadGoClientTestConfig("../render/go/config_goclient_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
 	cfg.OutputPath = tempFolder
 	r := golang.Renderer{}
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
-	e := render.NewEngine().With(cfg)
+	e := render.NewEngine(cfg)
 	e.SetRenderer(&r)
 
 	// We have to pop the first element off the path constant
@@ -78,7 +70,7 @@ func TestGolang_GoClient_Renderer(t *testing.T) {
 	apiTree.SetMetadata(tree.Metadata{
 		"package": cfg.Template.BasePackageName,
 	})
-	_, err = tree.Traverse(apiTree, e.BuildRenderNode())
+	_, err = tree.Traverse(apiTree, e.Render)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -106,15 +98,12 @@ func TestGolang_GoClient_Renderer_HeavyNesting(t *testing.T) {
 			t.Errorf(err.Error())
 		}
 	}(tempFolder)
-	cfg := golang.NewGoClientTestConfig("../render/go/config_goclient_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
-	if err := cfg.Load(); err != nil {
-		t.Error(err)
-	}
+	cfg := golang.MustLoadGoClientTestConfig("../render/go/config_goclient_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
 	cfg.OpenAPIFile = "test/fixtures/heavy_nesting.yaml"
 	cfg.OutputPath = tempFolder
 	r := golang.Renderer{}
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
-	e := render.NewEngine().With(cfg)
+	e := render.NewEngine(cfg)
 	e.SetRenderer(&r)
 
 	// We have to pop the first element off the path constant
@@ -126,7 +115,7 @@ func TestGolang_GoClient_Renderer_HeavyNesting(t *testing.T) {
 	apiTree.SetMetadata(tree.Metadata{
 		"package": cfg.Template.BasePackageName,
 	})
-	if _, err := tree.Traverse(apiTree, e.BuildRenderNode()); err != nil {
+	if _, err := tree.Traverse(apiTree, e.Render); err != nil {
 		t.Error(err)
 	}
 	if err := filepath.Walk(tempFolder, assertFilesPresent(tempFolder, heavyNestingFilenames)); err != nil {
@@ -153,15 +142,12 @@ func TestGolang_GoGin_Renderer_HeavyNesting(t *testing.T) {
 			t.Errorf(err.Error())
 		}
 	}(tempFolder)
-	cfg := golang.NewGinServerTestConfig("../render/go/config_goginserver_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
-	if err := cfg.Load(); err != nil {
-		t.Error(err)
-	}
+	cfg := golang.MustLoadGinServerTestConfig("../render/go/config_goginserver_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
 	cfg.OpenAPIFile = "test/fixtures/heavy_nesting.yaml"
 	cfg.OutputPath = tempFolder
 	r := golang.Renderer{}
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
-	e := render.NewEngine().With(cfg)
+	e := render.NewEngine(cfg)
 	e.SetRenderer(&r)
 
 	// We have to pop the first element off the path constant
@@ -173,7 +159,7 @@ func TestGolang_GoGin_Renderer_HeavyNesting(t *testing.T) {
 	apiTree.SetMetadata(tree.Metadata{
 		"package": cfg.Template.BasePackageName,
 	})
-	if _, err := tree.Traverse(apiTree, e.BuildRenderNode()); err != nil {
+	if _, err := tree.Traverse(apiTree, e.Render); err != nil {
 		t.Error(err)
 	}
 	if err := filepath.Walk(tempFolder, assertFilesPresent(tempFolder, heavyNestingFilenames)); err != nil {
@@ -201,15 +187,11 @@ func TestRegression_GoClient_EmptyRequestAndResponseBodiesShouldRender(t *testin
 		}
 	}(tempFolder)
 
-	cfg := golang.NewGoClientTestConfig("fixtures/regressions/empty_bodies/config_goclient_empty_bodies.yml", "fixtures/regressions/empty_bodies/empty_bodies.yml")
-	err := cfg.Load()
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+	cfg := golang.MustLoadGoClientTestConfig("fixtures/regressions/empty_bodies/config_goclient_empty_bodies.yml", "fixtures/regressions/empty_bodies/empty_bodies.yml")
 	cfg.OutputPath = tempFolder
 	r := golang.Renderer{}
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
-	e := render.NewEngine().With(cfg)
+	e := render.NewEngine(cfg)
 	e.SetRenderer(&r)
 	api, err := openapi.LoadFromYaml(cfg.OpenAPIFile)
 	if err != nil {
@@ -219,7 +201,7 @@ func TestRegression_GoClient_EmptyRequestAndResponseBodiesShouldRender(t *testin
 	api.SetMetadata(tree.Metadata{
 		"package": cfg.Template.BasePackageName,
 	})
-	_, err = tree.Traverse(api, e.BuildRenderNode())
+	_, err = tree.Traverse(api, e.Render)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -290,15 +272,11 @@ func TestRegression_GoGin_EmptyRequestAndResponseBodiesShouldRender(t *testing.T
 		}
 	}(tempFolder)
 
-	cfg := golang.NewGinServerTestConfig("fixtures/regressions/empty_bodies/config_goclient_empty_bodies.yml", "fixtures/regressions/empty_bodies/empty_bodies.yml")
-	err := cfg.Load()
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+	cfg := golang.MustLoadGinServerTestConfig("fixtures/regressions/empty_bodies/config_goclient_empty_bodies.yml", "fixtures/regressions/empty_bodies/empty_bodies.yml")
 	cfg.OutputPath = tempFolder
 	r := golang.Renderer{}
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
-	e := render.NewEngine().With(cfg)
+	e := render.NewEngine(cfg)
 	e.SetRenderer(&r)
 	api, err := openapi.LoadFromYaml(cfg.OpenAPIFile)
 	if err != nil {
@@ -308,7 +286,7 @@ func TestRegression_GoGin_EmptyRequestAndResponseBodiesShouldRender(t *testing.T
 	api.SetMetadata(tree.Metadata{
 		"package": cfg.Template.BasePackageName,
 	})
-	_, err = tree.Traverse(api, e.BuildRenderNode())
+	_, err = tree.Traverse(api, e.Render)
 	if err != nil {
 		t.Errorf(err.Error())
 	}

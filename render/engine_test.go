@@ -17,6 +17,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"text/template"
 )
 
 func Test_Render_Render(t *testing.T) {
@@ -29,17 +30,13 @@ func Test_Render_Render(t *testing.T) {
 	}(tempFolder)
 
 	// TODO test this in a language agnostic way or move to E2E testing suite
-	cfg := golang.NewGinServerTestConfig("../render/go/config_goginserver_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
-	err := cfg.Load()
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+	cfg := golang.MustLoadGinServerTestConfig("../render/go/config_goginserver_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
 	cfg.OutputPath = tempFolder
 	r := &golang.Renderer{}
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
-	e := render.NewEngine().With(cfg)
+	e := render.NewEngine(cfg)
 	e.SetRenderer(r)
-	_, err = tree.Traverse(test.OpenAPITree(), e.BuildRenderNode())
+	_, err := tree.Traverse(test.OpenAPITree(), e.Render)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -47,8 +44,62 @@ func Test_Render_Render(t *testing.T) {
 	// 	We're not currently rendering any 204 response schemas
 }
 
+func TestParseTemplate(t *testing.T) {
+	tests := []struct {
+		name              string
+		templateFilename  string
+		templateDirectory string
+		funcMap           *template.FuncMap
+		expectedErr       bool
+	}{
+		{
+			name:              "Valid Input",
+			templateFilename:  "openapi.tmpl",
+			templateDirectory: "../templates/go-client",
+			funcMap:           golang.DefaultFuncMap(),
+			expectedErr:       false,
+		},
+		{
+			name:              "Invalid Directory",
+			templateFilename:  "test.tmpl",
+			templateDirectory: "nonexistent_directory",
+			funcMap:           golang.DefaultFuncMap(),
+			expectedErr:       true,
+		},
+		{
+			name:              "Empty FuncMap",
+			templateFilename:  "test.tmpl",
+			templateDirectory: "../templates/go-client",
+			funcMap:           &template.FuncMap{},
+			expectedErr:       true,
+		},
+		{
+			name:              "Glob Error",
+			templateFilename:  "test.tmpl",
+			templateDirectory: "invalid_directory",
+			funcMap:           golang.DefaultFuncMap(),
+			expectedErr:       true,
+		},
+	}
+
+	// Create a Renderer instance
+
+	cfg := golang.MustLoadGoClientTestConfig("../render/go/config_goclient_test.yml", "../openapi/test/fixtures/validation_no_refs.yaml")
+	e := render.NewEngine(cfg)
+	e.SetRenderer(&golang.Renderer{})
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			e.GetRenderer().SetTemplateFuncMap(test.funcMap)
+			_, err := e.ParseTemplate(test.templateFilename, test.templateDirectory)
+			if (err != nil) != test.expectedErr {
+				t.Errorf("Expected error: %v, but got: %v", test.expectedErr, err)
+			}
+		})
+	}
+}
 func TestEngineGetAndSetRenderer(t *testing.T) {
-	mockRenderer := render.MockRenderer{}
+	mockRenderer := &render.MockRenderer{}
 	engine := render.Engine{}
 	engine.SetRenderer(mockRenderer)
 
@@ -58,10 +109,11 @@ func TestEngineGetAndSetRenderer(t *testing.T) {
 }
 
 func TestRender(t *testing.T) {
-	mockRenderer := render.MockRenderer{}
-	mockConfig := config.Data{OutputPath: "../templates"}
-	testEngine := render.NewEngine().With(mockConfig)
+	mockRenderer := &render.MockRenderer{}
+	mockConfig := config.Data{OutputPath: ".", TemplatesDir: "../../templates/go-client"}
+	testEngine := render.NewEngine(mockConfig)
 	testEngine.SetRenderer(mockRenderer)
+	mockRenderer.SetTemplateFuncMap(golang.DefaultFuncMap())
 
 	mockNode := &schema.Schema{Type: "object"}
 	mockParentNode := &parameter.Parameter{}

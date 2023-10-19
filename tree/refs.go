@@ -20,6 +20,7 @@ func readRef(absFilename string, n NodeTraverser) error {
 		return fmt.Errorf("unable to resolve Reference: %w", err)
 	}
 
+	// TODO: What if JSON?
 	err = yaml.Unmarshal(content, n)
 	if err != nil {
 		return fmt.Errorf("unable to unmarshal reference file:\n%w", err)
