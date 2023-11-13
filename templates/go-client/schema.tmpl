@@ -9,7 +9,7 @@ type {{ .GetName | SanitiseName }} {{ . | SanitiseType }}
 {{- if eq ( . | SanitiseType) "struct" }} {
 	{{- range $name, $schema := .Properties }}
         {{ if eq ($schema | SanitiseType) "struct" -}}
-            {{ $name | ToTitle }} {{ $schema.GetName | SanitiseName }}
+            {{ $name | ToTitle }} {{ $schema.GetName | SanitiseName }} `json:"{{ $name }},omitempty"`
         {{- else -}}
             {{- $required := false }}
             {{- range $requiredProperty := $schema.Required }}

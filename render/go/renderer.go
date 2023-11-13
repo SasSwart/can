@@ -107,7 +107,7 @@ func SanitiseName(s []string) string {
 		case IsHttpStatusCode(w):
 			temp = append(temp, w)
 			continue
-		case strings.Contains(w, "/"):
+		case strings.Contains(w[1:], "/"):
 			delim = "/"
 		case strings.Contains(w, " "):
 			delim = " "
@@ -116,6 +116,9 @@ func SanitiseName(s []string) string {
 		case strings.Contains(w, "-"):
 			delim = "-"
 		default:
+			if w == "/" {
+				// TODO: Handle root
+			}
 			temp = append(temp, caser.String(CreateFunctionString(w)))
 			continue
 		}

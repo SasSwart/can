@@ -77,17 +77,17 @@ func TestGolang_GoClient_Renderer(t *testing.T) {
 }
 
 var heavyNestingFilenames = [12]string{"NestedApiExample.go",
-	"NestedApiExampleNestedendpoint.go",
-	"NestedApiExampleNestedendpointPost.go",
-	"NestedApiExampleNestedendpointPost201ResponseModel.go",
-	"NestedApiExampleNestedendpointPost201ResponseModelNestedresource.go",
-	"NestedApiExampleNestedendpointPost201ResponseModelNestedresourceChildobject.go",
-	"NestedApiExampleNestedendpointPost201ResponseModelNestedresourceChildobjectGrandchildarray.go",
-	"NestedApiExampleNestedendpointPost201ResponseModelNestedresourceChildobjectGrandchildarrayItem.go",
-	"NestedApiExampleNestedendpointPostRequestBodyModel.go",
-	"NestedApiExampleNestedendpointPostRequestBodyModelChildobject.go",
-	"NestedApiExampleNestedendpointPostRequestBodyModelChildobjectGrandchildarray.go",
-	"NestedApiExampleNestedendpointPostRequestBodyModelChildobjectGrandchildarrayItem.go",
+	"NestedApiExampleNestedEndpoint.go",
+	"NestedApiExampleNestedEndpointPost.go",
+	"NestedApiExampleNestedEndpointPost201ResponseModel.go",
+	"NestedApiExampleNestedEndpointPost201ResponseModelNestedresource.go",
+	"NestedApiExampleNestedEndpointPost201ResponseModelNestedresourceChildobject.go",
+	"NestedApiExampleNestedEndpointPost201ResponseModelNestedresourceChildobjectGrandchildarray.go",
+	"NestedApiExampleNestedEndpointPost201ResponseModelNestedresourceChildobjectGrandchildarrayItem.go",
+	"NestedApiExampleNestedEndpointPostRequestBodyModel.go",
+	"NestedApiExampleNestedEndpointPostRequestBodyModelChildobject.go",
+	"NestedApiExampleNestedEndpointPostRequestBodyModelChildobjectGrandchildarray.go",
+	"NestedApiExampleNestedEndpointPostRequestBodyModelChildobjectGrandchildarrayItem.go",
 }
 
 func TestGolang_GoClient_Renderer_HeavyNesting(t *testing.T) {
@@ -121,11 +121,11 @@ func TestGolang_GoClient_Renderer_HeavyNesting(t *testing.T) {
 	if err := filepath.Walk(tempFolder, assertFilesPresent(tempFolder, heavyNestingFilenames)); err != nil {
 		t.Error(err)
 	}
-	file, err := os.Open(filepath.Join(tempFolder, "NestedApiExampleNestedendpointPostRequestBodyModelChildobjectGrandchildarrayItem.go"))
+	file, err := os.Open(filepath.Join(tempFolder, "NestedApiExampleNestedEndpointPostRequestBodyModelChildobjectGrandchildarrayItem.go"))
 	if err != nil {
 		t.Error(err)
 	}
-	want := "type NestedApiExampleNestedendpointPostRequestBodyModelChildobjectGrandchildarrayItem struct {\n\tGrandchildproperty string `json:\"grandchildProperty,omitempty\"`\n}"
+	want := "type NestedApiExampleNestedEndpointPostRequestBodyModelChildobjectGrandchildarrayItem struct {\n\tGrandchildproperty string `json:\"grandchildProperty,omitempty\"`\n}"
 	if err := fileShouldContain(file, want); err != nil {
 		t.Error(err)
 	}
@@ -165,11 +165,11 @@ func TestGolang_GoGin_Renderer_HeavyNesting(t *testing.T) {
 	if err := filepath.Walk(tempFolder, assertFilesPresent(tempFolder, heavyNestingFilenames)); err != nil {
 		t.Error(err)
 	}
-	file, err := os.Open(filepath.Join(tempFolder, "NestedApiExampleNestedendpointPostRequestBodyModelChildobjectGrandchildarrayItem.go"))
+	file, err := os.Open(filepath.Join(tempFolder, "NestedApiExampleNestedEndpointPostRequestBodyModelChildobjectGrandchildarrayItem.go"))
 	if err != nil {
 		t.Error(err)
 	}
-	want := "type NestedApiExampleNestedendpointPostRequestBodyModelChildobjectGrandchildarrayItem struct {\n\tGrandchildproperty string `json:\"grandchildProperty\"`\n}"
+	want := "type NestedApiExampleNestedEndpointPostRequestBodyModelChildobjectGrandchildarrayItem struct {\n\tGrandchildproperty string `json:\"grandchildProperty\"`\n}"
 	if err := fileShouldContain(file, want); err != nil {
 		t.Error(err)
 	}

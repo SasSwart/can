@@ -24,10 +24,11 @@ import (
     "encoding/json"
 {{- end }}
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"fmt"
+	"net/http/httputil"
 {{- if $pathParamPresent }}
 	"strings"
 {{- end }}
@@ -69,8 +70,11 @@ func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, pa
     pathPattern = strings.Replace(pathPattern, `{ {{- $param.ParamName -}} }`, params.{{ $param.ParamName | ToTitle }}, -1)
     {{- end }}
 	{{- end }}
-	URL := c.createUrl(pathPattern, vals)
-	req, err := http.NewRequestWithContext(ctx, http.Method{{ $name | ToTitle }}, URL.String(), payload)
+	URL, err := c.createUrl(pathPattern, vals)
+	if err != nil {
+	    return nil, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.Method{{ $name | ToTitle }}, URL, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -81,8 +85,15 @@ func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, pa
             return nil, err
         }
     }
+    if c.cfg.Debug {
+        data, err := httputil.DumpRequest(req, true)
+        if err != nil {
+            return nil, err
+        }
+        fmt.Println(string(data))
+    }
 
-	return c.Do(req)
+	return c.internalClient.Do(req)
 }
 {{- end }}
 

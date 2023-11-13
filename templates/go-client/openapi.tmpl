@@ -3,15 +3,12 @@ package {{ index .GetMetadata "package" }}
 import (
     "context"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
-
- 	"github.com/go-playground/validator/v10"
+	"strconv"
 )
 
-// ClientService is the interface for Client methods
+// ClientService defines this packages public api
 type ClientService interface {
     {{- range $pathName, $path := .Paths }}
     {{- range $name, $operation := $path.Operations }}
@@ -20,6 +17,12 @@ type ClientService interface {
     {{- end }}
 }
 
+type Doer interface {
+	Do(r *http.Request) (*http.Response, error)
+}
+
+// We must satisfy this interface for the client to be valid. This is a compile time assertion that should not be
+// removed.
 var _ ClientService = &Client{}
 
 // AuthFunc needs to be passed in as a closure at client generation and allows for authentication to be applied to any
@@ -27,58 +30,59 @@ var _ ClientService = &Client{}
 type AuthFunc func(*http.Request) error
 
 // Config allows you to specify the Host, Protocol, Content Type and optionally a Port when initialising this client.
-// It should only be used once, when calling NewHTTPClient.
+// It should only be used once, when calling NewClient.
 type Config struct {
-	Host string `validate:"required"`
-	Protocol string `validate:"required"`
-	ContentType string `validate:"required"`
-	Port string
+    // this url prefixes all path variants defined in the API schema
+    BaseUrl string
+    // not present in url if not set
+    Port int
+
+    // defaults to "content-type: application/json" if not set
+	ContentType string
+	Debug bool
 }
 
 type Client struct {
-    *http.Client
+    // settable through the use of SetClient(). Defaults to http.DefaultClient if not set
+    internalClient Doer
 
+    // contains initialisation fields for use when making calls
     cfg *Config
+
+    // auth is run directly before all `<client>.Do(req)` calls in order to apply user-defined auth to the request.
+    // If not set, no auth is applied
 	auth AuthFunc
 }
 
-func (c *Client) createUrl(pathPattern string, vals url.Values) url.URL {
-	u := url.URL{
-		Scheme:   c.cfg.Protocol,
-		Host:     c.cfg.Host,
-		Path:     pathPattern,
-		RawQuery: vals.Encode(),
+// createUrl simply appends the sub-path and query parameters to the base url, building a full url for use by the client
+func (c *Client) createUrl(pathPattern string, vals url.Values) (string, error) {
+	port := c.cfg.Port
+	url := c.cfg.BaseUrl
+	if port != 0 {
+		portString := strconv.Itoa(port)
+		url = url + ":" + portString
 	}
-	if c.Port != "" {
-	    u.Host += ":"
-	    u.Host += c.Port
-	}
-	return u
+	url = url + pathPattern  + vals.Encode()
+	return url, nil
 }
 
-// NewHTTPClient allows you to specify the configuration of your client. This function allows you to specify optional
+// NewClient allows you to specify configuration of your client. This function allows you to specify optional
 // auth steps that will be executed before a request is made, such as the attaching of an Authorization header to the
 // request, as well as the http.Client you intend to use to make the calls. See the config struct for an idea of what it
 // allows you to configure.
-func NewHTTPClient(cfg *Config, client *http.Client, af AuthFunc) (*Client, error) {
+func NewClient(cfg *Config, client Doer, af AuthFunc) (*Client, error) {
     if cfg == nil {
           return nil, errors.New("cannot start client without config")
     }
-    validate := validator.New()
-    if err := validate.Struct(cfg); err != nil {
-        return nil, err
+    var internalClient Doer
+    internalClient = http.DefaultClient
+    if client != nil {
+        internalClient = client
     }
-	if strings.Contains(cfg.Host, "://") {
-		cfg.Host = strings.Split(cfg.Host, "://")[1]
-	}
     c := &Client{
+        internalClient: internalClient,
         cfg: cfg,
         auth: af,
-    }
-    if client == nil {
-        c.Client = http.DefaultClient
-    } else {
-        c.Client = client
     }
     return c, nil
 }
