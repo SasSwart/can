@@ -35,12 +35,13 @@ type AuthFunc func(*http.Request) error
 // It should only be used once, when calling NewClient.
 type Config struct {
     // this url prefixes all path variants defined in the API schema
-    baseUrl string
+    BaseUrl string
     // not present in url if not set
-    port int
+    Port int
 
     // defaults to "content-type: application/json" if not set
-	contentType string `validate:"required"`
+	ContentType string
+	Debug bool
 }
 
 type Client struct {
@@ -57,8 +58,8 @@ type Client struct {
 
 // createUrl simply appends the
 func (c *Client) createUrl(pathPattern string, vals url.Values) (string, error) {
-	port := c.cfg.port
-	url := c.cfg.baseUrl
+	port := c.cfg.Port
+	url := c.cfg.BaseUrl
 	if port != 0 {
 		portString := strconv.Itoa(port)
 		url = url + ":" + portString

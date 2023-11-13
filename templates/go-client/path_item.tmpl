@@ -27,6 +27,8 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"fmt"
+	"net/http/httputil"
 {{- if $pathParamPresent }}
 	"strings"
 {{- end }}
@@ -76,12 +78,19 @@ func (c *Client) {{ $operation.GetName | SanitiseName }}(ctx context.Context, pa
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Content-Type", c.cfg.contentType)
+	req.Header.Add("Content-Type", c.cfg.ContentType)
     if c.auth != nil {
         err = c.auth(req)
         if err != nil {
             return nil, err
         }
+    }
+    if c.cfg.Debug {
+        data, err := httputil.DumpRequest(req, true)
+        if err != nil {
+            return nil, err
+        }
+        fmt.Println(string(data))
     }
 
 	return c.internalClient.Do(req)
