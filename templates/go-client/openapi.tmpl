@@ -56,7 +56,7 @@ type Client struct {
 	auth AuthFunc
 }
 
-// createUrl simply appends the
+// createUrl simply appends the sub-path and query parameters to the base url, building a full url for use by the client
 func (c *Client) createUrl(pathPattern string, vals url.Values) (string, error) {
 	port := c.cfg.Port
 	url := c.cfg.BaseUrl
