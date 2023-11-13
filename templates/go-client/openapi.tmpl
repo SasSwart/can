@@ -17,8 +17,6 @@ type ClientService interface {
     {{- end }}
 }
 
-// Doer defines the one behavioural trait required for a custom client to function within the generated methods
-// implemented by this client.
 type Doer interface {
 	Do(r *http.Request) (*http.Response, error)
 }
