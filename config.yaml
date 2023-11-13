@@ -1,5 +1,8 @@
-#generator:
-#  moduleName: github.com/test/api
-#  basePackageName: test
-#openAPIFile: openapi/test/fixtures/validation_no_refs.yaml
-#outputPath: .
+templatesDir: path/to/template/directory
+openAPIFile: path/to/openapi/file.yaml
+outputPath: path/to/output/files/to
+template:
+  name: test
+  moduleName: testModule
+  strategy: go
+  basePackageName: test
