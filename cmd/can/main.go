@@ -21,7 +21,7 @@ func main() {
 	engine := render.NewEngine(cfg)
 
 	// Setup appropriate renderer via the `strategy` design pattern
-	mustSetStrategy(engine, cfg.Template.Strategy)
+	mustSetStrategy(&engine, cfg.Template.Strategy)
 
 	apiSpec.SetMetadata(tree.Metadata{
 		"package": cfg.Template.BasePackageName,
@@ -33,7 +33,7 @@ func main() {
 	}
 }
 
-func mustSetStrategy(engine render.Engine, strategy string) {
+func mustSetStrategy(engine *render.Engine, strategy string) {
 	err := setStrategy(engine, strategy)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -52,7 +52,7 @@ func mustLoadOpenApiFile(path string) *openapi.OpenAPI {
 }
 
 // setStrategy creates and applies the renderer for the given strategy. An error is returned if the strategy is invalid
-func setStrategy(e render.Engine, strategy string) error {
+func setStrategy(e *render.Engine, strategy string) error {
 	var r render.Renderer
 	switch strategy {
 	case "go":
