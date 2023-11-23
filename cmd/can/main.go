@@ -16,8 +16,6 @@ import (
 )
 
 func main() {
-	fmt.Printf("can %s\n", config.SemVer)
-
 	if !flag.Parsed() { // Sorts out buggy tests
 		flag.BoolVar(&config.VersionFlagSet, "version", false, "Print Can version and exit")
 		flag.BoolVar(&config.Debug, "debug", false, "Enable debug logging")
@@ -38,8 +36,10 @@ func main() {
 	}
 	config.ConfigFilePath = absCfgPath
 
-	if config.VersionFlagSet {
+	if config.Debug {
 		fmt.Printf("Can: v%s\n", config.SemVer)
+	}
+	if config.VersionFlagSet {
 		os.Exit(0)
 	}
 
@@ -50,6 +50,7 @@ func main() {
 	configFileReader, err := os.Open(absCfgPath)
 	if err != nil {
 		fmt.Printf("failed to open config file: %v", err)
+		os.Exit(1)
 	}
 
 	configs := config.ReadConfigs(configFileReader)

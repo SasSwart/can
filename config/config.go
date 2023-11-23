@@ -260,15 +260,13 @@ func (d *Data) resolveTemplateConfig() error {
 }
 
 func (d *Data) setOverridesAndLoadConfig(reader io.Reader) error {
-	// TODO: Handle this error
-	bytesRead, _ := io.ReadAll(reader)
-	err := yaml.Unmarshal(bytesRead, &d)
+	bytesRead, err := io.ReadAll(reader)
 	if err != nil {
 		return fmt.Errorf("setOverridesAndLoadConfig:: could not read config: %w\n", err)
 	}
-	// Handle Template name
+	err = yaml.Unmarshal(bytesRead, &d)
 	if err != nil {
-		return fmt.Errorf("setOverridesAndLoadConfig:: could not unmarshal config file: %w\n", err)
+		return fmt.Errorf("setOverridesAndLoadConfig:: could not unmarshal config: %w\n", err)
 	}
 	// Handle empty config fields
 	if d.Template.Name == "" {

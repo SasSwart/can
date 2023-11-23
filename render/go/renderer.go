@@ -199,8 +199,14 @@ func ToTitle(s string) (ret string) {
 
 func MustLoadGinServerTestConfig(configPath, openAPIPath string) config.Data {
 	config.ConfigFilePath = configPath
-	absCfgPath, _ := filepath.Abs(config.ConfigFilePath)
-	configFileReader, _ := os.Open(absCfgPath)
+	absCfgPath, err := filepath.Abs(config.ConfigFilePath)
+	if err != nil {
+		panic(err)
+	}
+	configFileReader, err := os.Open(absCfgPath)
+	if err != nil {
+		panic(err)
+	}
 	config.Debug = true
 	c := config.Data{
 		Template: config.Template{
@@ -215,10 +221,15 @@ func MustLoadGinServerTestConfig(configPath, openAPIPath string) config.Data {
 	return c
 }
 func MustLoadGoClientTestConfig(configPath, openAPIPath string) config.Data {
-	// TODO: `Must` this function and load the returned config before returning it
 	config.ConfigFilePath = configPath
-	absCfgPath, _ := filepath.Abs(config.ConfigFilePath)
-	configFileReader, _ := os.Open(absCfgPath)
+	absCfgPath, err := filepath.Abs(config.ConfigFilePath)
+	if err != nil {
+		panic(err)
+	}
+	configFileReader, err := os.Open(absCfgPath)
+	if err != nil {
+		panic(err)
+	}
 	config.ConfigFilePath = configPath
 	config.Debug = true
 	c := config.Data{
@@ -228,7 +239,7 @@ func MustLoadGoClientTestConfig(configPath, openAPIPath string) config.Data {
 		OpenAPIFile: openAPIPath,
 		OutputPath:  ".",
 	}
-	if err := c.Load(configFileReader); err != nil {
+	if err = c.Load(configFileReader); err != nil {
 		panic(err)
 	}
 	return c
