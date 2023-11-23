@@ -2,9 +2,9 @@ package config
 
 import (
 	_ "embed"
-	"flag"
 	"fmt"
-	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
+	"io"
 	"os"
 	"path/filepath"
 )
@@ -24,39 +24,40 @@ var (
 	ExePath        string
 
 	// for package use only
-	outputPathFlag   string
-	templateNameFlag string
+	OutputPathFlag   string
+	TemplateNameFlag string
 )
 
 // Data represents the config data used in the day-to-day running of can
 //
 //	TODO this may be vague in definition for the sake of its legibility in use
 type Data struct {
-	Template
+	Name     string `yaml:"name"`
+	Template `yaml:"template"`
 
-	// left public due to it's need to be unmarshalled by Data.Load()
+	// left public due to its need to be unmarshalled by Data.Load()
 	TemplatesDir string `yaml:"templatesDir"`
 
 	// OpenAPIFile represents the path to the yaml OpenAPI 3 file to render
-	OpenAPIFile    string
+	OpenAPIFile    string `yaml:"openAPIFile"`
 	absOpenAPIPath string
 
-	OutputPath    string
+	OutputPath    string `yaml:"outputPath"`
 	absOutputPath string
 }
 
-// Template's fields are dependant on there being a defined templated name in the CLI arguments or config file.
+// Template fields are dependent on there being a defined templated name in the CLI arguments or config file.
 type Template struct {
-	Name       string
+	Name       string `yaml:"name"`
 	ModuleName string
 	Strategy   string
 	// BasePackageName represents the
-	BasePackageName string
+	BasePackageName string `yaml:"basePackageName"`
 
 	absDirectory string
 }
 
-func (d *Data) Load() (err error) {
+func (d *Data) Load(reader io.Reader) (err error) {
 	// Setup config pre-unmarshalling. This assumes we don't change directory before this is executed
 	ProcWorkingDir, err = os.Getwd()
 	if err != nil {
@@ -67,36 +68,7 @@ func (d *Data) Load() (err error) {
 		return fmt.Errorf("Config.load:: could not determine executable path: %w\n", err)
 	}
 
-	// flags
-	if !flag.Parsed() { // Sorts out buggy tests
-		flag.BoolVar(&VersionFlagSet, "version", false, "Print Can version and exit")
-		flag.BoolVar(&Debug, "debug", false, "Enable debug logging")
-		flag.StringVar(&ConfigFilePath, "configFile", ".", "Specify which config file to use")
-		flag.BoolVar(&Dryrun, "dryrun", false,
-			"Toggles whether to perform a render without writing to disk."+
-				"This works particularly well in combination with -debug")
-		flag.StringVar(&templateNameFlag, "template", "", "Specify which template set to use")
-		// TODO should we support stdout as an option here?
-		flag.StringVar(&outputPathFlag, "outputPath", "", "Specify where to write output to")
-		flag.Parse()
-	}
-
-	absCfgPath, err := filepath.Abs(ConfigFilePath)
-	if err != nil {
-		return fmt.Errorf("could not resolve relative config path: %w", err)
-	}
-	ConfigFilePath = absCfgPath
-
-	if VersionFlagSet {
-		fmt.Printf("Can: v%s\n", SemVer)
-		os.Exit(0)
-	}
-
-	// config load
-	if Debug {
-		fmt.Printf("[v%s]::Using config file \"%s\".\n", SemVer, ConfigFilePath)
-	}
-	err = d.setOverridesAndLoadConfig()
+	err = d.setOverridesAndLoadConfig(reader)
 	if err != nil {
 		return err
 	}
@@ -184,28 +156,42 @@ func (d *Data) GetOutputDir() (path string) {
 // it's first run and returning that on successive calls
 func (d *Data) GetOpenAPIFilepath() (path string) {
 	if d.absOpenAPIPath != "" { // we shouldn't have to run below logic multiple times
+		if Debug {
+			fmt.Println("GetOpenAPIFilepath already calculated and set to", d.absOpenAPIPath)
+		}
 		return d.absOpenAPIPath
 	}
+
 	if filepath.IsAbs(d.OpenAPIFile) {
+		if Debug {
+			fmt.Println("Calculating GetOpenAPIFilepath relative to the OpenAPI file location:", d.OpenAPIFile)
+		}
 		d.absOpenAPIPath = d.OpenAPIFile
 		return d.absOpenAPIPath
-	} else {
-		if filepath.IsAbs(ConfigFilePath) {
-			d.absOpenAPIPath = filepath.Join(
-				filepath.Dir(ConfigFilePath),
-				d.OpenAPIFile,
-			)
-			return d.absOpenAPIPath
-		} else {
-			d.absOpenAPIPath = filepath.Join(
-				// not relative as per above comment
-				ProcWorkingDir,
-				filepath.Dir(ConfigFilePath),
-				d.OpenAPIFile,
-			)
-			return d.absOpenAPIPath
-		}
 	}
+
+	if filepath.IsAbs(ConfigFilePath) {
+		if Debug {
+			fmt.Println("Calculating GetOpenAPIFilepath relative to the Config File location:", d.OpenAPIFile)
+		}
+		d.absOpenAPIPath = filepath.Join(
+			filepath.Dir(ConfigFilePath),
+			d.OpenAPIFile,
+		)
+		return d.absOpenAPIPath
+	}
+
+	if Debug {
+		fmt.Println("Calculating GetOpenAPIFilepath relative to the Executable File location:", d.OpenAPIFile)
+	}
+	d.absOpenAPIPath = filepath.Join(
+		// not relative as per above comment
+		ProcWorkingDir,
+		filepath.Dir(ConfigFilePath),
+		d.OpenAPIFile,
+	)
+
+	return d.absOpenAPIPath
 }
 
 func (d *Data) validTemplateName() bool {
@@ -273,31 +259,31 @@ func (d *Data) resolveTemplateConfig() error {
 	return nil
 }
 
-func (d *Data) setOverridesAndLoadConfig() error {
-	viper.SetConfigFile(ConfigFilePath)
-	err := viper.ReadInConfig()
+func (d *Data) setOverridesAndLoadConfig(reader io.Reader) error {
+	// TODO: Handle this error
+	bytesRead, _ := io.ReadAll(reader)
+	err := yaml.Unmarshal(bytesRead, &d)
 	if err != nil {
-		return fmt.Errorf("setOverridesAndLoadConfig:: could not read config file: %w\n", err)
+		return fmt.Errorf("setOverridesAndLoadConfig:: could not read config: %w\n", err)
 	}
 	// Handle Template name
-	err = viper.Unmarshal(&d)
 	if err != nil {
 		return fmt.Errorf("setOverridesAndLoadConfig:: could not unmarshal config file: %w\n", err)
 	}
 	// Handle empty config fields
 	if d.Template.Name == "" {
 		fmt.Printf("template not set via config file. Expecting field to be set via command line\n")
-		if templateNameFlag == "" {
+		if TemplateNameFlag == "" {
 			return fmt.Errorf("template not set via cli flags either\nexiting...")
 		}
-		d.Template.Name = templateNameFlag
+		d.Template.Name = TemplateNameFlag
 	}
 	if d.OutputPath == "" {
 		fmt.Printf("outputPath not set via config file. Expecting field to be set via command line\n")
-		if outputPathFlag == "" {
+		if OutputPathFlag == "" {
 			return fmt.Errorf("outputPath not set via cli flags either\nexiting...")
 		}
-		d.OutputPath = outputPathFlag
+		d.OutputPath = OutputPathFlag
 	}
 	return nil
 }

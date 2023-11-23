@@ -13,6 +13,8 @@ import (
 	"go/format"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"text/template"
@@ -197,6 +199,8 @@ func ToTitle(s string) (ret string) {
 
 func MustLoadGinServerTestConfig(configPath, openAPIPath string) config.Data {
 	config.ConfigFilePath = configPath
+	absCfgPath, _ := filepath.Abs(config.ConfigFilePath)
+	configFileReader, _ := os.Open(absCfgPath)
 	config.Debug = true
 	c := config.Data{
 		Template: config.Template{
@@ -205,13 +209,16 @@ func MustLoadGinServerTestConfig(configPath, openAPIPath string) config.Data {
 		OpenAPIFile: openAPIPath,
 		OutputPath:  ".",
 	}
-	if err := c.Load(); err != nil {
+	if err := c.Load(configFileReader); err != nil {
 		panic(err)
 	}
 	return c
 }
 func MustLoadGoClientTestConfig(configPath, openAPIPath string) config.Data {
 	// TODO: `Must` this function and load the returned config before returning it
+	config.ConfigFilePath = configPath
+	absCfgPath, _ := filepath.Abs(config.ConfigFilePath)
+	configFileReader, _ := os.Open(absCfgPath)
 	config.ConfigFilePath = configPath
 	config.Debug = true
 	c := config.Data{
@@ -221,7 +228,7 @@ func MustLoadGoClientTestConfig(configPath, openAPIPath string) config.Data {
 		OpenAPIFile: openAPIPath,
 		OutputPath:  ".",
 	}
-	if err := c.Load(); err != nil {
+	if err := c.Load(configFileReader); err != nil {
 		panic(err)
 	}
 	return c
