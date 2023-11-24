@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"flag"
 	"fmt"
 	"github.com/sasswart/gin-in-a-can/config"
 	"github.com/sasswart/gin-in-a-can/openapi"
@@ -13,52 +12,108 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/spf13/cobra"
 )
 
-func main() {
-	if !flag.Parsed() { // Sorts out buggy tests
-		flag.BoolVar(&config.VersionFlagSet, "version", false, "Print Can version and exit")
-		flag.BoolVar(&config.Debug, "debug", false, "Enable debug logging")
-		flag.StringVar(&config.ConfigFilePath, "configFile", ".", "Specify which config file to use")
-		flag.BoolVar(&config.Dryrun, "dryrun", false,
-			"Toggles whether to perform a render without writing to disk."+
-				"This works particularly well in combination with -debug")
-		flag.StringVar(&config.TemplateNameFlag, "template", "", "Specify which template set to use")
-		// TODO should we support stdout as an option here?
-		flag.StringVar(&config.OutputPathFlag, "outputPath", "", "Specify where to write output to")
-		flag.Parse()
-	}
+var canCmd = &cobra.Command{
+	Use:   "can",
+	Short: "Generate code based on OpenAPI specifications",
+}
 
-	absCfgPath, err := filepath.Abs(config.ConfigFilePath)
-	if err != nil {
-		fmt.Printf("could not resolve relative config path: %v\n", err)
-		return
-	}
-	config.ConfigFilePath = absCfgPath
+var generateCmd = &cobra.Command{
+	Use:   "generate",
+	Short: "Generate files",
+	Run: func(cmd *cobra.Command, args []string) {
+		absCfgPath, err := filepath.Abs(config.ConfigFilePath)
+		if err != nil {
+			fmt.Printf("could not resolve relative config path: %v\n", err)
+			return
+		}
+		config.ConfigFilePath = absCfgPath
 
-	if config.Debug {
+		configFileReader, err := os.Open(absCfgPath)
+		if err != nil {
+			fmt.Printf("failed to open config file: %v", err)
+			os.Exit(1)
+		}
+
+		configs := config.ReadConfigs(configFileReader)
+
+		generate(configs)
+	},
+}
+
+var cleanCmd = &cobra.Command{
+	Use:   "clean",
+	Short: "Remove generated files",
+	Run: func(cmd *cobra.Command, args []string) {
+		absCfgPath, err := filepath.Abs(config.ConfigFilePath)
+		if err != nil {
+			fmt.Printf("could not resolve relative config path: %v\n", err)
+			return
+		}
+		config.ConfigFilePath = absCfgPath
+
+		configFileReader, err := os.Open(absCfgPath)
+		if err != nil {
+			fmt.Printf("failed to open config file: %v", err)
+			os.Exit(1)
+		}
+
+		configs := config.ReadConfigs(configFileReader)
+
+		clean(configs)
+	},
+}
+
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Print the version number",
+	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("Can: v%s\n", config.SemVer)
-	}
-	if config.VersionFlagSet {
-		os.Exit(0)
-	}
+	},
+}
 
-	if config.Debug {
-		fmt.Printf("[v%s]::Using config file \"%s\".\n", config.SemVer, config.ConfigFilePath)
-	}
+func main() {
+	canCmd.PersistentFlags().StringVarP(
+		&config.ConfigFilePath,
+		"configFile",
+		"c",
+		"./can.yml",
+		"config file (default is ./can.yml)")
 
-	configFileReader, err := os.Open(absCfgPath)
-	if err != nil {
-		fmt.Printf("failed to open config file: %v", err)
+	canCmd.PersistentFlags().BoolVarP(
+		&config.Debug,
+		"debug",
+		"d",
+		false,
+		"Enable Debug logging")
+
+	canCmd.PersistentFlags().BoolVarP(
+		&config.Dryrun,
+		"dry-run",
+		"r",
+		false,
+		"Print actions instead of applying them to disk")
+
+	canCmd.AddCommand(generateCmd)
+	canCmd.AddCommand(cleanCmd)
+	canCmd.AddCommand(versionCmd)
+
+	if err := canCmd.Execute(); err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
+}
 
-	configs := config.ReadConfigs(configFileReader)
-
+func clean(configs <-chan []byte) {
 	wg := sync.WaitGroup{}
 	for configBytes := range configs {
+
+		wg.Add(1)
+
 		go func(configBytes []byte) {
-			wg.Add(1)
 			defer wg.Done()
 
 			if len(configBytes) == 0 {
@@ -71,7 +126,41 @@ func main() {
 			configReader := bytes.NewReader(configBytes)
 			cfg := mustLoadConfig(configReader)
 
-			err = executeJobForConfig(cfg)
+			if config.Dryrun {
+				fmt.Printf("Would delete %s\n", cfg.GetOutputDir())
+				return
+			}
+
+			err := os.RemoveAll(cfg.GetOutputDir())
+			if err != nil {
+				fmt.Println(err)
+			}
+
+		}(configBytes)
+	}
+	wg.Wait()
+}
+
+func generate(configs <-chan []byte) {
+	wg := sync.WaitGroup{}
+	for configBytes := range configs {
+
+		wg.Add(1)
+
+		go func(configBytes []byte) {
+			defer wg.Done()
+
+			if len(configBytes) == 0 {
+				if config.Debug {
+					fmt.Println("Skipping empty config")
+				}
+				return
+			}
+
+			configReader := bytes.NewReader(configBytes)
+			cfg := mustLoadConfig(configReader)
+
+			err := executeJobForConfig(cfg)
 			if err != nil {
 				fmt.Println(err)
 			}

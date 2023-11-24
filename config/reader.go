@@ -3,10 +3,11 @@ package config
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io"
 )
 
-func ReadConfigs(reader io.Reader) chan []byte {
+func ReadConfigs(reader io.Reader) <-chan []byte {
 	configs := make(chan []byte)
 	scanner := bufio.NewScanner(reader)
 	scanner.Split(splitAtDashDashDash)
@@ -14,7 +15,13 @@ func ReadConfigs(reader io.Reader) chan []byte {
 	go func() {
 		defer close(configs)
 		for scanner.Scan() {
+			if Debug {
+				fmt.Println("Reading config")
+			}
 			configBytes := scanner.Bytes()
+			if Debug {
+				fmt.Println("Read config:", len(configBytes), "bytes")
+			}
 			configs <- configBytes
 		}
 	}()
