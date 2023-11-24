@@ -3,6 +3,7 @@
 package config
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
 	"testing"
@@ -16,7 +17,8 @@ func TestConfig_Load(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 	cfg := newTestConfig()
-	err = cfg.Load()
+	reader := bytes.NewReader([]byte{})
+	err = cfg.Load(reader)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -78,7 +80,8 @@ func TestConfig_validTemplateName(t *testing.T) {
 }
 func TestConfig_GetOpenAPIFilepath(t *testing.T) {
 	cfg := newTestConfig()
-	err := cfg.Load()
+	reader := bytes.NewReader([]byte{})
+	err := cfg.Load(reader)
 	if err != nil {
 		t.Errorf(err.Error())
 	}

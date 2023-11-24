@@ -1,4 +1,4 @@
-VERSION := v0.0.0
+VERSION := 0.0.0
 
 all: linux_amd64.zip
 
@@ -8,7 +8,7 @@ linux_amd64.zip: build/linux_amd64 LICENSE
 build/linux_amd64: build/linux_amd64/can build/linux_amd64/templates
 
 build/linux_amd64/can:
-	echo '${VERSION}' > ./config/version.txt
+	echo -n '${VERSION}' > ./config/version.txt
 	go build -o ./build/linux_amd64/ ./...
 
 build/linux_amd64/templates:
@@ -24,3 +24,6 @@ test:
 test_coverage:
 	go test ./openapi -coverprofile=coverage.out
 	go tool cover -html=coverage.out
+
+install: build/linux_amd64
+	cp build/linux_amd64/can ~/bin/can

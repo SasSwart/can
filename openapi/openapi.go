@@ -58,6 +58,7 @@ func (o *OpenAPI) SetChild(i string, child tree.NodeTraverser) {
 // LoadFromYaml expects a path to an openapi file in yaml format. It will unmarshal the yaml file and resolve the
 // references contained within.
 func LoadFromYaml(openApiFilepath string) (*OpenAPI, error) {
+	fmt.Printf("Attempting to read %s\n", openApiFilepath)
 	// Read yaml file
 	// TODO: should this function have to perform file IO?
 	content, err := os.ReadFile(openApiFilepath)
