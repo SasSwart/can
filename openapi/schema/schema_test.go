@@ -8,11 +8,12 @@ import (
 	"testing"
 )
 
-func TestOpenAPI_Schema_SetAndGetChildren(t *testing.T) {
+func TestOpenAPI_Schema_SetAndGetArrayChildren(t *testing.T) {
 	s := new(schema.Schema)
 	s.Items = new(schema.Schema)
 	s.Properties = make(map[string]*schema.Schema, 4)
 	s.Name = "Test Schema"
+	s.Type = "array"
 	this := &schema.Schema{
 		Node: tree.Node{
 			Name: "schema item",
@@ -37,7 +38,45 @@ func TestOpenAPI_Schema_SetAndGetChildren(t *testing.T) {
 	if children[schema.ItemsKey].(*schema.Schema) != this {
 		t.Fail()
 	}
-	// Check Properties
+	// We should not get any properties for an array
+	if children["that"] != nil {
+		t.Fail()
+	}
+	if children["theOther"] != nil {
+		t.Fail()
+	}
+}
+
+func TestOpenAPI_Schema_SetAndGetObjectChildren(t *testing.T) {
+	s := new(schema.Schema)
+	s.Items = new(schema.Schema)
+	s.Properties = make(map[string]*schema.Schema, 4)
+	s.Name = "Test Schema"
+	s.Type = "object"
+	this := &schema.Schema{
+		Node: tree.Node{
+			Name: "schema item",
+		},
+	}
+	that := &schema.Schema{
+		Node: tree.Node{
+			Name: "that",
+		},
+	}
+	theOther := &schema.Schema{
+		Node: tree.Node{
+			Name: "theOther",
+		},
+	}
+	s.SetChild(schema.ItemsKey, this)
+	s.SetChild("that", that)
+	s.SetChild("theOther", theOther)
+	children := s.GetChildren()
+
+	// Check Item
+	if children[schema.ItemsKey] != nil {
+		t.Fail()
+	}
 	if children["that"].(*schema.Schema) != that {
 		t.Fail()
 	}
@@ -45,7 +84,6 @@ func TestOpenAPI_Schema_SetAndGetChildren(t *testing.T) {
 		t.Fail()
 	}
 }
-
 func TestOpenAPI_Schema_GetAndSetBasePath(t *testing.T) {
 	ref := "testRef/ref"
 	basePath := "/base/path/"

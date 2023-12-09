@@ -41,12 +41,12 @@ func TestGolang_SanitiseName(t *testing.T) {
 		{
 			name:     "testopenapi path",
 			node:     test.Dig(apiSpec, test.Endpoint),
-			expected: "ValidationFixtureEndpoint",
+			expected: "Endpoint",
 		},
 		{
 			name:     "testopenapi pathitem",
 			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost),
-			expected: "ValidationFixtureEndpointPost",
+			expected: "EndpointPost",
 		},
 		{
 			name:     "testopenapi parameter",
@@ -56,27 +56,27 @@ func TestGolang_SanitiseName(t *testing.T) {
 		{
 			name:     "testopenapi requestbody",
 			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey),
-			expected: "ValidationFixtureEndpointPostRequestBody",
+			expected: "EndpointPostRequestBody",
 		},
 		{
 			name:     "testopenapi json mediaitem",
 			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey),
-			expected: "ValidationFixtureEndpointPostRequestBody",
+			expected: "EndpointPostRequestBody",
 		},
 		{
 			name:     "testopenapi schema",
 			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.PropertyKey),
-			expected: "ValidationFixtureEndpointPostRequestBodyModel",
+			expected: "EndpointPostRequestBodyModel",
 		},
 		{
 			name:     "testopenapi property",
 			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.PropertyKey, "name"),
-			expected: "ValidationFixtureEndpointPostRequestBodyModelName",
+			expected: "EndpointPostRequestBodyModelName",
 		},
 		{
 			name:     "testopenapi property with dashes in name",
 			node:     test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.PropertyKey, goPropertiesWithDashes),
-			expected: "ValidationFixtureEndpointPostRequestBodyModelGoPropertiesWithDashes",
+			expected: "EndpointPostRequestBodyModelGoPropertiesWithDashes",
 		},
 	}
 	for _, testCase := range tests {
