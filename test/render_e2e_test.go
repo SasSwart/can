@@ -77,17 +77,17 @@ func TestGolang_GoClient_Renderer(t *testing.T) {
 }
 
 var heavyNestingFilenames = [12]string{"NestedApiExample.go",
-	"NestedApiExampleNestedEndpoint.go",
-	"NestedApiExampleNestedEndpointPost.go",
-	"NestedApiExampleNestedEndpointPost201ResponseModel.go",
-	"NestedApiExampleNestedEndpointPost201ResponseModelNestedresource.go",
-	"NestedApiExampleNestedEndpointPost201ResponseModelNestedresourceChildobject.go",
-	"NestedApiExampleNestedEndpointPost201ResponseModelNestedresourceChildobjectGrandchildarray.go",
-	"NestedApiExampleNestedEndpointPost201ResponseModelNestedresourceChildobjectGrandchildarrayItem.go",
-	"NestedApiExampleNestedEndpointPostRequestBodyModel.go",
-	"NestedApiExampleNestedEndpointPostRequestBodyModelChildobject.go",
-	"NestedApiExampleNestedEndpointPostRequestBodyModelChildobjectGrandchildarray.go",
-	"NestedApiExampleNestedEndpointPostRequestBodyModelChildobjectGrandchildarrayItem.go",
+	"NestedEndpoint.go",
+	"NestedEndpointPost.go",
+	"NestedEndpointPost201ResponseModel.go",
+	"NestedEndpointPost201ResponseModelNestedresource.go",
+	"NestedEndpointPost201ResponseModelNestedresourceChildobject.go",
+	"NestedEndpointPost201ResponseModelNestedresourceChildobjectGrandchildarray.go",
+	"NestedEndpointPost201ResponseModelNestedresourceChildobjectGrandchildarrayItem.go",
+	"NestedEndpointPostRequestBodyModel.go",
+	"NestedEndpointPostRequestBodyModelChildobject.go",
+	"NestedEndpointPostRequestBodyModelChildobjectGrandchildarray.go",
+	"NestedEndpointPostRequestBodyModelChildobjectGrandchildarrayItem.go",
 }
 
 func TestGolang_GoClient_Renderer_HeavyNesting(t *testing.T) {
@@ -121,11 +121,11 @@ func TestGolang_GoClient_Renderer_HeavyNesting(t *testing.T) {
 	if err := filepath.Walk(tempFolder, assertFilesPresent(tempFolder, heavyNestingFilenames)); err != nil {
 		t.Error(err)
 	}
-	file, err := os.Open(filepath.Join(tempFolder, "NestedApiExampleNestedEndpointPostRequestBodyModelChildobjectGrandchildarrayItem.go"))
+	file, err := os.Open(filepath.Join(tempFolder, "NestedEndpointPostRequestBodyModelChildobjectGrandchildarrayItem.go"))
 	if err != nil {
 		t.Error(err)
 	}
-	want := "type NestedApiExampleNestedEndpointPostRequestBodyModelChildobjectGrandchildarrayItem struct {\n\tGrandchildproperty string `json:\"grandchildProperty,omitempty\"`\n}"
+	want := "type NestedEndpointPostRequestBodyModelChildobjectGrandchildarrayItem struct {\n\tGrandchildproperty string `json:\"grandchildProperty,omitempty\"`\n}"
 	if err := fileShouldContain(file, want); err != nil {
 		t.Error(err)
 	}
@@ -165,11 +165,11 @@ func TestGolang_GoGin_Renderer_HeavyNesting(t *testing.T) {
 	if err := filepath.Walk(tempFolder, assertFilesPresent(tempFolder, heavyNestingFilenames)); err != nil {
 		t.Error(err)
 	}
-	file, err := os.Open(filepath.Join(tempFolder, "NestedApiExampleNestedEndpointPostRequestBodyModelChildobjectGrandchildarrayItem.go"))
+	file, err := os.Open(filepath.Join(tempFolder, "NestedEndpointPostRequestBodyModelChildobjectGrandchildarrayItem.go"))
 	if err != nil {
 		t.Error(err)
 	}
-	want := "type NestedApiExampleNestedEndpointPostRequestBodyModelChildobjectGrandchildarrayItem struct {\n\tGrandchildproperty string `json:\"grandchildProperty\"`\n}"
+	want := "type NestedEndpointPostRequestBodyModelChildobjectGrandchildarrayItem struct {\n\tGrandchildproperty string `json:\"grandchildProperty\"`\n}"
 	if err := fileShouldContain(file, want); err != nil {
 		t.Error(err)
 	}
@@ -207,12 +207,12 @@ func TestRegression_GoClient_EmptyRequestAndResponseBodiesShouldRender(t *testin
 	}
 
 	// Patch file assertions
-	file, err := os.Open(filepath.Join(tempFolder, "EmptyRequestAndResponseApiResourcePatch.go"))
+	file, err := os.Open(filepath.Join(tempFolder, "ResourcePatch.go"))
 	if err != nil {
 		t.Error(err)
 	}
-	want1 := "type EmptyRequestAndResponseApiResourcePatchRequestBody struct{}"
-	want2 := "type EmptyRequestAndResponseApiResourcePatch204Response struct{}"
+	want1 := "type ResourcePatchRequestBody struct{}"
+	want2 := "type ResourcePatch204Response struct{}"
 	if err := fileShouldContain(file, want1, want2); err != nil {
 		t.Error(err)
 	}
@@ -221,12 +221,12 @@ func TestRegression_GoClient_EmptyRequestAndResponseBodiesShouldRender(t *testin
 	}
 
 	// Delete file assertions
-	file, err = os.Open(filepath.Join(tempFolder, "EmptyRequestAndResponseApiResourceDelete.go"))
+	file, err = os.Open(filepath.Join(tempFolder, "ResourceDelete.go"))
 	if err != nil {
 		t.Error(err)
 	}
-	want1 = "type EmptyRequestAndResponseApiResourceDeleteRequestBody struct{}"
-	want2 = "type EmptyRequestAndResponseApiResourceDelete204Response struct{}"
+	want1 = "type ResourceDeleteRequestBody struct{}"
+	want2 = "type ResourceDelete204Response struct{}"
 	if err := fileShouldContain(file, want1, want2); err != nil {
 		t.Error(err)
 	}
@@ -235,12 +235,12 @@ func TestRegression_GoClient_EmptyRequestAndResponseBodiesShouldRender(t *testin
 	}
 
 	// Get file assertions
-	file, err = os.Open(filepath.Join(tempFolder, "EmptyRequestAndResponseApiResourceGet.go"))
+	file, err = os.Open(filepath.Join(tempFolder, "ResourceGet.go"))
 	if err != nil {
 		t.Error(err)
 	}
-	want1 = "type EmptyRequestAndResponseApiResourceGetRequestBody struct{}"
-	want2 = "type EmptyRequestAndResponseApiResourceGet200Response struct{}"
+	want1 = "type ResourceGetRequestBody struct{}"
+	want2 = "type ResourceGet200Response struct{}"
 	if err := fileShouldContain(file, want1, want2); err != nil {
 		t.Error(err)
 	}
@@ -249,12 +249,12 @@ func TestRegression_GoClient_EmptyRequestAndResponseBodiesShouldRender(t *testin
 	}
 
 	// Post file assertions
-	file, err = os.Open(filepath.Join(tempFolder, "EmptyRequestAndResponseApiResourcePost.go"))
+	file, err = os.Open(filepath.Join(tempFolder, "ResourcePost.go"))
 	if err != nil {
 		t.Error(err)
 	}
-	want1 = "type EmptyRequestAndResponseApiResourcePostRequestBody struct{}"
-	want2 = "type EmptyRequestAndResponseApiResourcePost201Response struct{}"
+	want1 = "type ResourcePostRequestBody struct{}"
+	want2 = "type ResourcePost201Response struct{}"
 	if err := fileShouldContain(file, want1, want2); err != nil {
 		t.Error(err)
 	}
@@ -292,12 +292,12 @@ func TestRegression_GoGin_EmptyRequestAndResponseBodiesShouldRender(t *testing.T
 	}
 
 	// Patch file assertions
-	file, err := os.Open(filepath.Join(tempFolder, "EmptyRequestAndResponseApiResourcePatch.go"))
+	file, err := os.Open(filepath.Join(tempFolder, "ResourcePatch.go"))
 	if err != nil {
 		t.Error(err)
 	}
-	want1 := "type EmptyRequestAndResponseApiResourcePatchRequestBody struct{}"
-	want2 := "type EmptyRequestAndResponseApiResourcePatch204Response struct{}"
+	want1 := "type ResourcePatchRequestBody struct{}"
+	want2 := "type ResourcePatch204Response struct{}"
 	if err := fileShouldContain(file, want1, want2); err != nil {
 		t.Error(err)
 	}
@@ -306,12 +306,12 @@ func TestRegression_GoGin_EmptyRequestAndResponseBodiesShouldRender(t *testing.T
 	}
 
 	// Delete file assertions
-	file, err = os.Open(filepath.Join(tempFolder, "EmptyRequestAndResponseApiResourceDelete.go"))
+	file, err = os.Open(filepath.Join(tempFolder, "ResourceDelete.go"))
 	if err != nil {
 		t.Error(err)
 	}
-	want1 = "type EmptyRequestAndResponseApiResourceDeleteRequestBody struct{}"
-	want2 = "type EmptyRequestAndResponseApiResourceDelete204Response struct{}"
+	want1 = "type ResourceDeleteRequestBody struct{}"
+	want2 = "type ResourceDelete204Response struct{}"
 	if err := fileShouldContain(file, want1, want2); err != nil {
 		t.Error(err)
 	}
@@ -320,12 +320,12 @@ func TestRegression_GoGin_EmptyRequestAndResponseBodiesShouldRender(t *testing.T
 	}
 
 	// Get file assertions
-	file, err = os.Open(filepath.Join(tempFolder, "EmptyRequestAndResponseApiResourceGet.go"))
+	file, err = os.Open(filepath.Join(tempFolder, "ResourceGet.go"))
 	if err != nil {
 		t.Error(err)
 	}
-	want1 = "type EmptyRequestAndResponseApiResourceGetRequestBody struct{}"
-	want2 = "type EmptyRequestAndResponseApiResourceGet200Response struct{}"
+	want1 = "type ResourceGetRequestBody struct{}"
+	want2 = "type ResourceGet200Response struct{}"
 	if err := fileShouldContain(file, want1, want2); err != nil {
 		t.Error(err)
 	}
@@ -334,12 +334,12 @@ func TestRegression_GoGin_EmptyRequestAndResponseBodiesShouldRender(t *testing.T
 	}
 
 	// Post file assertions
-	file, err = os.Open(filepath.Join(tempFolder, "EmptyRequestAndResponseApiResourcePost.go"))
+	file, err = os.Open(filepath.Join(tempFolder, "ResourcePost.go"))
 	if err != nil {
 		t.Error(err)
 	}
-	want1 = "type EmptyRequestAndResponseApiResourcePostRequestBody struct{}"
-	want2 = "type EmptyRequestAndResponseApiResourcePost201Response struct{}"
+	want1 = "type ResourcePostRequestBody struct{}"
+	want2 = "type ResourcePost201Response struct{}"
 	if err := fileShouldContain(file, want1, want2); err != nil {
 		t.Error(err)
 	}

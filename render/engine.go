@@ -55,7 +55,7 @@ func (e *Engine) ParseTemplate(templateFilename, templateDirectory string) (*tem
 // Render fetches the appropriate template name and renders yielded by it and the provided node to disk.
 func (e *Engine) Render(key string, parent, node tree.NodeTraverser) (tree.NodeTraverser, error) {
 	if s, ok := node.(*schema.Schema); ok {
-		// This allows us to avoid rendering schemas with these types
+		// For schemas, only render objects and arrays
 		if s.Type != "object" && s.Type != "array" {
 			return node, nil
 		}

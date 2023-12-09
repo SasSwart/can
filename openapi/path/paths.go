@@ -29,6 +29,10 @@ func (p *Item) GetRef() string {
 	return p.Ref
 }
 
+func (p *Item) GetName() []string {
+	return []string{p.Name}
+}
+
 func (p *Item) GetPath() string {
 	return strings.Join(p.GetName(), "")
 }

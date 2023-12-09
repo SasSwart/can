@@ -179,7 +179,6 @@ func executeJobForConfig(cfg config.Data) error {
 
 	engine := render.NewEngine(cfg)
 
-	// Setup appropriate renderer via the `strategy` design pattern
 	err := setStrategy(&engine, cfg.Template.Strategy)
 	if err != nil {
 		return err
@@ -206,6 +205,8 @@ func mustLoadOpenApiFile(path string) *openapi.OpenAPI {
 }
 
 // setStrategy creates and applies the renderer for the given strategy. An error is returned if the strategy is invalid
+// TODO: A "strategy" is really just a renderer. This function should be a factory that returns a renderer, which then
+// gets applied to the engine where this is called.
 func setStrategy(e *render.Engine, strategy string) error {
 	var r render.Renderer
 	switch strategy {
