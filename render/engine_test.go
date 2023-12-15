@@ -5,11 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/sasswart/gin-in-a-can/config"
-	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/sasswart/gin-in-a-can/openapi/operation"
-	"github.com/sasswart/gin-in-a-can/openapi/parameter"
-	"github.com/sasswart/gin-in-a-can/openapi/path"
-	"github.com/sasswart/gin-in-a-can/openapi/schema"
+	"github.com/sasswart/gin-in-a-can/openapi3"
+	"github.com/sasswart/gin-in-a-can/openapi3/operation"
+	"github.com/sasswart/gin-in-a-can/openapi3/parameter"
+	"github.com/sasswart/gin-in-a-can/openapi3/path"
+	"github.com/sasswart/gin-in-a-can/openapi3/schema"
 	"github.com/sasswart/gin-in-a-can/render"
 	golang "github.com/sasswart/gin-in-a-can/render/go"
 	"github.com/sasswart/gin-in-a-can/test"
@@ -154,7 +154,7 @@ func TestGetTemplateFilename(t *testing.T) {
 		node     tree.NodeTraverser
 		expected string
 	}{
-		{&openapi.OpenAPI{}, "openapi.tmpl"},
+		{&openapi3.OpenAPI{}, "openapi.tmpl"},
 		{&path.Item{}, "path_item.tmpl"},
 		{&operation.Operation{}, "operation.tmpl"},
 		{&schema.Schema{}, "schema.tmpl"},

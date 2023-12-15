@@ -2,7 +2,7 @@ package media
 
 import (
 	"github.com/sasswart/gin-in-a-can/errors"
-	"github.com/sasswart/gin-in-a-can/openapi/schema"
+	"github.com/sasswart/gin-in-a-can/openapi3/schema"
 	"github.com/sasswart/gin-in-a-can/tree"
 )
 

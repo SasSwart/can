@@ -1,9 +1,9 @@
 package path_test
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/sasswart/gin-in-a-can/openapi/operation"
-	"github.com/sasswart/gin-in-a-can/openapi/path"
+	"github.com/sasswart/gin-in-a-can/openapi3"
+	"github.com/sasswart/gin-in-a-can/openapi3/operation"
+	"github.com/sasswart/gin-in-a-can/openapi3/path"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"net/http"
 	"path/filepath"
@@ -29,7 +29,7 @@ func Test_Path_GetBasePath(t *testing.T) {
 		Ref:  piPath,
 		Node: tree.Node{},
 	}
-	o := openapi.OpenAPI{
+	o := openapi3.OpenAPI{
 		Node: tree.Node{},
 	}
 	o.SetBasePath(oaPath)

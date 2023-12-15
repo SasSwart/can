@@ -2,9 +2,9 @@ package operation
 
 import (
 	"github.com/sasswart/gin-in-a-can/errors"
-	"github.com/sasswart/gin-in-a-can/openapi/parameter"
-	"github.com/sasswart/gin-in-a-can/openapi/request"
-	"github.com/sasswart/gin-in-a-can/openapi/response"
+	"github.com/sasswart/gin-in-a-can/openapi3/parameter"
+	"github.com/sasswart/gin-in-a-can/openapi3/request"
+	"github.com/sasswart/gin-in-a-can/openapi3/response"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"strconv"
 )

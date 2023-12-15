@@ -1,8 +1,8 @@
 package response_test
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi/media"
-	"github.com/sasswart/gin-in-a-can/openapi/response"
+	"github.com/sasswart/gin-in-a-can/openapi3/media"
+	"github.com/sasswart/gin-in-a-can/openapi3/response"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"reflect"
 	"strings"

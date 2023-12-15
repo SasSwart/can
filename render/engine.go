@@ -7,10 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/sasswart/gin-in-a-can/config"
-	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/sasswart/gin-in-a-can/openapi/operation"
-	"github.com/sasswart/gin-in-a-can/openapi/path"
-	"github.com/sasswart/gin-in-a-can/openapi/schema"
+	"github.com/sasswart/gin-in-a-can/openapi3"
+	"github.com/sasswart/gin-in-a-can/openapi3/operation"
+	"github.com/sasswart/gin-in-a-can/openapi3/path"
+	"github.com/sasswart/gin-in-a-can/openapi3/schema"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"os"
 	"path/filepath"
@@ -86,7 +86,7 @@ func (e *Engine) Render(key string, parent, node tree.NodeTraverser) (tree.NodeT
 
 func GetTemplateFilename(node tree.NodeTraverser) string {
 	switch node.(type) {
-	case *openapi.OpenAPI:
+	case *openapi3.OpenAPI:
 		return "openapi.tmpl"
 	case *path.Item:
 		return "path_item.tmpl"

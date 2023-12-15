@@ -1,11 +1,11 @@
-package openapi_test
+package openapi3_test
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/sasswart/gin-in-a-can/openapi/media"
-	"github.com/sasswart/gin-in-a-can/openapi/path"
-	"github.com/sasswart/gin-in-a-can/openapi/request"
-	"github.com/sasswart/gin-in-a-can/openapi/schema"
+	"github.com/sasswart/gin-in-a-can/openapi3"
+	"github.com/sasswart/gin-in-a-can/openapi3/media"
+	"github.com/sasswart/gin-in-a-can/openapi3/path"
+	"github.com/sasswart/gin-in-a-can/openapi3/request"
+	"github.com/sasswart/gin-in-a-can/openapi3/schema"
 	"github.com/sasswart/gin-in-a-can/test"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"net/http"
@@ -16,7 +16,7 @@ import (
 
 func TestOpenAPI_LoadOpenAPI(t *testing.T) {
 	specPath := "../" + test.OpenapiFile
-	apiSpec, err := openapi.LoadFromYaml(specPath)
+	apiSpec, err := openapi3.LoadFromYaml(specPath)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -27,7 +27,7 @@ func TestOpenAPI_LoadOpenAPI(t *testing.T) {
 
 func TestOpenAPI_GetAndSetBasePath(t *testing.T) {
 	want := "test/Base/Path"
-	o := openapi.OpenAPI{}
+	o := openapi3.OpenAPI{}
 	o.SetBasePath(want)
 	got := o.GetBasePath()
 	if got != want {
@@ -36,7 +36,7 @@ func TestOpenAPI_GetAndSetBasePath(t *testing.T) {
 }
 
 func TestOpenAPI_GetParent(t *testing.T) {
-	o := openapi.OpenAPI{}
+	o := openapi3.OpenAPI{}
 	p := o.GetParent()
 	if p != nil {
 		t.Fail()
@@ -46,7 +46,7 @@ func TestOpenAPI_GetParent(t *testing.T) {
 func TestGetOpenAPI_GetAndSetChildren(t *testing.T) {
 	pathName := "/path"
 	want := path.Item{Node: tree.Node{}}
-	o := openapi.OpenAPI{Node: tree.Node{}}
+	o := openapi3.OpenAPI{Node: tree.Node{}}
 	o.SetChild(pathName, &want)
 	got := o.GetChildren()[pathName].(*path.Item)
 	if !reflect.DeepEqual(&want, got) {
@@ -56,7 +56,7 @@ func TestGetOpenAPI_GetAndSetChildren(t *testing.T) {
 
 func TestOpenAPI_GetAndSetName(t *testing.T) {
 	want := "testName"
-	o := openapi.OpenAPI{}
+	o := openapi3.OpenAPI{}
 	o.SetName(want)
 	got := strings.Join(o.GetName(), "")
 	if got != want {
@@ -66,7 +66,7 @@ func TestOpenAPI_GetAndSetName(t *testing.T) {
 
 func TestOpenAPI_GetAndSetMetadata(t *testing.T) {
 	want := tree.Metadata{"key": "value"}
-	o := openapi.OpenAPI{}
+	o := openapi3.OpenAPI{}
 	o.SetMetadata(want)
 	got := o.GetMetadata()
 	if !reflect.DeepEqual(want, got) {
@@ -75,7 +75,7 @@ func TestOpenAPI_GetAndSetMetadata(t *testing.T) {
 }
 
 func TestOpenAPI_MetadataSetPoint(t *testing.T) {
-	apiSpec, _ := openapi.LoadFromYaml("../" + test.OpenapiFile)
+	apiSpec, _ := openapi3.LoadFromYaml("../" + test.OpenapiFile)
 	data := tree.Metadata{"this": "is", "some": "metadata"}
 	traversable := test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.PropertyKey, "name")
 

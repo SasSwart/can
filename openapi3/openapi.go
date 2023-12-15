@@ -1,12 +1,12 @@
-package openapi
+package openapi3
 
 import (
 	"fmt"
 	"github.com/sasswart/gin-in-a-can/errors"
-	"github.com/sasswart/gin-in-a-can/openapi/components"
-	"github.com/sasswart/gin-in-a-can/openapi/info"
-	"github.com/sasswart/gin-in-a-can/openapi/path"
-	"github.com/sasswart/gin-in-a-can/openapi/servers"
+	"github.com/sasswart/gin-in-a-can/openapi3/components"
+	"github.com/sasswart/gin-in-a-can/openapi3/info"
+	"github.com/sasswart/gin-in-a-can/openapi3/path"
+	"github.com/sasswart/gin-in-a-can/openapi3/servers"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"gopkg.in/yaml.v3"
 	"os"

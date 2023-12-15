@@ -7,7 +7,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/sasswart/gin-in-a-can/config"
-	"github.com/sasswart/gin-in-a-can/openapi/schema"
+	"github.com/sasswart/gin-in-a-can/openapi3/schema"
 	"github.com/sasswart/gin-in-a-can/render"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"go/format"
@@ -66,6 +66,7 @@ func (g *Renderer) GetOutputFilename(n tree.NodeTraverser) string {
 func DefaultFuncMap() *template.FuncMap {
 	return &template.FuncMap{
 		"ToUpper": strings.ToUpper,
+		"ToLower": strings.ToLower,
 		"ToTitle": ToTitle,
 		"StringsReplace": func(input, from, to string) string {
 			return strings.Replace(input, from, to, -1)
