@@ -1,8 +1,8 @@
 package tree_test
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/sasswart/gin-in-a-can/openapi/path"
+	"github.com/sasswart/gin-in-a-can/openapi3"
+	"github.com/sasswart/gin-in-a-can/openapi3/path"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"reflect"
 	"strings"
@@ -35,7 +35,7 @@ func TestOpenAPI_Node_GetRef(t *testing.T) {
 
 func TestOpenAPI_Node_GetAndSetMetadata(t *testing.T) {
 	p := path.Item{Node: tree.Node{}}
-	o := openapi.OpenAPI{Node: tree.Node{}}
+	o := openapi3.OpenAPI{Node: tree.Node{}}
 	p.SetParent(&o)
 	o.SetChild("/test", &p)
 	want := tree.Metadata{"key": "value"}

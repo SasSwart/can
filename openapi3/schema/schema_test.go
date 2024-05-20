@@ -1,8 +1,8 @@
 package schema_test
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi/parameter"
-	"github.com/sasswart/gin-in-a-can/openapi/schema"
+	"github.com/sasswart/gin-in-a-can/openapi3/parameter"
+	"github.com/sasswart/gin-in-a-can/openapi3/schema"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"path/filepath"
 	"testing"

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/sasswart/gin-in-a-can/config"
-	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/openapi3"
 	"github.com/sasswart/gin-in-a-can/render"
 	golang "github.com/sasswart/gin-in-a-can/render/go"
 	"github.com/sasswart/gin-in-a-can/tree"
@@ -194,9 +194,9 @@ func executeJobForConfig(cfg config.Data) error {
 	return nil
 }
 
-func mustLoadOpenApiFile(path string) *openapi.OpenAPI {
+func mustLoadOpenApiFile(path string) *openapi3.OpenAPI {
 	// TODO: What if JSON?
-	apiSpec, err := openapi.LoadFromYaml(path)
+	apiSpec, err := openapi3.LoadFromYaml(path)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)

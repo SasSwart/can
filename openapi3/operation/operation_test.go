@@ -1,11 +1,11 @@
 package operation_test
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/sasswart/gin-in-a-can/openapi/operation"
-	"github.com/sasswart/gin-in-a-can/openapi/parameter"
-	"github.com/sasswart/gin-in-a-can/openapi/request"
-	"github.com/sasswart/gin-in-a-can/openapi/response"
+	"github.com/sasswart/gin-in-a-can/openapi3"
+	"github.com/sasswart/gin-in-a-can/openapi3/operation"
+	"github.com/sasswart/gin-in-a-can/openapi3/parameter"
+	"github.com/sasswart/gin-in-a-can/openapi3/request"
+	"github.com/sasswart/gin-in-a-can/openapi3/response"
 	"github.com/sasswart/gin-in-a-can/test"
 	"reflect"
 	"testing"
@@ -22,7 +22,7 @@ func TestOpenAPI_Operation_SetAndGetBasePath(t *testing.T) {
 }
 
 func TestOpenAPI_Operation_GetRef(t *testing.T) {
-	apiSpec, _ := openapi.LoadFromYaml("../../" + test.OpenapiFile)
+	apiSpec, _ := openapi3.LoadFromYaml("../../" + test.OpenapiFile)
 	ops := test.Dig(apiSpec, test.Endpoint)
 	for _, op := range ops.GetChildren() {
 		if o, ok := op.(*operation.Operation); ok {
@@ -34,7 +34,7 @@ func TestOpenAPI_Operation_GetRef(t *testing.T) {
 }
 
 func TestOpenAPI_Operation_SetAndGetParent(t *testing.T) {
-	apiSpec, _ := openapi.LoadFromYaml("../../" + test.OpenapiFile)
+	apiSpec, _ := openapi3.LoadFromYaml("../../" + test.OpenapiFile)
 	ops := test.Dig(apiSpec, test.Endpoint)
 	for _, o := range ops.GetChildren() {
 		if o.GetParent() == nil {

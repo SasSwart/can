@@ -2,7 +2,7 @@ package request
 
 import (
 	"github.com/sasswart/gin-in-a-can/errors"
-	"github.com/sasswart/gin-in-a-can/openapi/media"
+	"github.com/sasswart/gin-in-a-can/openapi3/media"
 	"github.com/sasswart/gin-in-a-can/tree"
 )
 

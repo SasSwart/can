@@ -1,9 +1,9 @@
 package parameter_test
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/sasswart/gin-in-a-can/openapi/parameter"
-	"github.com/sasswart/gin-in-a-can/openapi/schema"
+	"github.com/sasswart/gin-in-a-can/openapi3"
+	"github.com/sasswart/gin-in-a-can/openapi3/parameter"
+	"github.com/sasswart/gin-in-a-can/openapi3/schema"
 	"github.com/sasswart/gin-in-a-can/test"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"reflect"
@@ -12,7 +12,7 @@ import (
 )
 
 func TestOpenAPILoadsParameterValidation(t *testing.T) {
-	apiSpec, _ := openapi.LoadFromYaml("../../" + test.OpenapiFile)
+	apiSpec, _ := openapi3.LoadFromYaml("../../" + test.OpenapiFile)
 
 	IDParam := apiSpec.Paths["/endpoint"].Post.Parameters[0]
 	if IDParam.Required != true {

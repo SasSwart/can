@@ -2,10 +2,10 @@ package golang_test
 
 import (
 	"bytes"
-	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/sasswart/gin-in-a-can/openapi/media"
-	"github.com/sasswart/gin-in-a-can/openapi/request"
-	"github.com/sasswart/gin-in-a-can/openapi/schema"
+	"github.com/sasswart/gin-in-a-can/openapi3"
+	"github.com/sasswart/gin-in-a-can/openapi3/media"
+	"github.com/sasswart/gin-in-a-can/openapi3/request"
+	"github.com/sasswart/gin-in-a-can/openapi3/schema"
 	golang "github.com/sasswart/gin-in-a-can/render/go"
 	"github.com/sasswart/gin-in-a-can/test"
 	"github.com/sasswart/gin-in-a-can/tree"
@@ -25,7 +25,7 @@ func TestGolang_SetTemplateFuncMap(t *testing.T) {
 func TestGolang_SanitiseName(t *testing.T) {
 
 	specPath := "../../" + test.OpenapiFile
-	apiSpec, _ := openapi.LoadFromYaml(specPath)
+	apiSpec, _ := openapi3.LoadFromYaml(specPath)
 	goPropertiesWithDashes := "go-properties-with-dashes"
 
 	tests := []struct {

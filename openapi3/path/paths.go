@@ -2,8 +2,8 @@ package path
 
 import (
 	"github.com/sasswart/gin-in-a-can/errors"
-	"github.com/sasswart/gin-in-a-can/openapi/operation"
-	"github.com/sasswart/gin-in-a-can/openapi/parameter"
+	"github.com/sasswart/gin-in-a-can/openapi3/operation"
+	"github.com/sasswart/gin-in-a-can/openapi3/parameter"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"net/http"
 	"path/filepath"

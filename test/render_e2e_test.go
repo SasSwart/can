@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sasswart/gin-in-a-can/openapi"
+	"github.com/sasswart/gin-in-a-can/openapi3"
 	"github.com/sasswart/gin-in-a-can/render"
 	golang "github.com/sasswart/gin-in-a-can/render/go"
 	"github.com/sasswart/gin-in-a-can/tree"
@@ -31,7 +31,7 @@ func TestGolang_GinServer_Renderer(t *testing.T) {
 	e.SetRenderer(&r)
 
 	// We have to pop the first element off the path constant
-	apiTree, err := openapi.LoadFromYaml(filepath.Join(strings.Split(OpenapiFile, "/")[1:]...))
+	apiTree, err := openapi3.LoadFromYaml(filepath.Join(strings.Split(OpenapiFile, "/")[1:]...))
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -62,7 +62,7 @@ func TestGolang_GoClient_Renderer(t *testing.T) {
 	e.SetRenderer(&r)
 
 	// We have to pop the first element off the path constant
-	apiTree, err := openapi.LoadFromYaml(filepath.Join(strings.Split(OpenapiFile, "/")[1:]...))
+	apiTree, err := openapi3.LoadFromYaml(filepath.Join(strings.Split(OpenapiFile, "/")[1:]...))
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -107,7 +107,7 @@ func TestGolang_GoClient_Renderer_HeavyNesting(t *testing.T) {
 	e.SetRenderer(&r)
 
 	// We have to pop the first element off the path constant
-	apiTree, err := openapi.LoadFromYaml(filepath.Join(strings.Split(cfg.OpenAPIFile, "/")[1:]...))
+	apiTree, err := openapi3.LoadFromYaml(filepath.Join(strings.Split(cfg.OpenAPIFile, "/")[1:]...))
 	if err != nil {
 		t.Error(err)
 	}
@@ -151,7 +151,7 @@ func TestGolang_GoGin_Renderer_HeavyNesting(t *testing.T) {
 	e.SetRenderer(&r)
 
 	// We have to pop the first element off the path constant
-	apiTree, err := openapi.LoadFromYaml(filepath.Join(strings.Split(cfg.OpenAPIFile, "/")[1:]...))
+	apiTree, err := openapi3.LoadFromYaml(filepath.Join(strings.Split(cfg.OpenAPIFile, "/")[1:]...))
 	if err != nil {
 		t.Error(err)
 	}
@@ -193,7 +193,7 @@ func TestRegression_GoClient_EmptyRequestAndResponseBodiesShouldRender(t *testin
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
 	e := render.NewEngine(cfg)
 	e.SetRenderer(&r)
-	api, err := openapi.LoadFromYaml(cfg.OpenAPIFile)
+	api, err := openapi3.LoadFromYaml(cfg.OpenAPIFile)
 	if err != nil {
 		t.Error(err)
 	}
@@ -278,7 +278,7 @@ func TestRegression_GoGin_EmptyRequestAndResponseBodiesShouldRender(t *testing.T
 	r.SetTemplateFuncMap(golang.DefaultFuncMap())
 	e := render.NewEngine(cfg)
 	e.SetRenderer(&r)
-	api, err := openapi.LoadFromYaml(cfg.OpenAPIFile)
+	api, err := openapi3.LoadFromYaml(cfg.OpenAPIFile)
 	if err != nil {
 		t.Error(err)
 	}

@@ -1,21 +1,21 @@
 package test
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/sasswart/gin-in-a-can/openapi/media"
-	"github.com/sasswart/gin-in-a-can/openapi/operation"
-	"github.com/sasswart/gin-in-a-can/openapi/path"
-	"github.com/sasswart/gin-in-a-can/openapi/request"
-	"github.com/sasswart/gin-in-a-can/openapi/response"
-	"github.com/sasswart/gin-in-a-can/openapi/schema"
+	"github.com/sasswart/gin-in-a-can/openapi3"
+	"github.com/sasswart/gin-in-a-can/openapi3/media"
+	"github.com/sasswart/gin-in-a-can/openapi3/operation"
+	"github.com/sasswart/gin-in-a-can/openapi3/path"
+	"github.com/sasswart/gin-in-a-can/openapi3/request"
+	"github.com/sasswart/gin-in-a-can/openapi3/response"
+	"github.com/sasswart/gin-in-a-can/openapi3/schema"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"net/http"
 )
 
 var md = tree.Metadata{"package": "testPackage", "some": "metadata"}
 
-func OpenAPITree() *openapi.OpenAPI {
-	root := openapi.OpenAPI{
+func OpenAPITree() *openapi3.OpenAPI {
+	root := openapi3.OpenAPI{
 		Node: tree.Node{Name: "root"},
 	}
 	root.SetMetadata(md)

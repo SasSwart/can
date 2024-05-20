@@ -1,0 +1,31 @@
+class Client {
+  constructor(baseUrl, auth = null, contentType = 'application/json', debug = false) {
+    this.baseUrl = baseUrl;
+    this.auth = auth;
+    this.contentType = contentType;
+    this.debug = debug;
+  }
+
+  async provisionDelete(params) {
+    if (!params) {
+      throw new Error('params cannot be null');
+    }
+
+    const url = new URL('/provision', this.baseUrl);
+    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+    const options = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': this.contentType,
+        ...(this.auth && { 'Authorization': this.auth })
+      }
+    };
+
+    const response = await fetch(url, options);
+    if (this.debug) {
+      console.log('Request:', options, 'URL:', url);
+    }
+    return response;
+  }
+}

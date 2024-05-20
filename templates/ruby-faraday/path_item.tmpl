@@ -1,0 +1,21 @@
+require 'faraday'
+require 'json'
+
+class Client
+  def {{ $operation.GetName | SanitiseName }}(params)
+    raise ArgumentError, 'params cannot be nil' if params.nil?
+    raise ArgumentError, 'body cannot be nil' if body.nil?
+
+    url = URI.join(@base_url, '{{ .GetParent.Name }}').to_s
+    url += "?#{URI.encode_www_form(params)}"
+
+    response = Faraday.{{ $name | ToLower }}(url) do |req|
+      req.headers['Content-Type'] = @content_type
+      req.headers['Authorization'] = @auth if @auth
+      req.options.params_encoder = Faraday::FlatParamsEncoder
+    end
+
+    log_request(response.env) if @debug
+    response
+  end
+end

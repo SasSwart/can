@@ -1,10 +1,10 @@
 package request_test
 
 import (
-	"github.com/sasswart/gin-in-a-can/openapi"
-	"github.com/sasswart/gin-in-a-can/openapi/media"
-	"github.com/sasswart/gin-in-a-can/openapi/request"
-	"github.com/sasswart/gin-in-a-can/openapi/schema"
+	"github.com/sasswart/gin-in-a-can/openapi3"
+	"github.com/sasswart/gin-in-a-can/openapi3/media"
+	"github.com/sasswart/gin-in-a-can/openapi3/request"
+	"github.com/sasswart/gin-in-a-can/openapi3/schema"
 	"github.com/sasswart/gin-in-a-can/test"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"net/http"
@@ -13,7 +13,7 @@ import (
 )
 
 func TestOpenAPI_LoadsRequestBodyValidation(t *testing.T) {
-	apiSpec, _ := openapi.LoadFromYaml("../../" + test.OpenapiFile)
+	apiSpec, _ := openapi3.LoadFromYaml("../../" + test.OpenapiFile)
 
 	traversable := test.Dig(apiSpec, test.Endpoint, http.MethodPost, request.BodyKey, media.JSONKey, schema.PropertyKey, "name")
 	name := traversable.(*schema.Schema)
