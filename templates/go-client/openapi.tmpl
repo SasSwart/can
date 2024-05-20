@@ -62,8 +62,11 @@ func (c *Client) createUrl(pathPattern string, vals url.Values) (string, error) 
 		portString := strconv.Itoa(port)
 		url = url + ":" + portString
 	}
-	url = url + pathPattern  + vals.Encode()
-	return url, nil
+	queryParams := vals.Encode()
+	if queryParams != "" {
+		return url + pathPattern + "?" + queryParams, nil
+	}
+	return url + pathPattern, nil
 }
 
 // NewClient allows you to specify configuration of your client. This function allows you to specify optional

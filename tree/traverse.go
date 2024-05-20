@@ -1,6 +1,8 @@
 package tree
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Traverser interface {
 	GetChildren() map[string]NodeTraverser

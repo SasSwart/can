@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"fmt"
+	"github.com/sasswart/gin-in-a-can/config"
 	"github.com/sasswart/gin-in-a-can/errors"
 	"github.com/sasswart/gin-in-a-can/tree"
 	"path/filepath"
@@ -36,12 +38,21 @@ type Schema struct {
 
 func (s *Schema) GetChildren() map[string]tree.NodeTraverser {
 	children := map[string]tree.NodeTraverser{}
-	for name := range s.Properties {
-		property := s.Properties[name]
-		children[name] = property
-	}
-	if s.Items != nil {
-		children[ItemsKey] = s.Items
+	switch s.Type {
+	case "object":
+		for name := range s.Properties {
+			property := s.Properties[name]
+			children[name] = property
+		}
+	case "array":
+		if s.Items != nil {
+			children[ItemsKey] = s.Items
+			if config.Debug {
+				fmt.Printf("Found Items %v for array node schema %v\n", s.Items, s)
+			}
+		} else {
+			fmt.Println("Array with nil Items found")
+		}
 	}
 	return children
 }
@@ -90,11 +101,12 @@ func (s *Schema) GetName() []string {
 	if s.GetParent() == nil {
 		return []string{s.Name}
 	}
+	parentName := s.GetParent().GetName()
 	switch s.Name {
 	case PropertyKey:
-		return append(s.GetParent().GetName(), "Model")
+		return append(parentName, "Model")
 	case ItemsKey:
-		return append(s.GetParent().GetName(), "Item")
+		return append(parentName, "Item")
 	}
-	return append(s.GetParent().GetName(), s.Name)
+	return append(parentName, s.Name)
 }
